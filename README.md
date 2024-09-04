@@ -20,3 +20,7 @@ $ conda remove -n test --all
 ```
 
 ### Getting started
+
+```shell
+$ # python -m pytest .
+```
