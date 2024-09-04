@@ -1,4 +1,6 @@
-# .coveragerc to control coverage.py
+# .coveragerc
+# to control coverage.py
+
 [run]
 omit =
   *__init__*
