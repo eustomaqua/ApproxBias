@@ -11,13 +11,13 @@ Does machine bring in extra bias in learning? Approximating discrimination withi
 
 ```shell
 # Create a virtual environment
-conda create -n test python=3.9
+conda create -n test python=3.11
 source activate test
 
 # Install packages
-pip install -r requirements.txt
 pip install pytest==8.3.2
 pip install carbontracker==1.2.5
+pip install -r requirements.txt
 
 # Delete the virtual environment
 source deactivate
