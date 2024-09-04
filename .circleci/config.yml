@@ -1,10 +1,13 @@
 # version: 2
 
-version: 2.1
-orbs:
-  python: circleci/python@2.0.3
+# version: 2.1
+# orbs:
+#   python: circleci/python@2.0.3
 jobs:
   build-and-test:  # this can be any name you choose
+    docker:
+      - image: cimg/python:3.11.9
+      # - image: cimg/python:3.12.5
     # use the default executor defined within the orb
     executor: python/default
     steps:
