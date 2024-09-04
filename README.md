@@ -15,6 +15,7 @@ conda create -n test python=3.11
 source activate test
 
 # Install packages
+pip install --upgrade pip
 pip install pytest==8.3.2
 pip install carbontracker==1.2.5
 pip install -r requirements.txt
