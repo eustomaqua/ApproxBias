@@ -16,15 +16,14 @@ jobs:
           command: |  # multiple commands
             pip install --upgrade setuptools pip
             pip install -r requirements.txt
+            pip install carbontracker pytest
             pip install coverage coveralls pytest-xdist
             coverage run -m pytest --ignore-glob="*/excl_test_*"
             coverage report
             coverage html
-            rm *.png && rm *.csv && rm *.log
+            # rm *.png && rm *.csv && rm *.log
             coverage xml
-            export CODACY_PROJECT_TOKEN=7e7e14940a6b4a918c535adb0965b10f
-            bash <(curl -Ls https://coverage.codacy.com/get.sh)
-            export COVERALLS_REPO_TOKEN=MObRtHkR5WuY1WurFnTTa2ucbWGg9GWJW
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -33,3 +32,9 @@ workflows:
   main:
     jobs:
       - build-and-test
+
+env:
+  global:
+    - CODACY_PROJECT_TOKEN=7e7e14940a6b4a918c535adb0965b10f
+    - COVERALLS_REPO_TOKEN=MObRtHkR5WuY1WurFnTTa2ucbWGg9GWJW
+    # export xx
