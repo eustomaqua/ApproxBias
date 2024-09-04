@@ -8,9 +8,6 @@
 #
 
 
-import math
-import pdb
-
 import numpy as np
 import numba
 
@@ -59,8 +56,6 @@ def sub_accelerator_smaler(X_yfx, Ai, idx_y_fx, i, m2):
     num_j += 1
     j -= 1
   return min_js
-
-  return
 
 
 @numba.jit(nopython=True)

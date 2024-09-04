@@ -10,9 +10,6 @@
 # 
 
 
-import math
-import pdb
-
 import numpy as np
 import numba
 
@@ -92,7 +89,7 @@ idx_Ai_Sjs: a list of lists, where each element is a list of np.ndarrays
 # In face of one sensitive attribute with binary values, that is, na=1
 #
 # For a certain bi-valued sensitive attribute $a_i\in \mathcal{A}_i =\{
-# 0,1\}$, a dataset S can be  $a_i=1$ 
+# 0,1\}$, a dataset S can be  $a_i=1$
 #
 @fantasy_timer
 @numba.jit(nopython=True)
@@ -121,8 +118,8 @@ def DirectDist_nonbin(X_nA_y, idx_Sjs):
 # that is, na>=2, na\in\mathbb{Z}_+
 #
 # This is the general case, where we have several sensitive attributes
-# $\bm{a}= [a_1,a_2,...,n_{n_a}]^\mathsf{T}$ and each $a_i\in 
-# \mathcal{A} =\{1,2,...,n_{a_i}\}$, where $n_{a_i}$ is the number of 
+# $\bm{a}= [a_1,a_2,...,n_{n_a}]^\mathsf{T}$ and each $a_i\in
+# \mathcal{A} =\{1,2,...,n_{a_i}\}$, where $n_{a_i}$ is the number of
 # values for this sensitive attribute $a_i (1\leq i\leq n_a)$
 #
 @fantasy_timer

@@ -4,8 +4,8 @@
 #
 
 
-import numpy as np
-import pdb
+# import numpy as np
+# import pdb
 from hfm.hfm_df import bias_degree_bin, bias_degree_nonbin
 
 
