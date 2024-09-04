@@ -1,0 +1,39 @@
+# version: 2
+
+version: 2.1
+orbs:
+  python: circleci/python@2.0.3
+jobs:
+  build-and-test:  # this can be any name you choose
+    # use the default executor defined within the orb
+    executor: python/default
+    steps:
+      - checkout  # checkout source code
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: Run tests
+          command: |  # multiple commands
+            pip install --upgrade setuptools pip
+            pip install -r requirements.txt
+            pip install coverage coveralls pytest
+            coverage run -m pytest --ignore-glob="*/excl_test_*"
+            coverage report
+            coverage html
+            rm *.png && rm *.csv && rm *.log
+            coverage xml
+            # export CODACY_PROJECT_TOKEN=7e7e14940a6b4a918c535adb0965b10f
+            bash <(curl -Ls https://coverage.codacy.com/get.sh)
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .
+workflows:
+  main:
+    jobs:
+      - build-and-test
+
+env:
+  global:
+    - COVERALLS_REPO_TOKEN=MObRtHkR5WuY1WurFnTTa2ucbWGg9GWJW
+    - CODACY_PROJECT_TOKEN=7e7e14940a6b4a918c535adb0965b10f
