@@ -3,7 +3,7 @@
 # Usage: to approximate the distance quickly
 #
 # Author: Yijun Bian
-# 2. Approximating Discrimination Within Models When Faced With Several 
+# 2. Approximating Discrimination Within Models When Faced With Several
 #    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
 #
 
@@ -91,7 +91,7 @@ def sub_accelerator_larger(X_yfx, Ai, idx_y_fx, i, m2):
 # ------------------------------------------
 # Algorithm 3. AcceleDist
 
-""" parameters
+"""parameters
 X_nA_y: np.ndarray, size (n, 1+n_d)
 A_i: np.ndarray, size (n,)
      indicating which group the instance belongs to,
@@ -152,7 +152,7 @@ def orthogonal_weight(n_d, n_e=3):
 def ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e=2):
   n, n_d = X_nA_y.shape  # n_d-1: number of non-sensitive attributes
   d_max, d_avg = [], []
-  for j in range(m1):
+  for _ in range(m1):  # for j in
 
     # Take two orthogonal vectors $w_0$ and $w_1$ where each $w_k
     # \in [-1,+1]^{1+n_x} (k=\{0,1\})$
@@ -208,7 +208,8 @@ def ApproxDist_nonbin_mpver(X_nA_y, A_j, m1, m2, n_e=2, pool=None):
 
 @fantasy_timer
 def ExtendDist_multiver_mp(X_nA_y, A, m1, m2, n_e=3, pool=None):
-  n, n_a = A.shape  # n_a: number of sensitive attributes
+  # n, n_a = A.shape  # n: number of instances
+  _, n_a = A.shape  # n_a: number of sensitive attributes
 
   X_nA_y_map = [X_nA_y] * n_a
   A_i_map = [A[:, j].copy() for j in range(n_a)]

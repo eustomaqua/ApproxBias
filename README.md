@@ -11,7 +11,7 @@ Does machine bring in extra bias in learning? Approximating discrimination withi
 
 ```shell
 # Create a virtual environment
-conda create -n test python=3.8
+conda create -n test python=3.11
 source activate test
 
 # Install packages

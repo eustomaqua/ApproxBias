@@ -22,7 +22,7 @@ from hfm.dist_drt import DistDirect_Euclidean
 # ------------------------------------------
 # Algorithm 2: Sub-routes
 
-""" parameters
+"""parameters
 # X, A, y, fx: np.ndarray
 # idx_S1: np.ndarray of `np.bool_`
 # m1, m2: scalar, hyperparameters
@@ -161,9 +161,10 @@ def weight_generator(n_d):
 @fantasy_timer
 def ApproxDist_bin(X_and_yddot, A, idx_S1, m1, m2):
   idx_S0 = ~idx_S1
-  n, n_d = X_and_yddot.shape
+  # n, n_d = X_and_yddot.shape
+  n_d = X_and_yddot.shape[1]
   d_max = []
-  for k in range(m1):
+  for _ in range(m1):  # for k in
     vec_w = weight_generator(n_d - 1)
     tmp, _ = AcceleDist_bin(
         X_and_yddot, A, idx_S0, idx_S1, m2, vec_w)
@@ -176,7 +177,7 @@ def ApproxDist_bin_revised(X_and_yddot, A, idx_S1, m1, m2):
   idx_S0 = ~idx_S1
   n, n_d = X_and_yddot.shape
   d_max, d_avg = [], []
-  for k in range(m1):
+  for _ in range(m1):  # for k in
     vec_w = weight_generator(n_d - 1)
     tmp, _ = AcceleDist_bin(
         X_and_yddot, A, idx_S0, idx_S1, m2, vec_w)

@@ -5,7 +5,7 @@
 # Author: Yijun Bian
 # 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
 #    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
-# 2. Approximating Discrimination Within Models When Faced With Several 
+# 2. Approximating Discrimination Within Models When Faced With Several
 #    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
 #
 

@@ -5,9 +5,9 @@
 # Author: Yijun Bian
 # 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
 #    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
-# 2. Approximating Discrimination Within Models When Faced With Several 
+# 2. Approximating Discrimination Within Models When Faced With Several
 #    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
-# 
+#
 
 
 import numpy as np
@@ -37,7 +37,7 @@ from utils.decorators import fantasy_timer
 
 
 # ------------------------------------------
-""" Parameters
+"""Parameters
 n : number of instances in a dataset
 nd: number of non-sensitive features
 na: number of sensitive attributes
@@ -71,7 +71,7 @@ def DistDirect_mediator(X_nA_y, idx_Si):
 
 
 # ------------------------------------------
-""" Parameters
+"""Parameters
 X_nA_y    : a matrix with size of (n, 1+nd)
 
 idx_Si    : an np.ndarray with the size of (n,)
