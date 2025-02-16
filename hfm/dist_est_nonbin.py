@@ -91,15 +91,15 @@ def sub_accelerator_larger(X_yfx, Ai, idx_y_fx, i, m2):
 # ------------------------------------------
 # Algorithm 3. AcceleDist
 
-""" parameters
-X_nA_y: np.ndarray, size (n, 1+n_d)
-A_i: np.ndarray, size (n,)
-     indicating which group the instance belongs to,
-     corresponding to one single sensitive attribute
-m1 : scalar, number of repetition
-m2 : scalar, number of comparison
-vec_w: np.ndarray, size (1+n_d,)
-"""
+# """ parameters
+# X_nA_y: np.ndarray, size (n, 1+n_d)
+# A_i: np.ndarray, size (n,)
+#      indicating which group the instance belongs to,
+#      corresponding to one single sensitive attribute
+# m1 : scalar, number of repetition
+# m2 : scalar, number of comparison
+# vec_w: np.ndarray, size (1+n_d,)
+# """
 
 
 @fantasy_timer
@@ -150,7 +150,8 @@ def orthogonal_weight(n_d, n_e=3):
 
 @fantasy_timer
 def ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e=2):
-    n, n_d = X_nA_y.shape  # n_d-1: number of non-sensitive attributes
+    n, n_d = X_nA_y.shape  # n_d-1: number of non-sen att(s)
+    # n_d-1: number of non-sensitive attributes
     d_max, d_avg = [], []
     for _ in range(m1):  # for j in
 

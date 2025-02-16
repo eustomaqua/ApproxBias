@@ -37,15 +37,16 @@ from utils.decorators import fantasy_timer
 
 
 # ------------------------------------------
-""" Parameters
-n : number of instances in a dataset
-nd: number of non-sensitive features
-na: number of sensitive attributes
-nc: number of classes/labels
-
-X_nA_y: a matrix with size of (n, 1+nd)
-  Non-sensitive attributes of instances and their corresponding labels
-"""
+# """ Parameters
+# n : number of instances in a dataset
+# nd: number of non-sensitive features
+# na: number of sensitive attributes
+# nc: number of classes/labels
+#
+# X_nA_y: a matrix with size of (n, 1+nd)
+#   Non-sensitive attributes of instances and their corresponding
+#   labels
+# """
 
 
 @numba.jit(nopython=True)
@@ -77,19 +78,21 @@ X_nA_y    : a matrix with size of (n, 1+nd)
 idx_Si    : an np.ndarray with the size of (n,)
             whether the corresponding instance belongs to the privileged
             group (if True) or not.
-idx_Sjs   : a list of np.ndarrays, of which each indicates whether the
-            instance belongs to different subgroups divided by the values
-            of this one sensitive attribute.
+idx_Sjs   : a list of np.ndarrays, of which each indicates whether
+            the instance belongs to different subgroups divided by
+            the values of this one sensitive attribute.
 idx_Ai_Sjs: a list of lists, where each element is a list of np.ndarrays
-            Basically, idx_Ai_Sjs = list of [idx_Sjs,], and idx_Si is a
-            special circumstance of idx_Sjs when $a_i$ is bi-valued.
+            Basically, idx_Ai_Sjs = list of [idx_Sjs,], and idx_Si
+            is a special circumstance of idx_Sjs when $a_i$ is
+            bi-valued.
 """
 
 
-# In face of one sensitive attribute with binary values, that is, na=1
+# In face of one sensitive attribute with binary values, that is,
+# na=1
 #
-# For a certain bi-valued sensitive attribute $a_i\in \mathcal{A}_i =\{
-# 0,1\}$, a dataset S can be  $a_i=1$
+# For a certain bi-valued sensitive attribute $a_i\in \mathcal{A}_i
+# =\{ 0,1\}$, a dataset S can be  $a_i=1$
 #
 @fantasy_timer
 @numba.jit(nopython=True)

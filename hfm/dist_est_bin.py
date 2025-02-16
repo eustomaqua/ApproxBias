@@ -22,21 +22,22 @@ from hfm.dist_drt import DistDirect_Euclidean
 # ------------------------------------------
 # Algorithm 2: Sub-routes
 
-""" parameters
-# X, A, y, fx: np.ndarray
-# idx_S1: np.ndarray of `np.bool_`
-# m1, m2: scalar, hyperparameters
-
-X : np.ndarray, size (n, n_d)
-A : np.ndarray, size (n, n_a)
-y : np.ndarray, size (n,), true labels
-fx: np.ndarray, size (n,), prediction of one classifier
-idx_S1: np.ndarray, size (n,)
-      whether the instance belongs to the privileged group (if True)
-m1: scalar, number of repetition
-m2: scalar, number of comparison
-vec_w : np.ndarray, size (1+n_d,)
-"""
+# """ parameters
+# # X, A, y, fx: np.ndarray
+# # idx_S1: np.ndarray of `np.bool_`
+# # m1, m2: scalar, hyperparameters
+#
+# X : np.ndarray, size (n, n_d)
+# A : np.ndarray, size (n, n_a)
+# y : np.ndarray, size (n,), true labels
+# fx: np.ndarray, size (n,), prediction of one classifier
+# idx_S1: np.ndarray, size (n,)
+#       whether the instance belongs to the privileged group (if
+#       True)
+# m1: scalar, number of repetition
+# m2: scalar, number of comparison
+# vec_w : np.ndarray, size (1+n_d,)
+# """
 
 
 @numba.jit(nopython=True)
