@@ -22,7 +22,7 @@ from hfm.dist_drt import DistDirect_Euclidean
 # ------------------------------------------
 # Algorithm 2: Sub-routes
 
-"""parameters
+""" parameters
 # X, A, y, fx: np.ndarray
 # idx_S1: np.ndarray of `np.bool_`
 # m1, m2: scalar, hyperparameters
@@ -75,6 +75,7 @@ def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
         num_j += 1
         j -= 1
     # Find the minimum among them, recorded as d_min^s
+    del A_anchor
     return min_js
 
 

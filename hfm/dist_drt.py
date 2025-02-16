@@ -37,7 +37,7 @@ from utils.decorators import fantasy_timer
 
 
 # ------------------------------------------
-"""Parameters
+""" Parameters
 n : number of instances in a dataset
 nd: number of non-sensitive features
 na: number of sensitive attributes

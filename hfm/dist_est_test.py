@@ -6,15 +6,16 @@
 
 
 from hfm.dist_est_bin import (
-    projector, weight_generator, AcceleDist_bin, ApproxDist_bin,
+    # projector,
+    weight_generator, AcceleDist_bin, ApproxDist_bin,
     ApproxDist_bin_revised)
 from hfm.dist_est_nonbin import (
     orthogonal_weight, AcceleDist_nonbin, ApproxDist_nonbin,
-    ApproxDist_nonbin_mpver, ExtendDist_multiver_mp)
+    ApproxDist_nonbin_mpver)  # , ExtendDist_multiver_mp)
 
 import numpy as np
 from pathos import multiprocessing as pp
-import pdb
+# import pdb
 from hfm.dist_drt import (
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
 # from utils.verifiers import check_equal
@@ -73,11 +74,11 @@ def compare_accele(nai, m1, m2):
     # pdb.set_trace()
 
     '''
-  assert tmp_1[0] == tmp_2[0] == tmp_3[0]  # >= tmp_4[0]
-  assert tmp_1[1] == tmp_2[1] == tmp_3[1]  # >= tmp_4[1]
-  assert tmp_3[0] >= tmp_4[0] or check_equal(tmp_3[0], tmp_4[0])
-  assert tmp_3[1] >= tmp_4[1] or check_equal(tmp_3[1], tmp_4[1])
-  '''
+    assert tmp_1[0] == tmp_2[0] == tmp_3[0]  # >= tmp_4[0]
+    assert tmp_1[1] == tmp_2[1] == tmp_3[1]  # >= tmp_4[1]
+    assert tmp_3[0] >= tmp_4[0] or check_equal(tmp_3[0], tmp_4[0])
+    assert tmp_3[1] >= tmp_4[1] or check_equal(tmp_3[1], tmp_4[1])
+    '''
 
     no_less_than_check([tmp_1[0], tmp_2[0], tmp_3[0]], res_2[0][0])
     no_less_than_check([tmp_1[1], tmp_2[1], tmp_3[1]], res_2[0][1])
@@ -92,7 +93,7 @@ def compare_approx(nai, m1, m2, n_e=2):
     X_nA_y, A, indices, vec_w = generate_dat(n, nd, na, nai)
     k = 0
     idx_S1, Ap = indices[k][1], A[:, k]
-    idx_S0 = ~idx_S1
+    # idx_S0 = ~idx_S1
     Aq = Ap.copy()
     Aq[Ap > 1] = 0
 
@@ -131,13 +132,13 @@ def compare_approx(nai, m1, m2, n_e=2):
     # assert ans_1 == ans_2[0] == ans_3[0] == ans_4 == ans_5[0] >= ans_6[0]
     # assert ans_2[1] == ans_3[1] == ans_5[1] >= ans_6[1]  # avg  # ↑ max
     '''
-  assert ans_1 >= res_2[0][0]
-  assert ans_2[0] >= res_2[0][0] and ans_2[1] >= res_2[0][1]
-  assert ans_3[0] >= res_2[0][0] and ans_3[1] >= res_2[0][1]
-  assert ans_4 >= res_2[0][0]
-  assert ans_5[0] >= res_2[0][0] and ans_5[1] >= res_2[0][1]
-  assert ans_6[0] >= res_3[0][0] and ans_6[1] >= res_3[0][1]
-  '''
+    assert ans_1 >= res_2[0][0]
+    assert ans_2[0] >= res_2[0][0] and ans_2[1] >= res_2[0][1]
+    assert ans_3[0] >= res_2[0][0] and ans_3[1] >= res_2[0][1]
+    assert ans_4 >= res_2[0][0]
+    assert ans_5[0] >= res_2[0][0] and ans_5[1] >= res_2[0][1]
+    assert ans_6[0] >= res_3[0][0] and ans_6[1] >= res_3[0][1]
+    '''
 
     # assert ans_2[0] >= res_2[0] or check_equal(
     #     ans_2[0], res_2[0])     # max
@@ -146,6 +147,7 @@ def compare_approx(nai, m1, m2, n_e=2):
     # assert ans_1 >= res_2[0] or check_equal(
     #     ans_1, res_2[0])        # max
 
+    del vec_w
     return
 
 
@@ -197,6 +199,8 @@ def compare_multiver(nai, m1, m2, n_e=2):
     no_less_than_check(res_1, tmp_1[0])
     assert tmp_7[0][k] == tmp_4[0]  # max
     assert tmp_7[1][k] == tmp_4[1]  # avg
+
+    del W
     return
 
 

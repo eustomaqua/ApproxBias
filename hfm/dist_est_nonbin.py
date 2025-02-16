@@ -91,7 +91,7 @@ def sub_accelerator_larger(X_yfx, Ai, idx_y_fx, i, m2):
 # ------------------------------------------
 # Algorithm 3. AcceleDist
 
-"""parameters
+""" parameters
 X_nA_y: np.ndarray, size (n, 1+n_d)
 A_i: np.ndarray, size (n,)
      indicating which group the instance belongs to,
@@ -159,8 +159,8 @@ def ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e=2):
         # Or take three orthogonal vectors. Your choice.
         W, _ = orthogonal_weight(n_d, n_e)
 
-        tmp = [
-            AcceleDist_nonbin(X_nA_y, A_j, m2, W[k]) for k in range(n_e)]
+        tmp = [AcceleDist_nonbin(
+            X_nA_y, A_j, m2, W[k]) for k in range(n_e)]
         tmp, _ = zip(*tmp)
         t_max, t_avg = zip(*tmp)
 
