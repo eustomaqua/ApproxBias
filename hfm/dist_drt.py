@@ -50,24 +50,24 @@ X_nA_y: a matrix with size of (n, 1+nd)
 
 @numba.jit(nopython=True)
 def DistDirect_Euclidean(ele_i, ele_ic):
-  return float(np.linalg.norm(ele_i - ele_ic))
+    return float(np.linalg.norm(ele_i - ele_ic))
 
 
 @numba.jit(nopython=True)
 def DistDirect_halfway_min(ele_i, Si_c):
-  elements = [DistDirect_Euclidean(
-      ele_i, ele_ic) for ele_ic in Si_c]
-  return min(elements)  # float
+    elements = [DistDirect_Euclidean(
+        ele_i, ele_ic) for ele_ic in Si_c]
+    return min(elements)  # float
 
 
 @numba.jit(nopython=True)
 def DistDirect_mediator(X_nA_y, idx_Si):
-  Sj, Sj_c = X_nA_y[idx_Si], X_nA_y[~idx_Si]
-  if len(Sj) == 0 or len(Sj_c) == 0:
-    return 0., 0.  # default if Sj is an empty set
-  elements = [DistDirect_halfway_min(
-      ele_i, Sj_c) for ele_i in Sj]
-  return max(elements), sum(elements)
+    Sj, Sj_c = X_nA_y[idx_Si], X_nA_y[~idx_Si]
+    if len(Sj) == 0 or len(Sj_c) == 0:
+        return 0., 0.  # default if Sj is an empty set
+    elements = [DistDirect_halfway_min(
+        ele_i, Sj_c) for ele_i in Sj]
+    return max(elements), sum(elements)
 
 
 # ------------------------------------------
@@ -94,10 +94,10 @@ idx_Ai_Sjs: a list of lists, where each element is a list of np.ndarrays
 @fantasy_timer
 @numba.jit(nopython=True)
 def DirectDist_bin(X_nA_y, idx_Si):
-  half_1, half_1avg = DistDirect_mediator(X_nA_y, idx_Si)
-  half_2, half_2avg = DistDirect_mediator(X_nA_y, ~idx_Si)
-  tmp = (half_1avg + half_2avg) / len(X_nA_y)
-  return max(half_1, half_2), tmp
+    half_1, half_1avg = DistDirect_mediator(X_nA_y, idx_Si)
+    half_2, half_2avg = DistDirect_mediator(X_nA_y, ~idx_Si)
+    tmp = (half_1avg + half_2avg) / len(X_nA_y)
+    return max(half_1, half_2), tmp
 
 
 # In face of one sensitive attribute with multiple values, in other
@@ -107,11 +107,11 @@ def DirectDist_bin(X_nA_y, idx_Si):
 #
 @fantasy_timer
 def DirectDist_nonbin(X_nA_y, idx_Sjs):
-  half_mid = [DistDirect_mediator(
-      X_nA_y, idx_Si) for idx_Si in idx_Sjs]
-  half_pl_max, half_pl_avg = zip(*half_mid)
-  n = len(X_nA_y)
-  return max(half_pl_max), sum(half_pl_avg) / n
+    half_mid = [DistDirect_mediator(
+        X_nA_y, idx_Si) for idx_Si in idx_Sjs]
+    half_pl_max, half_pl_avg = zip(*half_mid)
+    n = len(X_nA_y)
+    return max(half_pl_max), sum(half_pl_avg) / n
 
 
 # In face of several sensitive attributes with binary/multiple values,
@@ -124,13 +124,13 @@ def DirectDist_nonbin(X_nA_y, idx_Sjs):
 #
 @fantasy_timer
 def DirectDist_multiver(X_nA_y, idx_Ai_Sjs):
-  half_mid = [DirectDist_nonbin(
-      X_nA_y, idx_Sjs) for idx_Sjs in idx_Ai_Sjs]
-  half_mid, half_ut = zip(*half_mid)
-  half_pl_max, half_pl_avg = zip(*half_mid)
-  n_a = len(idx_Ai_Sjs)
-  return max(half_pl_max), sum(half_pl_avg) / n_a, (
-      half_pl_max, half_pl_avg, half_ut)
+    half_mid = [DirectDist_nonbin(
+        X_nA_y, idx_Sjs) for idx_Sjs in idx_Ai_Sjs]
+    half_mid, half_ut = zip(*half_mid)
+    half_pl_max, half_pl_avg = zip(*half_mid)
+    n_a = len(idx_Ai_Sjs)
+    return max(half_pl_max), sum(half_pl_avg) / n_a, (
+        half_pl_max, half_pl_avg, half_ut)
 
 
 # ------------------------------------------

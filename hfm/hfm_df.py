@@ -34,11 +34,11 @@ from utils.verifiers import check_zero
 
 @fantasy_timer
 def bias_degree_bin(Dy_dis, Df_dis):
-  if (Dy_dis == 0) and (Df_dis == 0):
-    tmp = 1.
-  else:
-    tmp = Df_dis / check_zero(Dy_dis)
-  return tmp - 1.
+    if (Dy_dis == 0) and (Df_dis == 0):
+        tmp = 1.
+    else:
+        tmp = Df_dis / check_zero(Dy_dis)
+    return tmp - 1.
 
 
 # ---------------------------------------------
@@ -47,12 +47,12 @@ def bias_degree_bin(Dy_dis, Df_dis):
 
 @fantasy_timer
 def bias_degree_nonbin(Dy_dis, Df_dis):
-  if (Dy_dis == 0) and (Df_dis == 0):
-    tmp = 1.
-  else:
-    tmp = Df_dis / check_zero(Dy_dis)
-  tmp = check_zero(tmp)
-  return np.log10(tmp)
+    if (Dy_dis == 0) and (Df_dis == 0):
+        tmp = 1.
+    else:
+        tmp = Df_dis / check_zero(Dy_dis)
+    tmp = check_zero(tmp)
+    return np.log10(tmp)
 
 
 # ---------------------------------------------
