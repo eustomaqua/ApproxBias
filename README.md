@@ -49,7 +49,7 @@ In other words, we provide the evaluation of extra discrimination for three case
 
 ### Requirements
 
-We developed it with **Python=3.8** and also tested it with **Python=3.11** at the time of release. Note to choose the `requirements.txt` accordingly. 
+We developed it with **Python 3.8** and also tested it with **Python 3.11** at the time of release. Note to choose the `requirements.txt` accordingly. 
 
 
 ```shell

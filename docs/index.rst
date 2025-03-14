@@ -24,26 +24,29 @@ Welcome to the ApproxBias's documentation. This is to help you reproduce our wor
 #. Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes `[arXiv 2408.06099] <https://arxiv.org/abs/2408.06099>`_
 
 
-We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes. *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
+We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
 
-- To get started quickly, see :doc:`an example <quickstart>` here
-- To understand the methodology, see :doc:`methodology.rst <methodology>`
-- To reproduce our results, see :doc:`reproduction.rst <reproduction>`
-- To dive into more details, see :doc:`documentation.rst <documentation>`
+- To get started quickly, see :doc:`an example <posts/quickstart>` here
+- To reproduce our results, see :doc:`reproduction.rst <posts/reproduction>`
+- To dive into more details, see :doc:`documentation.rst <posts/documentation>`
+
+.. - To understand the methodology, see :doc:`methodology.rst <static/methodology>`
 
 
 --------
 
 .. Taking a short cut
 .. Shortcuts
+.. ==================
 
 SHORTCUTS
-==================
+^^^^^^^^^^
 .. toctree::
    :maxdepth: 1
 
-   quickstart.rst
-   methodology.rst
-   reproduction.rst
-   documentation.rst
+   posts/quickstart.rst
+   posts/reproduction.rst
+   posts/documentation.rst
 
+
+.. static/methodology.rst
