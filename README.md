@@ -1,6 +1,7 @@
 # ApproxBias
 
 ![CircleCI](https://img.shields.io/circleci/build/github/eustomaqua/ApproxBias/master)
+[![Documentation Status](https://readthedocs.org/projects/approxbias/badge/?version=latest)](https://approxbias.readthedocs.io/en/latest/?badge=latest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) 
 
@@ -21,7 +22,7 @@ Note that the computation of HFM  # a brief example , quick tutorial
 
 Here we release the code of proposed methods from our following papers
 - \[**P1**\] *Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly* [[arXiv]](https://arxiv.org/abs/2405.09251)
-- \[**P2**\] *Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes*** [[arXiv]](https://arxiv.org/abs/2408.06099)
+- \[**P2**\] *Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes* [[arXiv]](https://arxiv.org/abs/2408.06099)
 
 
 ## Getting started
@@ -118,7 +119,7 @@ from hfm.dist_est_bin import ApproxDist_bin
 # param m2: designated number for comparison
 hat_D, _ = ApproxDist_bin(X_nA_y, A[:, k], sa_idx[k][0], m1, m2)
 hat_Df, _ = ApproxDist_bin(X_nA_fx, A[:, k],sa_idx[k][0], m1, m2)
-hat_df_prev = bias_degree_bin(hat_D, hat_Df)
+hat_df_prev, _ = bias_degree_bin(hat_D, hat_Df)
 ```
 
 ```python
@@ -148,7 +149,7 @@ df_avg, _ = bias_degree_nonbin(D[1], Df[1])
 # If you'd like to compute the distances quicker
 from hfm.dist_est_nonbin import ExtendDist_multiver_mp
 hat_D = ExtendDist_multiver_mp(X_nA_y, A, m1, m2)[0][:-1]
-hat_Df = ExtendDist_multiver_mp(X_nA_fx, A, m1, m2)[0][-1]
+hat_Df = ExtendDist_multiver_mp(X_nA_fx, A, m1, m2)[0][:-1]
 # compute hat_Df, hat_df_{max, avg} analogously
 ```
 
@@ -164,7 +165,7 @@ You're welcome to adjust the parameters (except `priv_val`, which depends on the
 
 ## Additional information
 
-Kindly cite our papers please if you find this repository useful.
+Kindly cite our work please if you find this repository useful.
 
 ```bibtex
 @article{bian2024does,
@@ -174,7 +175,7 @@ Kindly cite our papers please if you find this repository useful.
   year    = {2024},
 }
 
-@Article{bian2024approximating,
+@article{bian2024approximating,
   author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
   title   = {Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes},
   journal = {arXiv preprint arXiv:2408.06099},
@@ -185,5 +186,4 @@ Kindly cite our papers please if you find this repository useful.
 ### Licence
 
 *ApproxBias* is released under the [MIT Licence](./LICENSE).
-
 

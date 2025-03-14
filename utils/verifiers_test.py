@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from utils.verifiers import CONST_ZERO, CONST_DIFF
+from utils.recorders import get_elogger
 
 
 def test_helper():
@@ -17,3 +18,13 @@ def test_helper():
     assert check_equal(0, CONST_DIFF / 2)
     assert check_equal(1e-8, 1e-9)
     assert not check_equal(1e-5, 1e-6)
+
+
+def test_saver():
+    logger = get_elogger('ApproxBias', 'test.log')
+    logger.info('Hello')
+    logger.debug('error')
+
+    import os
+    os.remove('test.log')
+    return
