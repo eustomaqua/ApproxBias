@@ -194,8 +194,8 @@ For multi-valued sen-att-s [#P2]_,
 .. - *Algorithm 2. ApproxDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 .. - *Algorithm 1. AcceleDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 
-- *Algorithm 3. ExtendDist*,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S)`
-- *Algorithm 2. ApproxDist*,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
+- *Algorithm 3. ExtendDist* calling algo2,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S)`
+- *Algorithm 2. ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
 - *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
 
 .. return max{d_max^(j) | j=1,..,n_a}, sum(d_avg^(j))/n_a
@@ -236,6 +236,10 @@ For one bi-valued sen-att [#P1]_,
 .. - *Algorithm 4. Simplified ApproxDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 .. - *Algorithm 1. AcceleDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 
-- *Algorithm 4. Simplified ApproxDist*,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
+- *Algorithm 4. Simplified ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
 - *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
+
+.. In this way, we reduce the high computational complexity :math:`\mathcal{O}(n^2)` of direct computation to :math:`\mathcal{O}(n\log n)`.
+
+In this way, we reduce the high computational complexity of the Hausdorff distance's direct computation from :math:`\mathcal{O}(n^2)` to :math:`\mathcal{O}(n\log n)`.
 

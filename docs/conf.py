@@ -5,9 +5,10 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# eustomaqua, Yijun
 
 project = 'ApproxBias'
-copyright = '2025, Yijun'
+copyright = '2025, Yj'
 author = 'Yijun Bian'
 release = '0.1.0'
 

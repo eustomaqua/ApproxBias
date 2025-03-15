@@ -26,8 +26,11 @@ We proposed a fairness measure named *harmonic fairness measure via manifolds (H
 
 - To get started quickly, see :doc:`an example <posts/quickstart>` here
 - To understand the methodology, see :doc:`methodology <posts/methodology>`
-- To reproduce our results, see :doc:`reproduction <posts/reproduction>`
-- To dive into more details, see :doc:`documentation <posts/documentation>`
+- To learn the model evaluation we use, see :doc:`evaluation <posts/evaluation>`
+
+
+.. - To reproduce our results, see :doc:`reproduction <posts/reproduction>`
+.. - To dive into more details, see :doc:`documentation <posts/documentation>`
 
 .. :doc:`methodology.rst <static/methodology>`
 .. Welcome to the ApproxBias's documentation. This is to help you reproduce our work in
@@ -46,8 +49,8 @@ SHORTCUTS
 
    posts/quickstart.rst
    posts/methodology.rst
-   posts/reproduction.rst
-   posts/documentation.rst
+   posts/evaluation.rst
 
-
+..    posts/reproduction.rst
+..    posts/documentation.rst
 .. static/methodology.rst

@@ -27,7 +27,8 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
 .. code-block:: console
   :linenos:
 
-  $ # Install Anaconda/miniconda
+  $ # Install Anaconda/miniconda if you didn't
+  $
   $ # Create a virtual environment
   $ conda create -n test python=3.11 # or 3.8
   $ source activate test
@@ -66,6 +67,13 @@ You may need to adjust the forms of the data you use as follows.
   sa_val = [[priv_val]+list(i - set({priv_val})) for i in sa_val]
   sa_idx = [[A[:, i] == k for k in j]  for i, j in enumerate(sa_val)]
   X_nA_fx = np.concatenate([fx.reshape(-1, 1).astype('float'), X], axis=1)
+
+  # How to modify `sa_val`, for example, if we have a list of privileged
+  # values to indicate their members, that is,
+  # param priv_val: a list of priv_vals, shape=(#sen-att,)
+  sa_val = [set(A[:, i]) for i in range(A.shape[1])]
+  sa_val = [[j]+list(i - set({j})) for i,j in zip(sa_val, priv_val)]
+  sa_idx = [[A[:, i] == k for k in j]  for i, j in enumerate(sa_val)]
 
 
 Here are examples of three aforementioned cases respectively.
@@ -179,4 +187,6 @@ For example,
   hat_D, tim_consumed = ExtendDist_multiver_mp(X_nA_y, A, m1, m2)
   hat_D = hat_D[:-1]
 
-To understand these distances and HFM, see :doc:`methodology <methodology>`
+.. To understand these distances and HFM, see :doc:`methodology <methodology>`
+
+To understand these distances and HFM in more detail, see :doc:`methodology <methodology>`.

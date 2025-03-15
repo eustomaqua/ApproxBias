@@ -18,33 +18,60 @@ Df, _ = ApproxDist_bin(X_nA_fx, A[:, 0], A[:, 0]==priv_val, m1, m2)
 The proposed fairness measure is called *harmonic fairness measure via manifolds (HFM)* with three 
 We provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. 
 Note that the computation of HFM  # a brief example , quick tutorial
--->
 
 Here we release the code of proposed methods from our following papers
+We release the code of proposed methods from our following papers here, to help researchers or people who are interested to reproduce our results
+-->
+
+We release the code of proposed methods from our following papers here, to help people who are interested in reproducing our results.
 - \[**P1**\] *Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly* [[arXiv]](https://arxiv.org/abs/2405.09251)
 - \[**P2**\] *Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes* [[arXiv]](https://arxiv.org/abs/2408.06099)
 
 
 ## Getting started
 
-<!--
-### Instructions
-
-
-# Load data: X, A, y
-# Then get X_nA_y, sa_val, sa_idx, and X_nA_fx
-
-# Load data: X, A, y; etc.
-# Load data: X, A, y; etc.
-
-
-### Citing this work
--->
-
 We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). HFM relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
 
-In other words, we provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. Here is a [short tutorial](#Examples) covering all the aforementioned cases and methods.
+In other words, we provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. Here is a [short tutorial](https://approxbias.readthedocs.io/en/latest/quickstart) covering all the aforementioned cases and methods.
 
+You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues).
+
+
+## Additional information
+
+If you find this repository useful, you may consider to cite our work.
+
+```bibtex
+@article{bian2024does,
+  author  = {Bian, Yijun and Luo, Yujie},
+  title   = {Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly},
+  journal = {arXiv preprint arXiv:2405.09251},
+  year    = {2024},
+}
+
+@article{bian2024approximating,
+  author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
+  title   = {Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes},
+  journal = {arXiv preprint arXiv:2408.06099},
+  year    = {2024},
+}
+```
+
+### Licence
+
+*ApproxBias* is released under the [MIT Licence](./LICENSE).
+
+
+
+
+
+
+
+
+
+<!--
+
+Here is a [short tutorial](#Examples) covering all the aforementioned cases and methods.
 
 
 ### Requirements
@@ -69,22 +96,7 @@ conda remove -n test --all
 ```
 
 
-
 ### Examples
-
-<!--
-# pip install carbontracker==1.2.5
-# python -m pytest .
-
-D, _ = DirectDist_bin(X_nA_y, sa_idx[k][0])
-Df, _ = DirectDist_bin(X_nA_fx, sa_idx[k][0])
-df_max, _ = bias_degree_bin(D[0], Df[0])
-df_avg, _ = bias_degree_bin(D[1], Df[1])  # not in [P1], added later
-
-D, _ = ApproxDist_bin(X_nA_y, A[:, k], sa_idx[k][0], m1, m2)
-Df, _ = ApproxDist_bin(X_nA_fx, A[:, k],sa_idx[k][0], m1, m2)
-from hfm.dist_est_nonbin import ApproxDist_nonbin_mpver
--->
 
 You may need to adjust the forms of the data you use as follows:
 
@@ -153,37 +165,47 @@ hat_Df = ExtendDist_multiver_mp(X_nA_fx, A, m1, m2)[0][:-1]
 # compute hat_Df, hat_df_{max, avg} analogously
 ```
 
-<!--
-You're free to adjust the parameters if needed or for potential better results. 
-
-PS. Mistakes may exist in the current version. Feel free to contact us or submit a pull request please if you find any. 
--->
-
 You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or submit a pull request.
-
-
 
 ## Additional information
 
 Kindly cite our work please if you find this repository useful.
 
-```bibtex
-@article{bian2024does,
-  author  = {Bian, Yijun and Luo, Yujie},
-  title   = {Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly},
-  journal = {arXiv preprint arXiv:2405.09251},
-  year    = {2024},
-}
+-->
 
-@article{bian2024approximating,
-  author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
-  title   = {Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes},
-  journal = {arXiv preprint arXiv:2408.06099},
-  year    = {2024},
-}
-```
 
-### Licence
 
-*ApproxBias* is released under the [MIT Licence](./LICENSE).
+
+
+<!--
+### Instructions
+
+
+# Load data: X, A, y
+# Then get X_nA_y, sa_val, sa_idx, and X_nA_fx
+
+# Load data: X, A, y; etc.
+# Load data: X, A, y; etc.
+
+
+### Citing this work
+-->
+<!--
+# pip install carbontracker==1.2.5
+# python -m pytest .
+
+D, _ = DirectDist_bin(X_nA_y, sa_idx[k][0])
+Df, _ = DirectDist_bin(X_nA_fx, sa_idx[k][0])
+df_max, _ = bias_degree_bin(D[0], Df[0])
+df_avg, _ = bias_degree_bin(D[1], Df[1])  # not in [P1], added later
+
+D, _ = ApproxDist_bin(X_nA_y, A[:, k], sa_idx[k][0], m1, m2)
+Df, _ = ApproxDist_bin(X_nA_fx, A[:, k],sa_idx[k][0], m1, m2)
+from hfm.dist_est_nonbin import ApproxDist_nonbin_mpver
+-->
+<!--
+You're free to adjust the parameters if needed or for potential better results. 
+
+PS. Mistakes may exist in the current version. Feel free to contact us or submit a pull request please if you find any. 
+-->
 
