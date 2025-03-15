@@ -178,3 +178,5 @@ For example,
   df_max, tim_elapsed = bias_degree_nonbin(D[0], Df[0])
   hat_D, tim_consumed = ExtendDist_multiver_mp(X_nA_y, A, m1, m2)
   hat_D = hat_D[:-1]
+
+To understand these distances and HFM, see :doc:`methodology <methodology>`

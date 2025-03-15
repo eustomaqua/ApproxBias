@@ -17,20 +17,20 @@ ApproxBias documentation
    :caption: Contents:
 
 
+Welcome to the ApproxBias's documentation. This is to help you reproduce our work from
 
-Welcome to the ApproxBias's documentation. This is to help you reproduce our work in
-
-#. Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly `[arXiv 2405.09251]* <https://arxiv.org/abs/2405.09251>`_
+#. Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly `[arXiv 2405.09251] <https://arxiv.org/abs/2405.09251>`_
 #. Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes `[arXiv 2408.06099] <https://arxiv.org/abs/2408.06099>`_
-
 
 We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
 
 - To get started quickly, see :doc:`an example <posts/quickstart>` here
-- To reproduce our results, see :doc:`reproduction.rst <posts/reproduction>`
-- To dive into more details, see :doc:`documentation.rst <posts/documentation>`
+- To understand the methodology, see :doc:`methodology <posts/methodology>`
+- To reproduce our results, see :doc:`reproduction <posts/reproduction>`
+- To dive into more details, see :doc:`documentation <posts/documentation>`
 
-.. - To understand the methodology, see :doc:`methodology.rst <static/methodology>`
+.. :doc:`methodology.rst <static/methodology>`
+.. Welcome to the ApproxBias's documentation. This is to help you reproduce our work in
 
 
 --------
@@ -45,6 +45,7 @@ SHORTCUTS
    :maxdepth: 1
 
    posts/quickstart.rst
+   posts/methodology.rst
    posts/reproduction.rst
    posts/documentation.rst
 
