@@ -196,7 +196,7 @@ For multi-valued sen-att-s [#P2]_,
 
 - *Algorithm 3. ExtendDist* calling algo2,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S)`
 - *Algorithm 2. ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
-- *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
+- *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`n\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`
 
 .. return max{d_max^(j) | j=1,..,n_a}, sum(d_avg^(j))/n_a
 .. d_max^(j), d_avg^(j) = ApproxDist({(mathbf_x,a)}, {ddot_y}; m1,m2)

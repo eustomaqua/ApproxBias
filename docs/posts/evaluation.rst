@@ -127,7 +127,7 @@ Performance-based metrics
    .. math::
       \mathrm{FPR} \triangleq \frac{FP}{TN+FP}
 
-9. miss rate (the smaller the better)
+9. The miss rate (the smaller the better)
    
    .. math::
       \mathrm{mis}= 1- \mathrm{TPR}
@@ -215,7 +215,7 @@ There are three statistical non-discrimination criteria [#B1]_: independence, se
 
 .. [#B1] Barocas, S., Hardt, M., and Narayanan, A. Fairness and machine learning. fairmlbook.org, 2019. (Chapters 3.4--3.10, cf. https://fairmlbook.org/)
 .. [#R1c] Dwork C, Hardt M, Pitassi T, Reingold O, & Zemel R (2012, January). Fairness through awareness. In proceedings of the 3rd innovations in theoretical computer science conference (pp. 214-226).
-.. [#R1b] Gajane P, & Pechenizkiy M (2018). On formalizing fairness in prediction with machine learning. In the 5th workshop on fairness, accountability, and transparency in machine learning (FAT/ML).
+.. [#R1b] Gajane P, & Pechenizkiy M (2018). On formalizing fairness in prediction with machine learning. In the 5th workshop on fairness, accountability, and transparency in machine learning (FAT/ML), ICML workshop.
 .. [#R1a] Feldman M, Friedler SA, Moeller J, Scheidegger C, & Venkatasubramanian S (2015, August). Certifying and removing disparate impact. In proceedings of the 21th ACM SIGKDD international conference on knowledge discovery and data mining (pp. 259-268).
 .. [#R2] Hardt M, Price E, & Srebro N (2016). Equality of opportunity in supervised learning. Advances in neural information processing systems, 29.
 .. [#R3a] Chouldechova A (2017). Fair prediction with disparate impact: A study of bias in recidivism prediction instruments. Big data, 5(2), 153-163.
