@@ -26,7 +26,7 @@ We proposed a fairness measure named *harmonic fairness measure via manifolds (H
 
 - To get started quickly, see :doc:`an example <posts/quickstart>` here
 - To understand the methodology, see :doc:`methodology <posts/methodology>`
-- To learn the model evaluation we use, see :doc:`evaluation <posts/evaluation>`
+.. - To learn the model evaluation we use, see :doc:`evaluation <posts/evaluation>`
 
 
 .. - To reproduce our results, see :doc:`reproduction <posts/reproduction>`
@@ -49,7 +49,8 @@ SHORTCUTS
 
    posts/quickstart.rst
    posts/methodology.rst
-   posts/evaluation.rst
+
+..    posts/evaluation.rst
 
 ..    posts/reproduction.rst
 ..    posts/documentation.rst
