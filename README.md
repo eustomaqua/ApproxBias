@@ -32,9 +32,9 @@ We release the code of proposed methods from our following papers here, to help 
 
 We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). HFM relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
 
-In other words, we provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. Here is a [short tutorial](https://approxbias.readthedocs.io/en/latest/quickstart) covering all the aforementioned cases and methods.
+In other words, we provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. Here is a [short tutorial](https://approxbias.readthedocs.io/en/latest/posts/quickstart.html) covering all the aforementioned cases and methods.
 
-You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues).
+You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues) please.
 
 
 ## Additional information

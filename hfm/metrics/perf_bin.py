@@ -9,7 +9,6 @@
 import numpy as np
 import numba
 from hfm.utils.verifiers import check_zero
-import pdb
 
 
 def comp_accuracy(y, hx):

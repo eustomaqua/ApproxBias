@@ -72,7 +72,7 @@ def DistDirect_mediator(X_nA_y, idx_Si):
 
 
 # ------------------------------------------
-"""Parameters
+""" Parameters
 X_nA_y    : a matrix with size of (n, 1+nd)
 
 idx_Si    : an np.ndarray with the size of (n,)

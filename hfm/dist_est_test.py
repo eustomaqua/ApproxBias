@@ -155,6 +155,8 @@ def compare_multiver(nai, m1, m2, n_e=2):
     X_nA_y, A, indices, vec_w = generate_dat(n, nd, na, nai)
     W, tim = orthogonal_weight(nd + 1, n_e)
     pool = pp.ProcessingPool(nodes = 3)  # mp_cores)
+    assert np.dot(W[0], W[1]) < 10**8  # sum(W[0]*W[1])
+    assert abs(1 - sum(vec_w)) < 10**8
 
     k = 0
     A_j = A[:, k]
