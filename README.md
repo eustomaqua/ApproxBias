@@ -21,11 +21,14 @@ Note that the computation of HFM  # a brief example , quick tutorial
 
 Here we release the code of proposed methods from our following papers
 We release the code of proposed methods from our following papers here, to help researchers or people who are interested to reproduce our results
--->
 
 We release the code of proposed methods from our following papers here, to help people who are interested in reproducing our results.
-- \[**P1**\] *Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly* [[arXiv]](https://arxiv.org/abs/2405.09251)
-- \[**P2**\] *Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes* [[arXiv]](https://arxiv.org/abs/2408.06099)
+-->
+
+We release the code of the proposed methods from our following papers here, to help people who are interested in our work reproduce those results.
+- \[**P1**\] Does machine bring in extra bias in learning? Approximating fairness in models promptly. [[arXiv]](https://arxiv.org/abs/2405.09251)
+- \[**P2**\] Approximating discrimination within models when faced with several non-binary sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
+- Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival). [[OpenReview]](https://openreview.net/pdf?id=ywqVkVQZDj)
 
 
 ## Getting started
