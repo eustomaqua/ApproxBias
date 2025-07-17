@@ -10,8 +10,8 @@
 
 import csv
 import os
+import pdb
 import numpy as np
-
 
 from hfm.utils.verifiers import check_zero, DTY_FLT
 from hfm.utils.decorators import elegant_durat
@@ -59,17 +59,6 @@ class Table2C_comparison(Plot2C_comparison):
             alpha=.1, dist_df='both', csv_w=csv_w)
         '''
 
-        '''
-        self.tabulating_third(
-            raw_dframe, tag_trn, tag_tst, nb_set, id_set,
-            each_gen, each_att, ind=[0, 0], ddof=0,  # ecai24
-            alpha=.1, dist_df='both', csv_w=csv_w)
-        self.tabulating_forth(
-            raw_dframe, tag_trn, tag_tst, nb_set, id_set,
-            # # each_gen, each_att, ind=[0, 0, 1, 2, 3], ddof=0,
-            each_gen, each_att, ind=[0, 3, 0, 1, 2], ddof=0,  # ecai24
-            alpha=.1, dist_df='both', csv_w=csv_w)  # 3:DR
-        '''
         self.tabulating_third(
             raw_dframe, tag_trn, tag_tst, nb_set, id_set,
             each_gen, each_att, ind=[0, 0], alpha=.05,
@@ -78,8 +67,24 @@ class Table2C_comparison(Plot2C_comparison):
             raw_dframe, tag_trn, tag_tst, nb_set, id_set,
             each_gen, each_att, ind=[0, 3, 0, 1, 2], alpha=.05,
             ddof=0, dist_df='both', csv_w=csv_w)  # 3:DR
-        # ind=[3,3] ind=[3,3,0,1,2]
 
+        csv_t.close()
+        del csv_t, csv_w
+
+        # accuracy↑, ↓f1_score
+        suff = suff.replace('1c', '1d')
+        log_document = suff + '_table_third.csv'
+        csv_t = open(log_document, 'w')
+        csv_w = csv.writer(csv_t)
+        self.tabulating_third(
+            raw_dframe, tag_trn, tag_tst, nb_set, id_set,
+            each_gen, each_att, ind=[3, 3], alpha=.05,
+            ddof=0, dist_df='both', csv_w=csv_w)
+        self.tabulating_forth(
+            raw_dframe, tag_trn, tag_tst, nb_set, id_set,
+            each_gen, each_att, ind=[3, 3, 0, 1, 2], alpha=.05,
+            ddof=0, dist_df='both', csv_w=csv_w)  # 3:DR
+        # ind=[3,3] ind=[3,3,0,1,2]
         csv_t.close()
         del csv_t, csv_w
 
@@ -185,19 +190,24 @@ class Table2C_comparison(Plot2C_comparison):
         for i in range(nb_clf):
             af_t2 = ['', '']
             for j in range(nb_col - 12):
-                af_t2.append(_encode_sign(UA_avg[i, j], UA_std[i, j], rez=2))
+                af_t2.append(_encode_sign(
+                    UA_avg[i, j], UA_std[i, j], rez=2))
             for j in range(12):  # nb_col - 12, nb_col):
-                af_t2.append(_encode_sign(UF_avg[i, j], UF_std[i, j], rez=4))
+                af_t2.append(_encode_sign(
+                    UF_avg[i, j], UF_std[i, j], rez=4))
             ans_tex.append(af_t2)
 
         return ans_tex
 
-    def tabulating_third(self, dframe, tag_trn, tag_tst, nb_set, id_set,
+    def tabulating_third(self,
+                         dframe, tag_trn, tag_tst, nb_set, id_set,
                          each_gen, each_att, ind=[0, 3], ddof=0,
                          alpha=.7, dist_df='both', csv_w=None):
-        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_trn, ind, dist_df)
+        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_trn, ind,
+                                                       dist_df)
         tag_trn_a_f = tmp_a_org + tmp_f_vm[0], tmp_a_org + tmp_f_vm[1]
-        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_tst, ind, dist_df)
+        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_tst, ind,
+                                                       dist_df)
         tag_tst_a_f = tmp_a_org + tmp_f_vm[0], tmp_a_org + tmp_f_vm[1]
 
         nb_col = 6 if dist_df == 'both' else 5
@@ -206,11 +216,16 @@ class Table2C_comparison(Plot2C_comparison):
         U_cp_raw = np.zeros((nb_att, 1 + nb_col, self._nb_iter))
 
         i, k = 0, 0
-        df_trn = dframe[tag_trn_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
-        df_tst = dframe[tag_tst_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
-        U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
-            df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-        pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_third_sub2(
+        df_trn = dframe[tag_trn_a_f[0]].iloc[id_set[i] + 1:
+                                             id_set[i + 1]]
+        df_tst = dframe[tag_tst_a_f[0]].iloc[id_set[i] + 1:
+                                             id_set[i + 1]]
+        (U_trn_raw, U_tst_raw,
+         U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
+            df_trn, df_tst, each_gen, each_att, alpha=alpha,
+            dist_df=dist_df)
+        (pick_by_avg, pick_by_bar, choose_avg,
+         choose_clf) = self.tabulating_third_sub2(
             U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ddof=0)
         U_cp_raw[k] = pick_by_avg
         U_f1_raw[k] = pick_by_bar
@@ -221,30 +236,42 @@ class Table2C_comparison(Plot2C_comparison):
             curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
             df_trn = dframe[tag_trn_a_f[0]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[0]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
+            (U_trn_raw, U_tst_raw,
+             U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
                 df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-            pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_third_sub2(
+            (pick_by_avg, pick_by_bar, choose_avg,
+             choose_clf) = self.tabulating_third_sub2(
                 U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ddof=0)
             U_cp_raw[k] = pick_by_avg
             U_f1_raw[k] = pick_by_bar
             k += 1
 
-            curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_trn = dframe[tag_trn_a_f[1]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[1]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
+            (U_trn_raw, U_tst_raw,
+             U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
                 df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-            pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_third_sub2(
+            (pick_by_avg, pick_by_bar, choose_avg,
+             choose_clf) = self.tabulating_third_sub2(
                 U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ddof=0)
             U_cp_raw[k] = pick_by_avg
             U_f1_raw[k] = pick_by_bar
             k += 1
 
+        # U_f1_raw .shape (1+2*4 set/att, picked f1_score/accuracy using*, #iter)
+        #                 based on (1-performance)*alpha +(1-alpha)*fairness
         suff = self._figname.replace('exp2c_', 'exp1c_')
-        suff = suff.replace('iter5_cls7', 'iter5cls7').replace('min_max', 'minmax')
+        if ind[0] == 3:
+            suff = suff.replace('1c', '1d')  # f1_score
+        suff = suff.replace(
+            'iter5_cls7', 'iter5cls7').replace('min_max', 'minmax')
         mode = 'descend'
-        ans_tex, ans_std, ans_wtl, ans_cmp = self.tabulating_third_sub3(
+        (ans_tex, ans_std, ans_wtl,
+         ans_cmp) = self.tabulating_third_sub3(
             U_f1_raw, ind, dist_df, ddof, rez=4, mode=mode,
             figname=suff + '_tab3_f1')
         csv_w.writerows(ans_tex)
@@ -256,7 +283,8 @@ class Table2C_comparison(Plot2C_comparison):
         csv_w.writerow([''])
         csv_w.writerows(ans_cmp)
         csv_w.writerows([[''], [''], [''], ['']])
-        ans_tex, ans_std, ans_wtl, ans_cmp = self.tabulating_third_sub3(
+        (ans_tex, ans_std, ans_wtl,
+         ans_cmp) = self.tabulating_third_sub3(
             U_cp_raw, ind, dist_df, ddof, rez=2, mode=mode,
             figname=suff + '_tab3_cp')
         csv_w.writerows(ans_tex)
@@ -265,7 +293,8 @@ class Table2C_comparison(Plot2C_comparison):
         csv_w.writerows(ans_cmp)
         return
 
-    def tabulating_third_sub1(self, df_trn, df_tst, each_gen, each_att,
+    def tabulating_third_sub1(self, df_trn, df_tst,
+                              each_gen, each_att,
                               alpha=.5, dist_df='both'):
         nb_clf = (each_gen + each_att) // self._nb_iter
         df_trn = df_trn.values.astype(DTY_FLT)
@@ -280,7 +309,7 @@ class Table2C_comparison(Plot2C_comparison):
             for j in range(nb_col):
                 U_trn_raw[i, j] = df_trn[loc_a: loc_b][:, j]
                 U_tst_raw[i, j] = df_tst[loc_a: loc_b][:, j]
-        # U_trn/tst_raw .shape= (14+4, 8, 5)
+        # U_trn/tst_raw .shape= (14+4, 8|7, 5)
 
         k = nb_col - (6 if dist_df == 'both' else 5)
         U_trn_tmp = np.zeros((nb_clf, nb_col - k, self._nb_iter))
@@ -341,14 +370,12 @@ class Table2C_comparison(Plot2C_comparison):
 
         ans_tex = []
         af_t1 = [self._pick_metric[i] for i in ind]
-        # af_t1 = af_t1[:: -1]  # because earlier it's [rule, comparison metric]
         af_t2 = [0, 1, 2, 3, 4, 5]
         if dist_df == 'direct':
             af_t2 = [0, 1, 2, 3, 4, ]
         elif dist_df == 'approx':
             af_t2 = [0, 1, 2, 3, 5, ]
         af_t3 = [self._picked_keys[i] for i in af_t2]
-        # ans_tex.append(af_t1 + af_t3)  # df_t2/t3  # af_t2 +
         ans_tex.append(af_t1[:: -1] + af_t3)
 
         name_baseline = [af_t1[0]] + af_t3
@@ -370,7 +397,8 @@ class Table2C_comparison(Plot2C_comparison):
         for i in range(nb_att):
             af_t4 = ['']
             for j in range(nb_col):
-                af_t4.append(_encode_sign(U_avg[i, j], U_std[i, j], rez))
+                af_t4.append(_encode_sign(
+                    U_avg[i, j], U_std[i, j], rez))
             ans_tex.append(af_t4)
         ans_tex.append([''])
         ans_tex.extend(idx_bar.tolist())
@@ -390,9 +418,11 @@ class Table2C_comparison(Plot2C_comparison):
                 tmp_std = ['']
                 for j in [0] + [k + 1 for k in [0, 1, 2, 3, 5]]:
                     compared = U_f1_raw[i, j, :]  # shape= (#iter,) =(5,)
-                    sign_B, G_B = comp_t_sing(compared, self._nb_iter, rez)
+                    sign_B, G_B = comp_t_sing(compared,
+                                              self._nb_iter, rez)
                     mk_mu, mk_s2 = comp_t_prep(proposed, compared)
-                    tmp_wtl.append(cmp_paired_wtl(G_A, G_B, mk_mu, mk_s2, mode=mode))
+                    tmp_wtl.append(cmp_paired_wtl(
+                        G_A, G_B, mk_mu, mk_s2, mode=mode))
                     tmp_cmp.append(cmp_paired_avg(G_A, G_B, mode=mode))
                     tmp_std.append(sign_B)
                 ans_wtl.append(tmp_wtl)
@@ -421,67 +451,89 @@ class Table2C_comparison(Plot2C_comparison):
             ans_std.append(tmp_std)
         return ans_tex, ans_std, ans_wtl, ans_cmp
 
-    def tabulating_forth(self, dframe, tag_trn, tag_tst, nb_set, id_set,
+    def tabulating_forth(self,
+                         dframe, tag_trn, tag_tst, nb_set, id_set,
                          each_gen, each_att, ind=[0, 3], ddof=0,
                          alpha=.1, dist_df='both', csv_w=None):
         # fourth (fairness), is relevant to third (accuracy / performance)
-        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_trn, ind[:1], dist_df)
+        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(
+            tag_trn, ind[:1], dist_df)
         tag_trn_a_f = tmp_a_org + tmp_f_vm[0], tmp_a_org + tmp_f_vm[1]
-        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_tst, ind[:1], dist_df)
+        tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(
+            tag_tst, ind[:1], dist_df)
         tag_tst_a_f = tmp_a_org + tmp_f_vm[0], tmp_a_org + tmp_f_vm[1]
         nb_col = 6 if dist_df == 'both' else 5
         nb_att = (nb_set - 1) * 2 + 1
         nb_row = len(ind) - 1
         ls_row = ind[1:]  # list of numbers or indices / indexes
-        U_f1_raw = np.zeros((nb_att, nb_row, 1 + nb_col, self._nb_iter))
-        U_cp_raw = np.zeros((nb_att, nb_row, 1 + nb_col, self._nb_iter))
-        # pdb.set_trace()
+        U_f1_raw = np.zeros((
+            nb_att, nb_row, 1 + nb_col, self._nb_iter))
+        U_cp_raw = np.zeros((
+            nb_att, nb_row, 1 + nb_col, self._nb_iter))
 
         i, k = 0, 0
-        df_trn = dframe[tag_trn_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
-        df_tst = dframe[tag_tst_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
-        U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
-            df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-        pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_forth_sub2(
-            # U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ind[1:], ddof=0)
-            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ind=ls_row, ddof=0)
+        df_trn = dframe[tag_trn_a_f[0]].iloc[id_set[i] + 1:
+                                             id_set[i + 1]]
+        df_tst = dframe[tag_tst_a_f[0]].iloc[id_set[i] + 1:
+                                             id_set[i + 1]]
+        (U_trn_raw, U_tst_raw,
+         U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
+            df_trn, df_tst, each_gen, each_att, alpha=alpha,
+            dist_df=dist_df)
+        (pick_by_avg, pick_by_bar, choose_avg,
+         choose_clf) = self.tabulating_forth_sub2(
+            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp,
+             ind=ls_row, ddof=0)  # ind[1:]
         U_cp_raw[k] = pick_by_avg
         U_f1_raw[k] = pick_by_bar
         k += 1
 
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
-            curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen + each_att))
             df_trn = dframe[tag_trn_a_f[0]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[0]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
+            (U_trn_raw, U_tst_raw,
+             U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
                 df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-            pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_forth_sub2(
-                U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ind=ls_row, ddof=0)
+            (pick_by_avg, pick_by_bar, choose_avg,
+             choose_clf) = self.tabulating_forth_sub2(
+                U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp,
+                 ind=ls_row, ddof=0)
             U_cp_raw[k] = pick_by_avg
             U_f1_raw[k] = pick_by_bar
             k += 1
 
-            curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_trn = dframe[tag_trn_a_f[1]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[1]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp = self.tabulating_third_sub1(
-                df_trn, df_tst, each_gen, each_att, alpha=alpha, dist_df=dist_df)
-            pick_by_avg, pick_by_bar, choose_avg, choose_clf = self.tabulating_forth_sub2(
-                U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ind=ls_row, ddof=0)
+            (U_trn_raw, U_tst_raw,
+             U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
+                df_trn, df_tst, each_gen, each_att, alpha=alpha,
+                 dist_df=dist_df)
+            (pick_by_avg, pick_by_bar, choose_avg,
+             choose_clf) = self.tabulating_forth_sub2(
+                U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp,
+                 ind=ls_row, ddof=0)
             U_cp_raw[k] = pick_by_avg
             U_f1_raw[k] = pick_by_bar
             k += 1
 
         suff = self._figname.replace('exp2c_', 'exp1c_')
+        if ind[0] == 3:
+            suff = suff.replace('1c', '1d')  # f1_score
         suff = suff.replace(
             'iter5_cls7', 'iter5cls7').replace('min_max', 'minmax')
         mode = 'ascend'
         # offset = -2 if dist_df == 'both' else -1
         csv_w.writerows([[''], [''], [''], ['']])
         for k in ls_row:
-            ans_tex, ans_std, ans_wtl, ans_cmp = self.tabulating_forth_sub3(
+            (ans_tex, ans_std, ans_wtl,
+             ans_cmp) = self.tabulating_forth_sub3(
                 U_f1_raw, k, ls_row, dist_df, ddof,
                 mode=mode, offset=-1,
                 figname=suff + '_tab4_fairk{}'.format(k))
@@ -495,7 +547,8 @@ class Table2C_comparison(Plot2C_comparison):
         return
 
     def tabulating_forth_sub2(self, U_trn_raw, U_tst_raw,
-                              U_trn_tmp, U_tst_tmp, ind=[0, 1, 2, 3], ddof=0):
+                              U_trn_tmp, U_tst_tmp,
+                              ind=[0, 1, 2, 3], ddof=0):
         # U_trn/tst_raw .shape= (#clf, 1+#fair, #iter) =(14+4, 7, 5)
         # U_trn/tst_tmp .shape= (#clf,   #fair, #iter) =(14+4, 6, 5)
 
@@ -548,7 +601,8 @@ class Table2C_comparison(Plot2C_comparison):
         _, idx_bar = Friedman_init(U_avg, mode=mode)
         # pdb.set_trace()
         ans_tex = []
-        af_t1 = ['Comparison via/on fairness: ' + self._picked_keys[k_i], '']
+        af_t1 = ['Comparison via/on fairness: ' + self._picked_keys[
+            k_i], '']
         af_t2 = [0, 1, 2, 3, 4, 5]
         # af_t5 = -1
         if dist_df == 'direct':
@@ -561,17 +615,23 @@ class Table2C_comparison(Plot2C_comparison):
         ans_tex.extend([[''], af_t1 + af_t3])
 
         name_baseline = ['Accuracy? performance'] + af_t3
-        name_baseline[0] = 'Accuracy'  # '$f_1$ score' #self._pick_metric[ind[0]]
+        name_baseline[0] = 'Accuracy'  # self._pick_metric[ind[0]]
+        if 'exp1d_' in figname:
+            name_baseline[0] = '$f_1$ score'
         del af_t1, af_t3
-        _, idx_bar = Friedman_init(curr_U_f1_raw.mean(axis=2), mode=mode)
+        _, idx_bar = Friedman_init(curr_U_f1_raw.mean(axis=2),
+                                   mode=mode)
         if verbose:
-            Friedman_chart(idx_bar, name_baseline, figname + '_fried5',
-                           alpha=0.05, logger=None, anotCD=True,
-                           offset=offset)  # arxiv
+            Friedman_chart(
+                idx_bar, name_baseline, figname + '_fried5',
+                alpha=0.05, logger=None, anotCD=True,
+                offset=offset)  # arxiv
         kwargs = {'cmap_name': 'PuBu', 'rotation': 60}
         kwargs['cmap_name'] = 'RdPu'
-        kwargs['annots'] = r'aggr.rank.{}'.format(self._picked_keys[k_i])
-        stat_chart_stack(idx_bar, name_baseline, figname + '_stack', **kwargs)
+        kwargs['annots'] = r'aggr.rank.{}'.format(
+            self._picked_keys[k_i])
+        stat_chart_stack(idx_bar, name_baseline,
+                         figname + '_stack', **kwargs)
 
         for i in range(nb_att):
             af_t4 = ['']

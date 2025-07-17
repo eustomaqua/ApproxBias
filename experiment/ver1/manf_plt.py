@@ -9,7 +9,7 @@ import logging
 import time
 import numpy as np
 import pandas as pd
-
+import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
 from hfm.utils.recorders import (
@@ -121,7 +121,8 @@ class Plot5A_hyperpm(GraphSetup):
             # else:
             #   pass
             curr_loc = id_set[i] + 1
-            index_wa += list(range(curr_loc, curr_loc + 2 * self._nb_iter))
+            index_wa += list(range(curr_loc,
+                                   curr_loc + 2 * self._nb_iter))
             for j in index_jt[2:]:
                 curr_loc = id_set[i] + 1 + j * self._nb_iter
                 index_wa += list(
@@ -182,17 +183,23 @@ class Plot5A_hyperpm(GraphSetup):
                 curr_loc = id_set[i] + 1 + j * self._nb_iter
                 curr_att = raw_dframe['I'].iloc[curr_loc]
                 if nb_att > 1 and j == nb_att - 1:
-                    curr_att = raw_dframe['I'].iloc[curr_loc - self._nb_iter]
+                    curr_att = raw_dframe[
+                        'I'].iloc[curr_loc - self._nb_iter]
 
-                curr_row = list(range(curr_loc, curr_loc + self._nb_iter))
-                direct = self.fetch_sub_data(raw_dframe, curr_row, tag_dir[-2:])
-                approx = self.fetch_sub_data(raw_dframe, curr_row, tag_app)
-                app_ut = self.fetch_sub_data(raw_dframe, curr_row, tag_ut)
+                curr_row = list(range(curr_loc,
+                                      curr_loc + self._nb_iter))
+                direct = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_dir[-2:])
+                approx = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_app)
+                app_ut = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_ut)
 
                 tmp_dir.append(direct)
                 tmp_app.append(approx)
                 tmp_ut.append(app_ut)
-                tmp_key.append('{}: {}'.format(DAT_EXPT_ORG[i], curr_att))
+                tmp_key.append('{}: {}'.format(DAT_EXPT_ORG[i],
+                                               curr_att))
             Ys_dir.append(tmp_dir)
             Ys_app.append(tmp_app)
             Ys_ut.append(tmp_ut)
@@ -209,12 +216,14 @@ class Plot5A_hyperpm(GraphSetup):
                     suffix += 'ad'
                 elif j == 3:
                     suffix += 'or'
-                kws = {'annotX': r'$m_2$', 'annotY': 'Approximated value'}
+                kws = {'annotX': r'$m_2$',
+                       'annotY': 'Approximated value'}
 
                 direct = Ys_dir[i][j]
                 approx = Ys_app[i][j]
-                scatter_k_cv_with_real(
-                    X, approx, direct[:, 0], figname='pic2_' + suffix, **kws)
+                scatter_k_cv_with_real(X, approx, direct[:, 0],
+                                       figname='pic2_' + suffix,
+                                       **kws)
 
     def painting_fig1(self, nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys):
         kws = {'annotX': r'$m_2$'}  # , 'annotY': 'Approximated value'}
@@ -226,12 +235,14 @@ class Plot5A_hyperpm(GraphSetup):
             approx = np.array(Ys_app[i])  # shape= (1|4, 5, 21)
             diff = _diff_between(approx, direct[:, :, 0])
             approximated_dist_comparison(
-                X, diff, picked_keys[i], figname='pic1_' + suffix, **kws)
+                X, diff, picked_keys[i],
+                figname='pic1_' + suffix, **kws)
 
             approx = np.array(Ys_ut[i])  # shape= (1|4, 5, 21)
             multiple_scatter_comparison(
                 X, approx, direct[:, :, 1], picked_keys[i],
-                annotY='Time Cost (sec)', figname='pic3_' + suffix, **kws)
+                annotY='Time Cost (sec)',
+                figname='pic3_' + suffix, **kws)
 
         # new_X, new_Ys_dir, new_Ys_app = [], [], []
         suffix = 'expt5a_merged_set'  # expt5a_merge_sets
@@ -240,15 +251,18 @@ class Plot5A_hyperpm(GraphSetup):
         new_Ys_app = [np.array(Ys_app[0] * 4).reshape(new_dim, -1)]
         new_Ys_ut = [np.array(Ys_ut[0] * 4).reshape(new_dim, -1)]
         for i in range(1, nb_set):
-            new_Ys_dir.append(np.array(Ys_dir[i]).reshape(new_dim, -1))
-            new_Ys_app.append(np.array(Ys_app[i]).reshape(new_dim, -1))
+            new_Ys_dir.append(
+                np.array(Ys_dir[i]).reshape(new_dim, -1))
+            new_Ys_app.append(
+                np.array(Ys_app[i]).reshape(new_dim, -1))
             new_Ys_ut.append(np.array(Ys_ut[i]).reshape(new_dim, -1))
         new_Ys_dir = np.array(new_Ys_dir)  # (set=6, 4*5, 2)
         new_Ys_app = np.array(new_Ys_app)  # (set=6, 4*5, num=21)
         new_Ys_ut = np.array(new_Ys_ut)    # (set=6, 4*5, num=21)
         diff = _diff_between(new_Ys_app, new_Ys_dir[:, :, 0])
         approximated_dist_comparison(
-            X, diff[:5], DAT_EXPT_ORG[:5], figname='pic1_' + suffix, **kws)
+            X, diff[:5], DAT_EXPT_ORG[:5],
+            figname='pic1_' + suffix, **kws)
         multiple_scatter_comparison(
             X, new_Ys_ut[:5], new_Ys_dir[:, :, 1], DAT_EXPT_ORG[:5],
             annotY='Time Cost (sec)', figname='pic3_' + suffix, **kws)
@@ -296,7 +310,8 @@ class Plot5B_hyperpm(GraphSetup):
             curr_tag_dir = tag_direct[-2]
         elif ind == 'ut':
             curr_tag_dir = tag_direct[-1]
-        curr_tag_app = [tag_approx[self._m1_set.index(i)] for i in picked_m1]
+        curr_tag_app = [tag_approx[
+            self._m1_set.index(i)] for i in picked_m1]
         index_jt, suffix = self.draw_sub2_jt(joint)
 
         index_wa, i = [], 0  # whole, overall
@@ -305,10 +320,12 @@ class Plot5B_hyperpm(GraphSetup):
                 index_wa += list(range(id_set[i] + 1, id_set[i + 1]))
                 continue
             curr_loc = id_set[i] + 1
-            index_wa += list(range(curr_loc, curr_loc + 2 * self._nb_iter))
+            index_wa += list(range(curr_loc,
+                                   curr_loc + 2 * self._nb_iter))
             for j in index_jt[2:]:
                 curr_loc = id_set[i] + 1 + j * self._nb_iter
-                index_wa += list(range(curr_loc, curr_loc + self._nb_iter))
+                index_wa += list(range(curr_loc,
+                                       curr_loc + self._nb_iter))
 
         df_raw = dframe[[curr_tag_dir] + curr_tag_app].iloc[index_wa]
         col_X, col_Y = curr_tag_dir, 'Approximation'
@@ -341,8 +358,9 @@ class Plot5B_hyperpm(GraphSetup):
             annotY = r'$\frac{abs(\hat{\mathbf{D}}-\mathbf{D})}{\mathbf{D}}$'
             kws['snspec'] = 'sty4b'
             line_reg_with_marginal_distr(
-                df_tmp, curr_tag_dir, col_Y, curr_tag_app, picked_keys,
-                annotX, annotY, figname=suff_6 + '_xp', invt_a=False,
+                df_tmp, curr_tag_dir, col_Y, curr_tag_app,
+                picked_keys, annotX, annotY,
+                figname=suff_6 + '_xp', invt_a=False,
                 identity=None, **kws)
             del df_tmp
         return
@@ -361,17 +379,23 @@ class Plot5B_hyperpm(GraphSetup):
                 curr_loc = id_set[i] + 1 + j * self._nb_iter
                 curr_att = raw_dframe['I'].iloc[curr_loc]
                 if nb_att > 1 and j == nb_att - 1:
-                    curr_att = raw_dframe['I'].iloc[curr_loc - self._nb_iter]
+                    curr_att = raw_dframe[
+                        'I'].iloc[curr_loc - self._nb_iter]
 
-                curr_row = list(range(curr_loc, curr_loc + self._nb_iter))
-                direct = self.fetch_sub_data(raw_dframe, curr_row, tag_dir[-2:])
-                approx = self.fetch_sub_data(raw_dframe, curr_row, tag_app)
-                app_ut = self.fetch_sub_data(raw_dframe, curr_row, tag_ut)
+                curr_row = list(range(curr_loc,
+                                      curr_loc + self._nb_iter))
+                direct = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_dir[-2:])
+                approx = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_app)
+                app_ut = self.fetch_sub_data(raw_dframe, curr_row,
+                                             tag_ut)
 
                 tmp_dir.append(direct)
                 tmp_app.append(approx)
                 tmp_ut.append(app_ut)
-                tmp_key.append('{}: {}'.format(DAT_EXPT_ORG[i], curr_att))
+                tmp_key.append('{}: {}'.format(DAT_EXPT_ORG[i],
+                                               curr_att))
             Ys_dir.append(tmp_dir)
             Ys_app.append(tmp_app)
             Ys_ut.append(tmp_ut)
@@ -388,14 +412,17 @@ class Plot5B_hyperpm(GraphSetup):
                     suffix += 'ad'
                 elif j == 3:
                     suffix += 'or'
-                kws = {'annotX': r'$m_1$', 'annotY': 'Approximated value'}
+                kws = {'annotX': r'$m_1$',
+                       'annotY': 'Approximated value'}
 
                 direct = Ys_dir[i][j]
                 approx = Ys_app[i][j]
-                scatter_k_cv_with_real(
-                    X, approx, direct[:, 0], figname='pic2_' + suffix, **kws)
+                scatter_k_cv_with_real(X, approx, direct[:, 0],
+                                       figname='pic2_' + suffix,
+                                       **kws)
 
-    def painting_fig1(self, nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys):
+    def painting_fig1(self, nb_set, X, Ys_dir, Ys_app, Ys_ut,
+                      picked_keys):
         kws = {'annotX': r'$m_1$'}
         for i in range(nb_set):
             suffix = 'expt5b_iter' + str(self._nb_iter)
@@ -405,12 +432,14 @@ class Plot5B_hyperpm(GraphSetup):
             approx = np.array(Ys_app[i])  # shape= (1|4, 5, 24)
             diff = _diff_between(approx, direct[:, :, 0])
             approximated_dist_comparison(
-                X, diff, picked_keys[i], figname='pic1_' + suffix, **kws)
+                X, diff, picked_keys[i], figname='pic1_' + suffix,
+                **kws)
 
             approx = np.array(Ys_ut[i])  # shape= (1|4, 5, 24)
             multiple_scatter_comparison(
                 X, approx, direct[:, :, 1], picked_keys[i],
-                annotY='Time Cost (sec)', figname='pic3_' + suffix, **kws)
+                annotY='Time Cost (sec)', figname='pic3_' + suffix,
+                **kws)
 
         suffix = 'expt5b_merged_set'
         new_dim = 4 * self._nb_iter
@@ -418,15 +447,18 @@ class Plot5B_hyperpm(GraphSetup):
         new_Ys_app = [np.array(Ys_app[0] * 4).reshape(new_dim, -1)]
         new_Ys_ut = [np.array(Ys_ut[0] * 4).reshape(new_dim, -1)]
         for i in range(1, nb_set):
-            new_Ys_dir.append(np.array(Ys_dir[i]).reshape(new_dim, -1))
-            new_Ys_app.append(np.array(Ys_app[i]).reshape(new_dim, -1))
+            new_Ys_dir.append(
+                np.array(Ys_dir[i]).reshape(new_dim, -1))
+            new_Ys_app.append(
+                np.array(Ys_app[i]).reshape(new_dim, -1))
             new_Ys_ut.append(np.array(Ys_ut[i]).reshape(new_dim, -1))
         new_Ys_dir = np.array(new_Ys_dir)  # (set=6, 4*5, 2)
         new_Ys_app = np.array(new_Ys_app)  # (set=6, 4*5, num=21)
         new_Ys_ut = np.array(new_Ys_ut)    # (set=6, 4*5, num=21)
         diff = _diff_between(new_Ys_app, new_Ys_dir[:, :, 0])
         approximated_dist_comparison(
-            X, diff[:5], DAT_EXPT_ORG[:5], figname='pic1_' + suffix, **kws)
+            X, diff[:5], DAT_EXPT_ORG[:5], figname='pic1_' + suffix,
+            **kws)
         multiple_scatter_comparison(
             X, new_Ys_ut[:5], new_Ys_dir[:, :, 1], DAT_EXPT_ORG[:5],
             annotY='Time Cost (sec)', figname='pic3_' + suffix, **kws)
@@ -485,37 +517,46 @@ class Plot2_comparison(GraphSetup):
     def drawing_fig1_alt(self):
         raise NotImplementedError
 
-    def draw_sub2_dat1(self, dframe, nb_set, id_set, tmp_f_vm, tmp_jt):
+    def draw_sub2_dat1(self, dframe, nb_set, id_set,
+                       tmp_f_vm, tmp_jt):
         i, j = 0, 0
-        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                          id_set[i + 1]]
         for i in range(1, nb_set):
             j = 0
-            df_tmp = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                              id_set[i + 1]]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp_jt[1:]:
-                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[j])}
+                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                                  id_set[i + 1]]
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
         df_raw = df_raw.reset_index(drop=True)
         return df_raw
 
-    def draw_sub2_dat2(self, dframe, nb_set, id_set, each_gen, each_att,
-                       tmp_f_vm):  # , tmp_jt):
+    def draw_sub2_dat2(self, dframe, nb_set, id_set, each_gen,
+                       each_att, tmp_f_vm):  # , tmp_jt):
         i = 0  # i, k = 0, 0
         df_raw = dframe[tmp_f_vm[0]].iloc[
             id_set[i] + 1: id_set[i + 1]]
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
 
-            curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
+            curr_loc = list(range(curr_set,
+                                  curr_set + each_gen + each_att))
             df_tmp = dframe[tmp_f_vm[0]].iloc[curr_loc]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
 
-            curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_tmp = dframe[tmp_f_vm[1]].iloc[curr_loc]
-            columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[1])}
+            columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                tmp_f_vm[1])}
             df_tmp = df_tmp.rename(columns=columns)
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
 
@@ -570,14 +611,16 @@ def _sub_depict_sep_alt(df_raw, tYs, suff, fig='_Ds', diff=True,
         col_X, col_Y = tYs[6], tYs[7]
         annotX = r'T_{\mathbf{D}}'
         annotY = r'T_{\hat{\mathbf{D}}}'
-        annotZ = [r'\frac{ T{\hat{\mathbf{D}}} }{ T_{\mathbf{D}} } -1',
-                  r'\lg(\frac{ T{\hat{\mathbf{D}}} }{ T_{\mathbf{D}} })']
+        annotZ = [
+            r'\frac{ T{\hat{\mathbf{D}}} }{ T_{\mathbf{D}} } -1',
+            r'\lg(\frac{ T{\hat{\mathbf{D}}} }{ T_{\mathbf{D}} })']
     elif fig.endswith('TDf'):
         col_X, col_Y = tYs[8], tYs[9]  # tYs[6], tYs[7]
         annotX = r'T_{\mathbf{D}_f}'
         annotY = r'T_{\hat{\mathbf{D}}_f}'
-        annotZ = [r'\frac{ T{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}_f} } -1',
-                  r'\lg(\frac{ T{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}_f} })']
+        annotZ = [
+            r'\frac{ T{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}_f} } -1',
+            r'\lg(\frac{ T{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}_f} })']
 
     scat_X = df_raw[col_X].values.astype(DTY_FLT)
     scat_Y = df_raw[col_Y].values.astype(DTY_FLT)
@@ -589,17 +632,18 @@ def _sub_depict_sep_alt(df_raw, tYs, suff, fig='_Ds', diff=True,
 
     scat_Z = scat_Y / scat_X - 1.
     if double_sep:
-        annots = ['${}$  (sec)'.format(annotX), '${}$'.format(annotZ[0]),
+        annots = ['${}$  (sec)'.format(annotX),
+                  '${}$'.format(annotZ[0]),
                   '${}={}$'.format(annotY, annotX)]
-        single_line_reg_with_distr(scat_X, scat_Z, annots,
-                                   suff + fig + '_s6a',
-                                   linreg=True, snspec='sty6')
+        single_line_reg_with_distr(
+            scat_X, scat_Z, annots, suff + fig + '_s6a',
+            linreg=True, snspec='sty6')
     scat_Z = np.log10(scat_Z + 1)
-    annots = ['${}$  (sec)'.format(annotX), '${}$'.format(annotZ[1]),
-              '${}={}$'.format(annotY, annotX)]
-    single_line_reg_with_distr(scat_X, scat_Z, annots,
-                               suff + fig + '_s6b',
-                               linreg=True, snspec='sty6')
+    annots = ['${}$  (sec)'.format(annotX), '${}$'.format(
+        annotZ[1]), '${}={}$'.format(annotY, annotX)]
+    single_line_reg_with_distr(
+        scat_X, scat_Z, annots, suff + fig + '_s6b',
+        linreg=True, snspec='sty6')
     return
 
 
@@ -620,7 +664,8 @@ def _sub_depict_sep(df_raw, tYs, suff, fig='_Ds', diff=True):
     annots = ['${}$'.format(annotX), '${}$'.format(annotY),
               '${}={}$'.format(annotY, annotX)]
     single_line_reg_with_distr(
-        scat_X, scat_Y, annots, suff + fig, linreg=True, snspec='sty3b')
+        scat_X, scat_Y, annots, suff + fig, linreg=True,
+        snspec='sty3b')
     if not diff:
         return
 
@@ -677,7 +722,8 @@ def _sub_depict_tim(df_raw, tYs, suff, diff=False,
     annotX = r'T_{\mathbf{D}}+T_{\mathbf{D}_f}'
     annotY = r'T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f}'
     del ant_xs, ant_ys, ant_xf, ant_yf
-    annots = ['${}$ (sec)'.format(annotX), '${}$  (sec)'.format(annotY),
+    annots = ['${}$ (sec)'.format(annotX),
+              '${}$  (sec)'.format(annotY),
               '${}={}$'.format(annotY, annotX)]
     kws = {'linreg': True, 'snspec': 'sty4'}
     single_line_reg_with_distr(
@@ -736,14 +782,16 @@ class Plot2A_comparison(Plot2_comparison):
 
         if split:
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys[:-1], self._picked_keys[:-1],
-                annotX, annotY, figname=suffix_1 + '_df')  # '_direct'
+                df_raw, col_X, col_Y, tag_Ys[:-1],
+                self._picked_keys[:-1], annotX, annotY,
+                figname=suffix_1 + '_df')  # '_direct'
             scatter_with_marginal_distrib(
                 df_raw, col_X, col_Y, tag_Ys[:-2] + [tag_Ys[-1]],
                 self._picked_keys[:-2] + [self._picked_keys[-1]],
                 annotX, annotY, figname=suffix_1 + '_hat')  # '_approx'
 
-    def painting_fig2(self, dframe, nb_set, tag, id_att, each_att, ind=0):
+    def painting_fig2(self, dframe, nb_set, tag, id_att,
+                      each_att, ind=0):
         tag_acc, tag_fair, tag_manf, tag_Ys, col_X = self.picking_fig_tags(tag, ind)
         col_Y = 'Fairness'
 
@@ -755,7 +803,8 @@ class Plot2A_comparison(Plot2_comparison):
         i = 0
         df_raw = dframe.iloc[id_att[i]: id_att[i] + each_att]
         scatter_with_marginal_distrib(
-            df_raw, col_X, col_Y, tag_Ys, self._picked_keys, annotX, annotY,
+            df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
+            annotX, annotY,
             figname='{}_set{}_att{}'.format(prefix_1, i, 1))
         lineplot_with_uncertainty(
             df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
@@ -765,7 +814,8 @@ class Plot2A_comparison(Plot2_comparison):
             j = i * 2 + 1
             df_raw = dframe.iloc[id_att[j]: id_att[j] + each_att]
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys, self._picked_keys, annotX, annotY,
+                df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
+                annotX, annotY,
                 figname='{}_set{}_att{}'.format(prefix_1, i + 1, 1))
             lineplot_with_uncertainty(
                 df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
@@ -774,7 +824,8 @@ class Plot2A_comparison(Plot2_comparison):
             j = i * 2 + 2
             df_raw = dframe.iloc[id_att[j]: id_att[j] + each_att]
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys, self._picked_keys, annotX, annotY,
+                df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
+                annotX, annotY,
                 figname='{}_set{}_att{}'.format(prefix_1, i + 1, 2))
             lineplot_with_uncertainty(
                 df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
@@ -811,7 +862,8 @@ class Plot2A_comparison(Plot2_comparison):
         kwargs.pop('snspec')
         if split:
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys[:-1], self._picked_keys[:-1],
+                df_raw, col_X, col_Y, tag_Ys[:-1],
+                self._picked_keys[:-1],
                 annotX, annotY, figname=suffix_1 + '_df', **kwargs)
             scatter_with_marginal_distrib(
                 df_raw, col_X, col_Y, tag_Ys[:-2] + tag_Ys[-1:],
@@ -849,7 +901,8 @@ class Plot2A_comparison(Plot2_comparison):
         # tYs_k2 = [0, 3, 1, 4, 6, 7]  # Direct vs Approx .Dist
         # tmp_f_vm = [tag_f_man[k] for k in [0, 3, 1, 4, 6, 7]]
         if corrected:
-            tmp_f_vm = [tag_f_man[k] for k in [0, 7, 1, 8, 14, 15, 4, 11, 5, 12]]
+            tmp_f_vm = [tag_f_man[
+                k] for k in [0, 7, 1, 8, 14, 15, 4, 11, 5, 12]]
         else:
             tmp_f_vm = [tag_f_man[k] for k in [0, 7, 1, 8, 14, 15]]
         tmp, suffix = self.draw_sub2_jt(joint)
@@ -860,28 +913,39 @@ class Plot2A_comparison(Plot2_comparison):
         i = 0  # i, k = 0, 0
         df_raw = dframe[tmp_f_vm].iloc[id_set[i] + 1: id_set[i + 1]]
         if split:
-            _sub_depict_scat(df_raw, tmp_f_vm, suff_4 + '_aset{}'.format(i))
-            _sub_depict_tim(df_raw, tmp_f_vm, suff_5 + '_aset{}'.format(i))
+            _sub_depict_scat(
+                df_raw, tmp_f_vm, suff_4 + '_aset{}'.format(i))
+            _sub_depict_tim(
+                df_raw, tmp_f_vm, suff_5 + '_aset{}'.format(i))
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
             curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
             df_tmp = dframe[tmp_f_vm].iloc[curr_loc]
             if split:
-                _sub_depict_scat(df_tmp, tmp_f_vm, suff_4 + '_set{}_att0'.format(i))
-                _sub_depict_tim(df_tmp, tmp_f_vm, suff_5 + '_set{}_att0'.format(i))
+                _sub_depict_scat(df_tmp, tmp_f_vm,
+                                 suff_4 + '_set{}_att0'.format(i))
+                _sub_depict_tim(df_tmp, tmp_f_vm,
+                                suff_5 + '_set{}_att0'.format(i))
             del df_tmp, curr_loc
-            curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_tmp = dframe[tmp_f_vm].iloc[curr_loc]
             if split:
-                _sub_depict_scat(df_tmp, tmp_f_vm, suff_4 + '_set{}_att1'.format(i))
-                _sub_depict_tim(df_tmp, tmp_f_vm, suff_5 + '_set{}_att1'.format(i))
+                _sub_depict_scat(df_tmp, tmp_f_vm,
+                                 suff_4 + '_set{}_att1'.format(i))
+                _sub_depict_tim(df_tmp, tmp_f_vm,
+                                suff_5 + '_set{}_att1'.format(i))
             del df_tmp, curr_loc
 
-            df_tmp = dframe[tmp_f_vm].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_f_vm].iloc[id_set[i] + 1:
+                                           id_set[i + 1]]
             if split:
-                _sub_depict_scat(df_tmp, tmp_f_vm, suff_4 + '_aset{}'.format(i))
-                _sub_depict_tim(df_tmp, tmp_f_vm, suff_5 + '_aset{}'.format(i))
+                _sub_depict_scat(df_tmp, tmp_f_vm,
+                                 suff_4 + '_aset{}'.format(i))
+                _sub_depict_tim(df_tmp, tmp_f_vm,
+                                suff_5 + '_aset{}'.format(i))
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             del df_tmp, curr_set
 
@@ -892,9 +956,11 @@ class Plot2A_comparison(Plot2_comparison):
         _sub_depict_sep(df_raw, tmp_f_vm, suff_6, '_Ds')
         _sub_depict_sep(df_raw, tmp_f_vm, suff_6, '_Df')
         if corrected:
-            _sub_depict_sep_alt(df_raw, tmp_f_vm, suff_6 + 'alt', '_TDs',
+            _sub_depict_sep_alt(df_raw, tmp_f_vm,
+                                suff_6 + 'alt', '_TDs',
                                 True, False)
-            _sub_depict_sep_alt(df_raw, tmp_f_vm, suff_6 + 'alt', '_TDf',
+            _sub_depict_sep_alt(df_raw, tmp_f_vm,
+                                suff_6 + 'alt', '_TDf',
                                 True, False)
         return
 
@@ -904,11 +970,11 @@ class Plot2B_comparison(Plot2_comparison):
         super().__init__(nb_iter, nb_cls, m1, m2, figname)
 
     def prepare_graph(self):
-        csv_row_1 = unique_column(11 + 211)  # + 147)
+        csv_row_1 = unique_column(11 + 211)
 
         params = csv_row_1[: 11 + 1]  # last: Ensem/ut
-        tag_trn = csv_row_1[12: 12 + 105]    # 12: 12 + 73]
-        tag_tst = csv_row_1[117: 117 + 105]  # 85: 85 + 73]
+        tag_trn = csv_row_1[12: 12 + 105]
+        tag_tst = csv_row_1[117: 117 + 105]
         return params, tag_trn, tag_tst
 
     def painting_fig1(self, dframe, tag, nb_set, id_set,
@@ -921,14 +987,18 @@ class Plot2B_comparison(Plot2_comparison):
         suffix_2 = self._figname + '_{}_pc2_mat{}'.format(fig, ind)
 
         i, j = 0, 0
-        df_raw = dframe[tmp_fm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_fm[j]].iloc[id_set[i] + 1:
+                                        id_set[i + 1]]
         for i in range(1, nb_set):
             j = 0
-            df_tmp = dframe[tmp_fm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_fm[j]].iloc[id_set[i] + 1:
+                                            id_set[i + 1]]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp[1:]:
-                df_tmp = dframe[tmp_fm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_fm[0], tmp_fm[j])}
+                df_tmp = dframe[tmp_fm[j]].iloc[id_set[i] + 1:
+                                                id_set[i + 1]]
+                columns = {t2: t1 for t1, t2 in zip(tmp_fm[0],
+                                                    tmp_fm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
         # pdb.set_trace()
@@ -958,7 +1028,6 @@ class Plot2B_comparison(Plot2_comparison):
             tmp = [0, 1, 2, ]
         elif joint == 'or':
             tag_fair = tag_fair[: 7 * 2] + tag_fair[-7:]
-            # tag_manf = tag_manf[: 8 * 2] + tag_manf[-8:]
             tag_manf = tag_manf[: 16 * 3] + tag_manf[-16:]
             tmp = [0, 1, 3, ]
         else:
@@ -987,11 +1056,14 @@ class Plot2B_comparison(Plot2_comparison):
                 tag_Ys = [tag_fair[k + 7 * j] for k in tYs_k1] + [
                     tag_manf[k + 16 * j] for k in tYs_k2]
                 scatter_with_marginal_distrib(
-                    df_raw, col_X, col_Y, tag_Ys, self._picked_keys, annotX, annotY,
-                    figname='{}_set{}_att{}_on{}'.format(prefix_1, i, 0, j))
+                    df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
+                    annotX, annotY,
+                    figname='{}_set{}_att{}_on{}'.format(
+                        prefix_1, i, 0, j))
                 lineplot_with_uncertainty(
                     df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
-                    figname='{}_set{}_att{}_on{}'.format(prefix_2, i, 0, j))
+                    figname='{}_set{}_att{}_on{}'.format(
+                        prefix_2, i, 0, j))
 
             p = (i - 1) * 2 + 2
             df_raw = dframe.iloc[id_att[p]: id_att[p] + each_att]
@@ -999,11 +1071,14 @@ class Plot2B_comparison(Plot2_comparison):
                 tag_Ys = [tag_fair[k + 7 * j] for k in tYs_k1] + [
                     tag_manf[k + 16 * j] for k in tYs_k2]
                 scatter_with_marginal_distrib(
-                    df_raw, col_X, col_Y, tag_Ys, self._picked_keys, annotX, annotY,
-                    figname='{}_set{}_att{}_on{}'.format(prefix_1, i, 0, j))
+                    df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
+                    annotX, annotY,
+                    figname='{}_set{}_att{}_on{}'.format(
+                        prefix_1, i, 0, j))
                 lineplot_with_uncertainty(
                     df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
-                    figname='{}_set{}_att{}_on{}'.format(prefix_2, i, 0, j))
+                    figname='{}_set{}_att{}_on{}'.format(
+                        prefix_2, i, 0, j))
 
     def drawing_fig1_alt(self, dframe, tag, nb_set, id_set, ind=0,
                          joint='and|or', dist='direct', fig='tst',
@@ -1017,14 +1092,18 @@ class Plot2B_comparison(Plot2_comparison):
         suffix_2 = self._figname + '_{}_pc2_mat{}_{}'.format(suffix, ind, fig)
 
         i, j = 0, 0
-        df_raw = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                          id_set[i + 1]]
         for i in range(1, nb_set):
             j = 0
-            df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                              id_set[i + 1]]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp[1:]:
-                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[j])}
+                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                                  id_set[i + 1]]
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
         df_raw = df_raw.reset_index(drop=True)
@@ -1035,13 +1114,13 @@ class Plot2B_comparison(Plot2_comparison):
             annotX, annotY, figname=suffix_1 + '_s', **kwargs)
         lineplot_with_uncertainty(
             df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
-            # figname=suffix_2 + '_b4', **kwargs)
             alpha_rev=True, alpha_loc='b4',
             figname=suffix_2 + '_b4', cmap_name='coolwarm_r')
 
         if split:
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys[:-1], self._picked_keys[:-1],
+                df_raw, col_X, col_Y, tag_Ys[:-1],
+                self._picked_keys[:-1],
                 annotX, annotY, figname=suffix_1 + '_df', **kwargs)
             scatter_with_marginal_distrib(
                 df_raw, col_X, col_Y, tag_Ys[:-2] + tag_Ys[-1:],
@@ -1178,20 +1257,26 @@ class Plot2C_comparison(Plot2B_comparison):
         _, _, _, tmp_f_vm, col_X = self.picking_fig_tags(tag, ind=ind)
         tmp, suffix = self.draw_sub2_jt(joint)
 
-        suffix_1 = self._figname + '_{}_pc1_{}_mat{}'.format(suffix, fig, ind)
-        suffix_2 = self._figname + '_{}_pc2_{}_mat{}'.format(suffix, fig, ind)
+        suffix_1 = self._figname + '_{}_pc1_{}_mat{}'.format(
+            suffix, fig, ind)
+        suffix_2 = self._figname + '_{}_pc2_{}_mat{}'.format(
+            suffix, fig, ind)
         suffix_3 = suffix_1.replace('exp2c_', 'exp2b_')
         tag_Ys = tmp_f_vm[0][2:]
 
         i, j = 0, 0
-        df_raw = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                          id_set[i + 1]]
         for i in range(1, nb_set):
             j = 0
-            df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                              id_set[i + 1]]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp[1:]:
-                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[j])}
+                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                                  id_set[i + 1]]
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
         df_raw = df_raw.reset_index(drop=True)
@@ -1201,7 +1286,8 @@ class Plot2C_comparison(Plot2B_comparison):
             ' error rate' if ind == 0 else r'$($1$-$ performance$)$'
         )
         annotXpz = 'Performance ({})'.format(self._pick_metric[ind])
-        annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(self._pick_metric[ind])
+        annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(
+            self._pick_metric[ind])
 
         scatter_with_marginal_distrib(
             df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
@@ -1225,14 +1311,16 @@ class Plot2C_comparison(Plot2B_comparison):
         kwargs.pop('snspec')
         if split:
             scatter_with_marginal_distrib(
-                df_raw, col_X, col_Y, tag_Ys[:-1], self._picked_keys[:-1],
+                df_raw, col_X, col_Y, tag_Ys[:-1],
+                self._picked_keys[:-1],
                 annotX, annotY, figname=suffix_1 + '_df', **kwargs)
         return
 
     def drawing_fig2_alt(self, dframe, tag, nb_set, id_set,
                          each_gen, each_att, joint='none', fig='tst',
                          ind=0, linreg=False, split=False):
-        _, tag_f_vot, tag_f_man, _, _ = self.picking_fig_tags(tag, ind=0)
+        _, tag_f_vot, tag_f_man, _, _ = self.picking_fig_tags(
+            tag, ind=0)
         # tYs_k2 = [0, 3, 1, 4, 6, 7]  # direct,approx,direct,approx,d_ut,a_ut
         tYs_k2 = [0, 7, 1, 8, 14, 15, ] + [4, 11, 5, 12, ]
         tmp_f_vm = [[t[k] for k in tYs_k2] for t in tag_f_man]
@@ -1245,25 +1333,36 @@ class Plot2C_comparison(Plot2B_comparison):
         if (ind is None) and split:
             tYs = tmp_f_vm[0]
             i, k = 0, 0
-            df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                              id_set[i + 1]]
             _sub_depict_scat(df_raw, tYs, suff_4 + '_aset{}'.format(i))
             _sub_depict_tim(df_raw, tYs, suff_5 + '_aset{}'.format(i))
             for i in range(1, nb_set):
                 curr_set = id_set[i] + 1
-                curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
+                curr_loc = list(range(curr_set,
+                                      curr_set + each_gen + each_att))
                 df_raw = dframe[tmp_f_vm[0]].iloc[curr_loc]
-                _sub_depict_scat(df_raw, tYs, suff_4 + '_set{}_att0'.format(i))
-                _sub_depict_tim(df_raw, tYs, suff_5 + '_set{}_att0'.format(i))
-                curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                    curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+                _sub_depict_scat(df_raw, tYs,
+                                 suff_4 + '_set{}_att0'.format(i))
+                _sub_depict_tim(df_raw, tYs,
+                                suff_5 + '_set{}_att0'.format(i))
+                curr_loc = list(range(
+                    curr_set, curr_set + each_gen)) + list(range(
+                        curr_set + each_gen + each_att,
+                        curr_set + each_gen + each_att * 2))
                 df_tmp = dframe[tmp_f_vm[1]].iloc[curr_loc]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[1])}
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[1])}
                 df_tmp = df_tmp.rename(columns=columns)
-                _sub_depict_scat(df_tmp, tYs, suff_4 + '_set{}_att1'.format(i))
-                _sub_depict_tim(df_tmp, tYs, suff_5 + '_set{}_att1'.format(i))
+                _sub_depict_scat(df_tmp, tYs,
+                                 suff_4 + '_set{}_att1'.format(i))
+                _sub_depict_tim(df_tmp, tYs,
+                                suff_5 + '_set{}_att1'.format(i))
                 df_raw = pd.concat([df_raw, df_tmp], axis=0).reset_index(drop=True)
-                _sub_depict_scat(df_raw, tYs, suff_4 + '_aset{}'.format(i))
-                _sub_depict_tim(df_raw, tYs, suff_5 + '_aset{}'.format(i))
+                _sub_depict_scat(df_raw, tYs,
+                                 suff_4 + '_aset{}'.format(i))
+                _sub_depict_tim(df_raw, tYs,
+                                suff_5 + '_aset{}'.format(i))
             return
 
         elif ind is None:
@@ -1314,131 +1413,8 @@ class Plot2C_comparison(Plot2B_comparison):
         return
 
 
-# -------------------------------
-#
-
-
 # ===============================
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# ===============================
-#
-
-
-# -------------------------------
-#
-
-
-# -------------------------------
-#
-
-
-# ===============================
-# Benchmarks
-
-
-# -------------------------------
-# Benchmarks
-# class FairManfDrawing()
-
-
-# class FairManfDrawing(DataSetup):
-#   def __init__(self):
-#     pass
-
-
-# -------------------------------
-#
-
-
-class ManfDrawing(object):
-    def __init__(self, trial_type, nb_iter=5,
-                 m1=20, m2=8, gen=False, rep=False):
-        self._trial_type = trial_type
-        self._nb_iter = nb_iter
-        self._iterator = None
-        self._m1, self._m2 = m1, m2
-        self._gen, self._rep = gen, rep
-
-        if trial_type.endswith('expt5a'):
-            self._iterator = Plot5A_hyperpm(nb_iter, gen, rep, m1, m2)
-        elif trial_type.endswith('exp5b_'):
-            self._iterator = None
-
-    @ property
-    def iterator(self):
-        return self._iterator
-
-    @ property
-    def log_document(self):
-        return self._log_document
-
-    def trial_one_process(self):
-        since = time.time()
-        logger, formatter, fileHandler = get_elogger(
-            'manifold_fair', self._log_document + '.log')
-        elegant_print([
-            "[BEGAN AT {:s}]".format(elegant_dated(since, 'txt')),
-            "EXPERIMENT",
-            "\t   trial = {}".format(self._trial_type),
-            "PARAMETERS",
-            # "\tname_ens = {}".format(self._iterator.name_ens),
-            # "\tabbr_cls = {}".format(self._iterator.abbr_cls),
-            # "\t  nb_cls = {}".format(self._iterator.nb_cls),
-            # "\t  nb_pru = {}".format(self._iterator.nb_pru),
-            "\t nb_iter = {}".format(self._iterator.nb_iter),
-            "\t  m1, m2 = {} / {}".format(self._m1, self._m2),
-            "\t gen,rep = {} / {}".format(self._gen, self._rep),
-            "HYPER-PARAMS", ""], logger)
-
-        # START
-
-        # END
-
-        time_elapsed = time.time() - since
-        since = time.time()
-        elegant_print([
-            "",  # "Duration in total"
-            " Time Cost: {:s}".format(elegant_durat(time_elapsed)),
-            "[ENDED AT {:s}]".format(elegant_dated(since, 'txt')),
-        ], logger)
-        del since, time_elapsed
-        rm_ehandler(logger, formatter, fileHandler)
-        logging.shutdown()
-        return
-
-    def trial_one_iterator(self, logger):
-        since = time.time()
-
-        time_elapsed = time.time() - since
-        elegant_print("\tDrawing: time cost {:.6f} minutes".format(
-            time_elapsed / 60), logger)
-        return
+# Replotting
 
 
 # -------------------------------
@@ -1493,13 +1469,17 @@ class RePlot2_comparison(GraphSetup):
     def draw_sub_manf_ext_dat1(self, dframe, nb_set, id_set, tmp_f_vm,
                                tmp):  # or tmp_jt
         i = j = 0
-        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                          id_set[i + 1]]
         for i in range(1, nb_set):
-            df_tmp = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_tmp = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                              id_set[i + 1]]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp[1:]:
-                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[j])}
+                df_tmp = dframe[tmp_f_vm[j]].iloc[id_set[i] + 1:
+                                                  id_set[i + 1]]
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
         # 18+(18+4)*4 =106  → 18+(18+4)*2*4 =194
@@ -1508,18 +1488,23 @@ class RePlot2_comparison(GraphSetup):
     def draw_sub_manf_ext_dat2(self, dframe, nb_set, id_set,
                                each_gen, each_att, tmp_f_vm):
         i = k = 0
-        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
+                                          id_set[i + 1]]
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
 
-            curr_loc = list(range(curr_set, curr_set + each_gen + each_att))
+            curr_loc = list(range(curr_set,
+                                  curr_set + each_gen + each_att))
             df_tmp = dframe[tmp_f_vm[0]].iloc[curr_loc]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
 
-            curr_loc = list(range(curr_set, curr_set + each_gen)) + list(range(
-                curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_tmp = dframe[tmp_f_vm[1]].iloc[curr_loc]
-            columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[1])}
+            columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                tmp_f_vm[1])}
             df_tmp = df_tmp.rename(columns=columns)
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
 
@@ -1700,19 +1685,24 @@ class Replot2B_comparison(RePlot2_comparison):
         return
 
     def drawing_fig4_fig1_alt(self, dframe, tag, ind, nb_set, id_set,
-                              each_gen, each_att, joint='none', fig='tst',
-                              pre='minmax'):  # , split=False, corrected=False):
+                              each_gen, each_att, joint='none',
+                              fig='tst', pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
-        tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(tag, ind)
+        tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(
+            tag, ind)
         col_Y_alt, annotY = 'Fairness', 'Fairness measure'
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
         # tag_Ys_alt = tag_fm[0][1:]
-        suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(pre, fig, ind)
-        suff_3 = self._figname + '{}_{}_each_confusion'.format(pre, fig)
+        suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(
+            pre, fig, ind)
+        suff_3 = self._figname + '{}_{}_each_confusion'.format(
+            pre, fig)
 
-        df_raw = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set, col_Ys, tmp)
+        df_raw = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set,
+                                             col_Ys, tmp)
         annotZ = ' error rate' if ind == 0 else '$($1- performance$)$'
-        kwargs = {'alpha_loc': 'b4', 'alpha_rev': True, 'annotY': annotZ}
+        kwargs = {'alpha_loc': 'b4', 'alpha_rev': True,
+                  'annotY': annotZ}
         lineplot_with_uncertainty(
             df_raw, col_X, col_Y_alt, col_Ys[0][1:],
             self._picked_keys, figname=suff_2,
@@ -1721,8 +1711,10 @@ class Replot2B_comparison(RePlot2_comparison):
         if ind != 0:
             return
         key_A = [self._pick_metric[k] for k in [0, 3, 1, 2, 7, ]]
-        tmp_f_vm = [[tag_acc[k] for k in [0, 3, 1, 2, 7]] + tY[1:] for tY in col_Ys]
-        df_tmp = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set, tmp_f_vm, tmp)
+        tmp_f_vm = [[tag_acc[k] for k in [
+            0, 3, 1, 2, 7]] + tY[1:] for tY in col_Ys]
+        df_tmp = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set,
+                                             tmp_f_vm, tmp)
         Mat_A = df_tmp[tmp_f_vm[0][:5]].values.astype(DTY_FLT)
         Mat_B = df_tmp[tmp_f_vm[0][5:]].values.astype(DTY_FLT)
         analogous_confusion_extended(
@@ -1792,18 +1784,24 @@ class Replot2C_comparison(Replot2B_comparison):
         return
 
     def drawing_fig4_fig1_alt(self, dframe, tag, ind, nb_set, id_set,
-                              drop_gen, each_gen, each_att, joint='none', fig='tst',
+                              drop_gen, each_gen, each_att,
+                              joint='none', fig='tst',
                               pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
-        tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(tag, ind)
+        (tag_acc, tag_fv, tag_fm, col_Ys,
+         col_X) = self.picking_fig_tags(tag, ind)
         tag_non = tag[: 13 - 1]  # non_adversarial_acc
         col_Y_alt, annotY = 'Fairness', 'Fairness measure'
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
-        suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(pre, fig, ind)
-        suff_3 = self._figname + '{}_{}_each_confusion'.format(pre, fig)
-        suff_4 = self._figname + '{}_{}_ealt_confusion'.format(pre, fig)
+        suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(
+            pre, fig, ind)
+        suff_3 = self._figname + '{}_{}_each_confusion'.format(
+            pre, fig)
+        suff_4 = self._figname + '{}_{}_ealt_confusion'.format(
+            pre, fig)
 
-        df_raw = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set, col_Ys, tmp)
+        df_raw = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set,
+                                             col_Ys, tmp)
         annotZ = ' error rate' if ind == 0 else '$($1- performance$)$'
         kwargs = {'alpha_loc': 'b4', 'alpha_rev': True, 'annotY': annotZ}
         lineplot_with_uncertainty(
@@ -1814,9 +1812,11 @@ class Replot2C_comparison(Replot2B_comparison):
         if ind != 0:
             return
         idx_A_C = [0, 3, 1, 2, 7, ]
-        tmp_A_C = [tag_non[k] for k in idx_A_C] + [tag_acc[k] for k in idx_A_C]
+        tmp_A_C = [tag_non[k] for k in idx_A_C] + [
+            tag_acc[k] for k in idx_A_C]
         key_A = [self._pick_metric[k] for k in idx_A_C]
-        key_C = [r'$\Delta${}'.format(self._pick_metric[k]) for k in idx_A_C]
+        key_C = [r'$\Delta${}'.format(
+            self._pick_metric[k]) for k in idx_A_C]
         tmp_f_vm = [tmp_A_C + tY[2:] for tY in col_Ys]
         df_tmp = self.draw_sub_manf_dat4_alt1(
             dframe, nb_set, id_set, drop_gen, tmp_f_vm, tmp)
@@ -1844,6 +1844,13 @@ class Replot2C_comparison(Replot2B_comparison):
             figname=suff_4 + '_advr', **kwargs)
         return
 
+
+# ===============================
+#
+
+
+# -------------------------------
+#
 
 # -------------------------------
 #

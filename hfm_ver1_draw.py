@@ -195,9 +195,9 @@ def default_parameters():
         help="Type of trial: experiment id")
     parser.add_argument(
         "-pre", "--data-preprocessing", type=str,
-        default="none", choices=[
+        default="min_max", choices=[
             'none', 'standard', 'min_max', 'normalize'])
-    parser.add_argument('-re', '--redo', action='store_true')
+    parser.add_argument('-re', '--replot', action='store_true')
 
     parser.add_argument('-nk', "--nb-iter", type=int, default=0,
                         help="Cross validation")
@@ -264,18 +264,18 @@ if trial_type[-6:] in ['expt2a', 'expt2b', 'expt2c']:
     # kwargs['prefix'] = 'manfRW_TDbug'
     kwargs['nb_iter'] = 5
 
-    if args.redo:
-        case = Replot_ManfDrawing(trial_type, **kwargs)
-    else:
+    if not args.replot:
         case = ManfDrawing(trial_type, **kwargs)
+    else:
+        case = Replot_ManfDrawing(trial_type, **kwargs)
     case.trial_one_process()
 
 
 # -------------------------------
 # Empirical plotting
 """
-python hfm_ver1_draw.py -nk 5 -exp rept_expt5a -m1 20 -pre min_max
-python hfm_ver1_draw.py -nk 5 -exp rept_expt5b -m2 8 -pre min_max
-python hfm_ver1_draw.py -exp mCV_expt2a -pre min_max -re
+python hfm_ver1_draw.py -nk 5 -exp rept_expt5a -m1 20
+python hfm_ver1_draw.py -nk 5 -exp rept_expt5b -m2 8
 python hfm_ver1_draw.py -exp mCV_expt2c -pre min_max
+python hfm_ver1_draw.py -exp mCV_expt2a -pre min_max -re
 """
