@@ -8,6 +8,15 @@ import argparse
 import time
 import sys
 
+from hfm.utils.recorders import elegant_print
+from hfm.utils.decorators import elegant_durat, elegant_dated
+
+from experiment.ver1.manf_plt import (
+    Plot5A_hyperpm, Plot5B_hyperpm,
+    Plot2A_comparison, Plot2B_comparison, Plot2C_comparison,
+    Replot2A_comparison, Replot2B_comparison, Replot2C_comparison)
+from experiment.ver1.manf_tab import Table2C_comparison
+
 
 # ===============================
 # Empirical results
@@ -19,13 +28,12 @@ class ManfDrawing(object):
                  abbr_cls='DT', nb_cls=1, constraint_type='FPR,FNR',
                  prefix='', ratio=.75, screen=True, logged=False):
         # super().__init__(data_type)
-        self._data_set = ['ricci', 'german', 'adult', 'ppr', 'ppvr',
-                          'tmp-simulative']
+        self._data_set = ['ricci', 'german', 'adult', 'ppr', 'ppvr']
         self._prefix = prefix
         self._ratio = ratio
-        self.preparing_iterator(trial_type, nb_iter, m1, m2, gen, rep,
-                                prep, abbr_cls, nb_cls, constraint_type,
-                                screen, logged)
+        self.preparing_iterator(
+            trial_type, nb_iter, m1, m2, gen, rep, prep,
+            abbr_cls, nb_cls, constraint_type, screen, logged)
 
     def preparing_iterator(self, trial_type, nb_iter, m1, m2, gen, rep,
                            prep, abbr_cls, nb_cls, constraint_type,
@@ -33,8 +41,8 @@ class ManfDrawing(object):
         self._trial_type = trial_type
         self._nb_iter = nb_iter
         self._gen_iter = gen
-        self._rep_iter = rep  # _cvs_iter = CVS
-        self._prep = prep  # preprocess data, pre-processing
+        self._rep_iter = rep  # cross-validation split
+        self._prep = prep     # pre-processing data
         self._m1, self._m2 = m1, m2
         self._screen, self._logged = screen, logged
 
@@ -53,7 +61,8 @@ class ManfDrawing(object):
     def trial_one_process(self):
         since = time.time()
         logger = None
-        elegant_print("[BEGAN {}]".format(elegant_dated(since)), logger)
+        elegant_print(
+            "[BEGAN {}]".format(elegant_dated(since)), logger)
 
         # START
 
@@ -85,10 +94,11 @@ class ManfDrawing(object):
 
         # END
 
-        time_elapsed = time.time() - since
-        elegant_print([
-            "Duration /TimeCost: {}".format(elegant_durat(time_elapsed)),
-            "[ENDED {}]".format(elegant_dated(time.time()))], logger)
+        tim_elapsed = time.time() - since
+        elegant_print(["Duration /TimeCost: {}".format(
+            elegant_durat(tim_elapsed)),
+            "[ENDED {}]".format(
+                elegant_dated(time.time()))], logger)
         return
 
     def drawing_expt5(self, prefix=''):
@@ -129,7 +139,8 @@ class Replot_ManfDrawing(ManfDrawing):
     def trial_one_process(self):
         since = time.time()
         logger = None
-        elegant_print("[BEGAN {}]".format(elegant_dated(since)), logger)
+        elegant_print(
+            "[BEGAN {}]".format(elegant_dated(since)), logger)
 
         if self._trial_type[-6:] in ['expt2a', 'expt2b', 'expt2c']:
             figname = 'exp{}_iter{}_cls{}_'.format(
@@ -138,9 +149,9 @@ class Replot_ManfDrawing(ManfDrawing):
             pre = self._prep if self._prep != 'min_max' else 'minmax'
             self.drawing_expt2(figname, pre, self._ratio, self._prefix)
 
-        time_elapsed = time.time() - since
-        elegant_print([
-            "Duration /TimeCost: {}".format(elegant_durat(time_elapsed)),
+        tim_elapsed = time.time() - since
+        elegant_print(["Duration /TimeCost: {}".format(
+            elegant_durat(tim_elapsed)),
             "[ENDED {}]".format(elegant_dated(time.time()))], logger)
         return
 
@@ -188,8 +199,8 @@ def default_parameters():
             'none', 'standard', 'min_max', 'normalize'])
     parser.add_argument('-re', '--redo', action='store_true')
 
-    parser.add_argument(
-        "--nb-iter", type=int, default=0, help="Cross validation")
+    parser.add_argument('-nk', "--nb-iter", type=int, default=0,
+                        help="Cross validation")
     parser.add_argument(
         '--nb-cls', type=int, default=7, help='For ensemble methods')
     parser.add_argument(
@@ -208,7 +219,7 @@ def default_parameters():
     parser.add_argument(
         "--logged", action="store_true", help="Where to output")
     parser.add_argument(
-        '--prefix', default='RWexp5re) ', help='prefix and suffix')
+        '--prefix', default='', help='prefix and suffix')
     parser.add_argument(
         '--ratio', type=float, default=.95,
         help='Previously for ICML / NeurIPS 23')
@@ -232,17 +243,6 @@ kwargs = {}
 kwargs['nb_iter'] = args.nb_iter
 kwargs['prep'] = args.data_preprocessing
 
-if args.redo:
-    kwargs['nb_cls'] = args.nb_cls
-    kwargs['rep'] = True
-    kwargs['ratio'] = .75
-    kwargs['prefix'] = 'manfRW_TDbug'
-    kwargs['nb_iter'] = 5
-
-    case = Replot_ManfDrawing(trial_type, **kwargs)
-    case.trial_one_process()
-    sys.exit()
-
 
 if trial_type[-6:] in ['expt5a', 'expt5b']:
 
@@ -252,6 +252,7 @@ if trial_type[-6:] in ['expt5a', 'expt5b']:
         kwargs['m2'] = args.m2_chosen
 
     kwargs['gen'] = args.gen_iter
+    # kwargs['prefix'] = 'manfRW'
     case = ManfDrawing(trial_type, prefix=args.prefix, **kwargs)
     case.trial_one_process()
 
@@ -260,13 +261,21 @@ if trial_type[-6:] in ['expt2a', 'expt2b', 'expt2c']:
     kwargs['rep'] = True
     kwargs['ratio'] = .75
 
-    kwargs['prefix'] = 'manfRW'
-    kwargs['prefix'] = 'manfRW_TDbug'
+    # kwargs['prefix'] = 'manfRW_TDbug'
     kwargs['nb_iter'] = 5
 
-    case = ManfDrawing(trial_type, **kwargs)
+    if args.redo:
+        case = Replot_ManfDrawing(trial_type, **kwargs)
+    else:
+        case = ManfDrawing(trial_type, **kwargs)
     case.trial_one_process()
 
 
 # -------------------------------
-#
+# Empirical plotting
+"""
+python hfm_ver1_draw.py -nk 5 -exp rept_expt5a -m1 20 -pre min_max
+python hfm_ver1_draw.py -nk 5 -exp rept_expt5b -m2 8 -pre min_max
+python hfm_ver1_draw.py -exp mCV_expt2a -pre min_max -re
+python hfm_ver1_draw.py -exp mCV_expt2c -pre min_max
+"""

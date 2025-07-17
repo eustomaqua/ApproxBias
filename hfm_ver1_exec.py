@@ -5,6 +5,10 @@
 #
 
 
+import argparse
+from experiment.ver1.manf_sim import ManfPrime_Empirical
+
+
 def default_parameters():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -102,3 +106,9 @@ case.trial_one_process(mode=mode)
 del screen, logged, kwargs
 del trial_type, data_type, abbr_cls, nb_iter
 del parser, args, case
+
+
+# Experiments
+"""
+python hfm_ver1_exec.py -exp repetit_expt5a -data ricci --nb-iter 1 -m1 5 --screen
+"""

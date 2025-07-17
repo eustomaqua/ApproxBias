@@ -1,27 +1,36 @@
 # coding: utf-8
+#
+# TARGET:
+#   Oracle bounds regarding fairness for majority vote
+#   Measuring fairness via data manifolds (w. extension)
+#
+
 
 import os
-import os.path as osp
-# import numpy as np
+import numpy as np
 import pandas as pd
-from utils.recorders import elegant_print
+from hfm.utils.recorders import elegant_print
 
 
-# ===========================
-# utils
+# =====================================
+# Data.py
+# =====================================
 
+
+# utilities.py
+# results.py
+# -------------------------------------
 
 def local_root_path():
     home = os.getcwd()
-    # Ubuntu : '/media/sf_GitD/FairML'
-    # Windows: 'D:\\GitH\\FairML'
-    # Mac    : '~/GitH/FairML'
+    # Ubuntu : '/media/sf_GitD/ApproxBias'
+    # Windows: 'D:\\GitHubLab\\ApproxBias'
     return home
 
 
 def local_data_path():
     home = local_root_path()
-    path = osp.join(home, 'data')
+    path = os.path.join(home, 'data')
     return path
 
 
@@ -29,9 +38,8 @@ PACKAGE_DIR = local_root_path()
 RAW_DATA_DIR = local_data_path()
 
 
-# ===========================
-# data
-
+# Data.py
+# -------------------------------------
 
 class Data:
     def __init__(self):
@@ -98,7 +106,7 @@ class Data:
         priv_class_names = self.get_privileged_group(tag)
         if len(priv_class_names) <= 1:
             return priv_class_names
-        # in this way, at most two sensitive attributes
+        # this way, at most two sensitive attributes
         return priv_class_names + [
             '-'.join(str(v) for v in priv_class_names)]
 
@@ -131,10 +139,9 @@ class Data:
         return "baseline_{}.csv".format(self._dataset_name)
 
     def load_raw_dataset(self):
-        data_path = osp.join(RAW_DATA_DIR, self.raw_filename)
+        data_path = os.path.join(RAW_DATA_DIR, self.raw_filename)
         data_frame = pd.read_csv(
-            data_path,
-            # error_bad_lines=False,
+            data_path,  # error_bad_lines=False,
             on_bad_lines='warn',  # 'skip'
             na_values=self._missing_val_indicators,
             encoding='ISO-8859-1')
@@ -148,31 +155,28 @@ class Data:
         return data_frame
 
     def get_class_balance_statistics(self, data_frame):
-        # if data_frame is None:
-        #   data_frame = self.load_raw_dataset()
         r = data_frame.groupby(self._label_name).size()
         return r
 
-    # def get_sensitive_attr_balance_stats(self, data_frame=None):
     def get_sens_attr_balance_stats(self, data_frame):
-        # if data_frame is None:
-        #   data_frame = self.load_raw_dataset()
         return [data_frame.groupby(
-            a).size() for a in self._sensitive_attrs]
+                a).size() for a in self._sensitive_attrs]
 
     def find_where_belongs(self, data_frame):
-        # if data_frame is None:
-        #   data_frame = self.load_raw_dataset()
         sens_attrs = self._sensitive_attrs
         priv_value = self._privileged_vals
         return [
-            # (data_frame[sa] == pv).tolist()
-            (data_frame[sa] == pv).to_numpy()
+            (data_frame[sa] == pv).to_numpy() 
             for sa, pv in zip(sens_attrs, priv_value)]
 
 
-# ===========================
-# dataset(s)
+# -------------------------------------
+# Adult.py
+# German.py
+# Ricci.py
+# PropublicaRecidivism.py
+# PropublicaViolentRecidivism.py
+# -------------------------------------
 
 
 class Adult(Data):
@@ -214,8 +218,7 @@ class German(Data):
         self.privileged_vals = ['male', 'adult']
 
         self.feats_to_keep = [
-            'status', 'month', 'credit_history', 'purpose',
-            'credit_amount',
+            'status', 'month', 'credit_history', 'purpose', 'credit_amount',
             'savings', 'employment', 'investment_as_income_percentage',
             'personal_status', 'other_debtors', 'residence_since',
             'property', 'age', 'installment_plans', 'housing',
@@ -224,10 +227,8 @@ class German(Data):
         ]
 
         self.categorical_feats = [
-            'status', 'credit_history', 'purpose', 'savings',
-            'employment',
-            'other_debtors', 'property', 'installment_plans',
-            'housing',
+            'status', 'credit_history', 'purpose', 'savings', 'employment',
+            'other_debtors', 'property', 'installment_plans', 'housing',
             'skill_level', 'telephone', 'foreign_worker'
         ]
 
@@ -240,8 +241,7 @@ class German(Data):
 
         data_frame = data_frame.assign(personal_status=data_frame[
             'personal_status'].replace(to_replace=sexdict))
-        data_frame = data_frame.rename(columns={
-            'personal_status': 'sex'})
+        data_frame = data_frame.rename(columns={'personal_status': 'sex'})
 
         # adding a derived binary age attribute (youth vs. adult) such that
         # >= 25 is adult
@@ -378,11 +378,23 @@ class PropublicaViolentRecidivism(Data):
             'days_b_screening_arrest', 'is_recid', 'decile_score',
             'score_text'])
 
+        '''
+        # >>> np.all(df['two_year_recid.1'] == df.two_year_recid)
+        # True
+        data_frame = data_frame.drop(columns=['two_year_recid.1'])
+        '''
+        # BUG. Cannot delete this column.
+
         return data_frame
 
 
-# ===========================
-# preprocess
+# =====================================
+# preprocess.py
+# =====================================
+
+
+# preprocess.py
+# -------------------------------------
 
 
 def make_sensitive_attrs_binary(dataframe,
@@ -531,7 +543,7 @@ DATASET_NAMES = [
 AVAILABLE_FAIR_DATASET = [
     # 'ricci', 'german', 'adult', 'ppc', 'ppvc'
     'ricci', 'german', 'adult', 'ppr', 'ppvr'
-]
+]  # fmanf_exec.py
 
 
 def prepare_data(dataset_name, logger=None):
@@ -548,5 +560,160 @@ def prepare_data(dataset_name, logger=None):
     raise ValueError("No dataset named `{}`.".format(dataset_name))
 
 
-# ===========================
-#
+# disturb, perturb, turbulence
+# -------------------------------------
+
+
+'''
+def find_group(dataset, processed_data):
+  belongs_priv = dataset.find_where_belongs(processed_data)
+  if len(belongs_priv) > 1:
+    belongs_priv_with_joint = np.logical_and(
+        belongs_priv[0], belongs_priv[1]).tolist()
+  else:
+    belongs_priv_with_joint = []
+
+  return belongs_priv, belongs_priv_with_joint
+'''
+
+
+def adverse_perturb(dataset, processed_data, ratio=.64):
+    sens_attrs = dataset.sensitive_attrs
+    priv_value = dataset.privileged_vals
+    unpriv_dict = [
+        processed_data[sa].unique().tolist() for sa in sens_attrs]
+    for sa_list, pv in zip(unpriv_dict, priv_value):
+        sa_list.remove(pv)
+
+    disturbed_data = processed_data.copy()
+    num = len(disturbed_data)
+    dim = len(sens_attrs)  # dim = len(belongs_priv)
+    if dim > 1:
+        new_attr_name = '-'.join(sens_attrs)
+        # disturbed_data = disturbed_data.drop(columns=[new_attr_name])
+
+    for i, ti in enumerate(processed_data.index):
+        prng = np.random.rand(dim)
+        prng = prng <= ratio
+
+        for j, sa, pv, un in zip(
+                range(dim), sens_attrs, priv_value, unpriv_dict):
+            if not prng[j]:
+                continue
+            if disturbed_data.iloc[i][sa] != pv:
+                disturbed_data.loc[ti, sa] = pv
+            else:
+                disturbed_data.loc[ti, sa] = np.random.choice(un)
+
+        if dim > 1:
+            disturbed_data.loc[ti, new_attr_name] = '-'.join([
+                disturbed_data.iloc[i][sa] for sa in sens_attrs])
+
+    '''
+    if dim > 1:
+        disturbed_data = disturbed_data.assign(
+            temp_name=disturbed_data[
+                sens_attrs].apply('-'.join, axis=1))
+        disturbed_data = disturbed_data.rename(
+            columns={'temp_name': new_attr_name})
+    '''
+    return disturbed_data
+
+
+# adversarial (not adversarialize), v. adverse
+def adversarial(dataset, data_frame, ratio=.4, logger=None):
+    processed_data = process_above(dataset, data_frame, logger)
+
+    # above: refer to `preprocess`
+    # ------------------------------
+
+    # belongs_priv, belongs_priv_with_joint \
+    #     = find_group(dataset, processed_data)
+    disturbed_data = adverse_perturb(dataset, processed_data, ratio)
+
+    # ------------------------------
+    # below: refer to `preprocess`
+
+    processed_numerical, processed_binsensitive, \
+        processed_categorical_binsensitive = process_below(
+            dataset, disturbed_data)
+    '''
+    processed_numerical = pd.get_dummies(
+        disturbed_data, columns=dataset.categorical_feats)
+    if dim > 1:
+        sens_attrs += [new_attr_name]
+        priv_value += ['-'.join(str(v) for v in priv_value)]
+    processed_binsensitive = make_sensitive_attrs_binary(
+        processed_numerical, sens_attrs, priv_value)
+    processed_categorical_binsensitive = make_sensitive_attrs_binary(
+        disturbed_data, sens_attrs, dataset.get_privileged_group(""))
+    class_attr = dataset.label_name
+    pos_val = dataset.positive_label
+    processed_binsensitive = make_class_attr_num(
+        processed_binsensitive, class_attr, pos_val)
+    '''
+
+    return {
+        "original": disturbed_data,
+        "numerical": processed_numerical,
+        "numerical-binsensitive": processed_binsensitive,
+        "categorical-binsensitive": processed_categorical_binsensitive
+    }
+
+
+def disturb_data(dataset_name, ratio=.6, logger=None):
+    for ds in DATASETS:
+        if ds.dataset_name != dataset_name:
+            continue
+
+        elegant_print(
+            "--- Disturbing dataset: %s ---" % ds.dataset_name, logger)
+
+        data_frame = ds.load_raw_dataset()
+        t = adversarial(ds, data_frame, ratio, logger)
+
+        return t
+    raise ValueError("No dataset named `{}`.".format(dataset_name))
+
+
+# =====================================
+# Experiments
+# =====================================
+
+
+# Deal with `data_frame`
+# -------------------------------------
+
+
+def transform_X_and_y(dataset, processed_binsensitive):
+    # processed_numerical: pd.DataFrame
+    y = processed_binsensitive[dataset.label_name]
+    X = processed_binsensitive.drop(columns=dataset.label_name)
+    return X, y
+
+
+def transform_unpriv_tag(dataset, processed_data):
+    # belongs_priv, belongs_priv_with_joint = find_group(
+    #     dataset, processed_data)
+
+    belongs_priv = dataset.find_where_belongs(processed_data)
+    if len(belongs_priv) > 1:
+        # belongs_priv_with_joint = np.logical_and(
+        #     belongs_priv[0], belongs_priv[1]).tolist()
+
+        """
+        belongs_priv_with_joint = np.logical_or(
+            belongs_priv[0], belongs_priv[1]
+        ).astype('bool').tolist()  # DTY_INT
+        """
+
+        belongs_priv_with_joint = np.logical_and(
+            belongs_priv[0], belongs_priv[1]
+        ).astype('bool').tolist()  # DTY_INT
+
+    else:
+        belongs_priv_with_joint = []
+
+    # belongs_priv = [i.astype(DTY_INT) for i in belongs_priv]
+    # belongs_priv = [i.astype(DTY_BOL) for i in belongs_priv]
+    return belongs_priv, belongs_priv_with_joint
