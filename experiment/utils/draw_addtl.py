@@ -17,7 +17,8 @@ from hfm.utils.verifiers import DTY_FLT
 
 from experiment.utils.draw_graph import (
     _style_set_axis, _setup_config, _setup_figsize, _setup_figshow,
-    _setup_locater, _set_quantile, _sns_line_err_bars, PLT_LOCATION,
+    _set_quantile, _sns_line_err_bars,
+    PLT_LOCATION, PLT_FRAMEBOX,
     cnames, cname_keys, cmap_names, _setup_rgb_color,
     _backslash_distributed, _barh_patterns,
     _sns_line_fit_regs, _sns_line_err_bars)
@@ -184,11 +185,11 @@ def scatter_k_cv_with_real(X, Ys, z,  # y/z: real values
     if not tidy_cv:
         tX = np.array([X] * nb_iter)
         tYs = Ys.reshape(-1)
-        tz = np.array([z] * num).T
+        # tz = np.array([z] * num).T
     else:
         tX = np.array([X] * nb_iter).T
         tYs = Ys.T.reshape(-1)
-        tz = np.array([z] * num)
+        # tz = np.array([z] * num)
     kws['linestyle'] = '--'
     _sns_line_err_bars(ax, kws, tX.reshape(-1), tYs)
     kws.pop('linestyle')
@@ -239,7 +240,7 @@ def boxplot_k_cv_with_real(X, Ys, z,
 
     kws['color'] = '#F65F47'
     tX = np.array([X] * nb_iter).reshape(-1)
-    tz = np.array([z] * num).T.reshape(-1)
+    # tz = np.array([z] * num).T.reshape(-1)
     kws['linestyle'] = '--'
     _sns_line_err_bars(ax, kws, tX, Ys.reshape(-1))
     kws.pop('linestyle')
@@ -302,8 +303,7 @@ def approximated_dist_comparison(
     fig, ax = plt.subplots(figsize=_setup_config['M-NT'])
 
     # cs, cl = _setup_rgb_color(nb_iter, cmap_name)
-    cs = sns.color_palette(cmap_name)
-    cl = len(cs)
+    cs = sns.color_palette(cmap_name)  # cl = len(cs)
     kws = {'color': 'navy', 'lw': 1}
     if isinstance(X, list):
         tX = X * nb_iter
@@ -356,7 +356,7 @@ def multiple_scatter_comparison(X, Yss, zs, picked_keys,
 
     tx_min, tx_max = ax.get_xlim()
     tz_avg = np.mean(zs, axis=1)            # (#att_sen,)
-    tz_std = np.std(zs, axis=1, ddof=ddof)  # (#att_sen,)
+    # tz_std = np.std(zs, axis=1, ddof=ddof)  # (#att_sen,)
     for i in range(nb_att):
         kws = {'color': cs[i % cl], 'lw': 1}
         ax.plot([tx_min, tx_max], [tz_avg[i], tz_avg[i]], **kws)
@@ -645,7 +645,7 @@ def _marginal_distr_step4(grid, dfs_pl, columns, col_X, col_Y,
             R = np.corrcoef(tX, tY)[1, 0]
             key = 'Correlation = %.4f' % R
             regr = np.polyfit(tX, tY, deg=1)
-            estimated = np.polyval(regr, tX)
+            # estimated = np.polyval(regr, tX)
             ax4.scatter(tX, tY,
                         label='{:4s} {}'.format(columns[i], key),
                         s=_curr_sz[i] / 4, marker=_curr_mk[i],
@@ -769,7 +769,7 @@ def single_line_reg_with_distr(X, Y, annots=('X', 'Y', 'Z'),
                                linreg=False, distrib=False,
                                snspec='sty2', cmap_name='coolwarm',
                                sci_format_y=False):
-    mycolor = sns.color_palette(cmap_name)
+    # mycolor = sns.color_palette(cmap_name)
 
     fig = plt.figure(figsize=_setup_config[figsize], dpi=300)
     plt.subplots_adjust(left=.11, bottom=.11, right=.98, top=.995)

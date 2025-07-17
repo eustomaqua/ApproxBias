@@ -202,7 +202,7 @@ def analogous_confusion(Mat, label_vals, figname,
     plt.yticks(tick_marks, label_vals)
     if normalize:
         cm = cm / cm.sum(axis=1)[:, np.newaxis]
-    thresh = cm.max() / 1.5 if normalize else cm.max() / 2
+    # thresh = cm.max() / 1.5 if normalize else cm.max() / 2
     for i, j in itertools.product(range(num_z),
                                   range(num_z)):
         plt.text(j, i, "{:.3f}".format(cm[i, j]),

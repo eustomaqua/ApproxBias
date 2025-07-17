@@ -5,30 +5,24 @@
 #
 
 
-from copy import deepcopy
-import json
-import time
-import os
-import numpy as np
-
 import logging
-import matplotlib.pyplot as plt
+import time
+import numpy as np
 import pandas as pd
-import pdb
 
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
-from hfm.utils.recorders import get_elogger, rm_ehandler
+from hfm.utils.recorders import (
+    get_elogger, rm_ehandler, elegant_print)
+from hfm.utils.decorators import elegant_dated
 from experiment.generic import GraphSetupVer1 as GraphSetup
 from experiment.generic import DAT_EXPT_ORG
 
 from experiment.utils.draw_addtl import (
     scatter_k_cv_with_real, approximated_dist_comparison,
-    boxplot_k_cv_with_real, multiple_scatter_comparison,
+    multiple_scatter_comparison,
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
     line_reg_with_marginal_distr, single_line_reg_with_distr)
-from experiment.utils.draw_graph import (
-    scatter_id_chart, scatter_and_corr)
 from experiment.utils.draw_chart import analogous_confusion_extended
 
 
@@ -86,7 +80,7 @@ class Plot5A_hyperpm(GraphSetup):
     def schedule_mspaint(self, raw_dframe):
         nb_set, Ys_dir, Ys_app, Ys_ut, \
             picked_keys = self.painting_prep(raw_dframe)
-        X = self._m2_set.copy()
+        # X = self._m2_set.copy()
         '''
         self.painting_fig2(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
         self.painting_fig1(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
@@ -134,7 +128,7 @@ class Plot5A_hyperpm(GraphSetup):
                     range(curr_loc, curr_loc + self._nb_iter))
 
         df_raw = dframe[[curr_tag_dir] + curr_tag_app].iloc[index_wa]
-        col_X, col_Y = curr_tag_dir, 'Approximation'
+        col_Y = 'Approximation'  # col_X, = curr_tag_dir,
         annotX = 'Distance via direct computation'
         annotY = 'Distance via approximation'
         picked_keys = [r'$m_2={:2d}$ '.format(i) for i in picked_m2]
@@ -181,7 +175,7 @@ class Plot5A_hyperpm(GraphSetup):
 
         for i in range(nb_set):
             nb_att = (id_set[i + 1] - id_set[i] - 1) // self._nb_iter
-            curr_dat = raw_dframe['A'].iloc[id_set[i]]
+            # curr_dat = raw_dframe['A'].iloc[id_set[i]]
             tmp_dir, tmp_app, tmp_ut, tmp_key = [], [], [], []
 
             for j in range(nb_att):
@@ -279,21 +273,24 @@ class Plot5B_hyperpm(GraphSetup):
     def schedule_mspaint(self, raw_dframe):
         nb_set, Ys_dir, Ys_app, Ys_ut, \
             picked_keys = self.painting_prep(raw_dframe)
-        X = self._m1_set.copy()
+        # X = self._m1_set.copy()
 
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=3)
         tag_pm, tag_direct, tag_approx, tag_ut = self.prepare_graph()
         picked_set = [0, 1, 2, 3, 4, ]  # without simulation data
         picked_m1 = [3, 11, 17, 23, 29, 35, ]
         picked_m1 = [3, 9, 15, 21, 27, ]
-        self.drawing_fig3_alt(raw_dframe, nb_set, id_set, tag_direct, tag_approx,
-                              'ua', picked_m1, picked_set, joint='none')
-        self.drawing_fig3_alt(raw_dframe, nb_set, id_set, tag_direct, tag_ut,
-                              'ut', picked_m1, picked_set, joint='none')
+        self.drawing_fig3_alt(
+            raw_dframe, nb_set, id_set, tag_direct, tag_approx,
+            'ua', picked_m1, picked_set, joint='none')
+        self.drawing_fig3_alt(
+            raw_dframe, nb_set, id_set, tag_direct, tag_ut,
+            'ut', picked_m1, picked_set, joint='none')
 
     def drawing_fig3_alt(self, dframe, nb_set, id_set,
                          tag_direct, tag_approx, ind='ua',
-                         picked_m1=[3, 5, 7, 9], picked_set=[0, 1, 2, 3, 4, ],
+                         picked_m1=[3, 5, 7, 9],
+                         picked_set=[0, 1, 2, 3, 4, ],
                          joint='and|or', distrib=False):
         if ind == 'ua':
             curr_tag_dir = tag_direct[-2]
@@ -505,8 +502,9 @@ class Plot2_comparison(GraphSetup):
 
     def draw_sub2_dat2(self, dframe, nb_set, id_set, each_gen, each_att,
                        tmp_f_vm):  # , tmp_jt):
-        i, k = 0, 0
-        df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
+        i = 0  # i, k = 0, 0
+        df_raw = dframe[tmp_f_vm[0]].iloc[
+            id_set[i] + 1: id_set[i + 1]]
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
 
@@ -1543,7 +1541,7 @@ class RePlot2_comparison(GraphSetup):
     def draw_sub_manf_dat4_alt1(self,
                                 dframe, nb_set, id_set, drop_gen,
                                 tmp_f_vm, tmp):  # drop_gen= 11*5
-        i = j = k = 0
+        i = j = 0  # i = j = k = 0
         curr_set = id_set[i] + 1 + drop_gen
         df_raw = dframe[tmp_f_vm[0]].iloc[curr_set: id_set[i + 1]]
         for i in range(1, nb_set):
@@ -1612,23 +1610,26 @@ class Replot2A_comparison(RePlot2_comparison):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
         nb_set, id_set, id_att, each_att = self.recap_sub_data(
             raw_dframe, nb_row=4)
-        each_gen = 0  # each generic / non-sensitive attribute?
+        # each_gen = 0  # each generic / non-sensitive attribute?
         tag_pm, tag_trn, tag_tst = self.prepare_graph()
 
         # kws = {'joint': 'none', 'fig': 'tst', 'split': False,
         #        'corrected': True, 'pre': pre}
         kws = {'fig': 'tst', 'pre': pre}
         for ind in [0, 3, 1, 2, 7]:
-            self.drawing_fig4_fig1_alt(raw_dframe, tag_tst, ind, nb_set, id_set,
-                                       each_att, **kws)
+            self.drawing_fig4_fig1_alt(
+                raw_dframe, tag_tst, ind, nb_set, id_set,
+                each_att, **kws)
         return
 
     def drawing_fig4_fig1_alt(self, dframe, tag, ind, nb_set, id_set,
                               each_att, fig='tst', pre='minmax'):
         tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(tag, ind)
-        col_Y_alt, annotY = 'Fairness', 'Fairness measure'
-        annotX = 'Performance ({})'.format(self._pick_metric[ind])
+        col_Y_alt = 'Fairness'  # ,annotY='Fairness measure'
+        # annotX = 'Performance ({})'.format(self._pick_metric[ind])
+        '''
         suff_1 = self._figname + '{}_{}_pc1_mat{}'.format(pre, fig, ind)
+        '''
         suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(pre, fig, ind)
 
         tmp_f_vm = [tag_acc[k] for k in [0, 3, 1, 2, 7, ]] + col_Ys
@@ -1705,16 +1706,17 @@ class Replot2B_comparison(RePlot2_comparison):
         tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(tag, ind)
         col_Y_alt, annotY = 'Fairness', 'Fairness measure'
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
-        tag_Ys_alt = tag_fm[0][1:]
+        # tag_Ys_alt = tag_fm[0][1:]
         suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(pre, fig, ind)
         suff_3 = self._figname + '{}_{}_each_confusion'.format(pre, fig)
 
         df_raw = self.draw_sub_manf_ext_dat1(dframe, nb_set, id_set, col_Ys, tmp)
         annotZ = ' error rate' if ind == 0 else '$($1- performance$)$'
         kwargs = {'alpha_loc': 'b4', 'alpha_rev': True, 'annotY': annotZ}
-        lineplot_with_uncertainty(df_raw, col_X, col_Y_alt, col_Ys[0][1:],
-                                  self._picked_keys, figname=suff_2,
-                                  cmap_name=self._cmap_name, **kwargs)
+        lineplot_with_uncertainty(
+            df_raw, col_X, col_Y_alt, col_Ys[0][1:],
+            self._picked_keys, figname=suff_2,
+            cmap_name=self._cmap_name, **kwargs)
 
         if ind != 0:
             return

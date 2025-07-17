@@ -60,9 +60,9 @@ class DataSetup:
             'numerical-binsensitive')
         self.saValue = [0 for sa in self.saValue if sa == 1]
 
-        @property
-        def data_type(self):
-            return self._data_type
+        # @property
+        # def data_type(self):
+        #     return self._data_type
 
         @property
         def log_document(self):

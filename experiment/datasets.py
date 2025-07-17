@@ -586,7 +586,7 @@ def adverse_perturb(dataset, processed_data, ratio=.64):
         sa_list.remove(pv)
 
     disturbed_data = processed_data.copy()
-    num = len(disturbed_data)
+    # num = len(disturbed_data)
     dim = len(sens_attrs)  # dim = len(belongs_priv)
     if dim > 1:
         new_attr_name = '-'.join(sens_attrs)

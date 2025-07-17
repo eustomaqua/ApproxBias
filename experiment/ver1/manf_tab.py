@@ -8,25 +8,16 @@
 #
 
 
-from copy import deepcopy
 import csv
-import json
-import time
 import os
 import numpy as np
 
-import logging
-import matplotlib.pyplot as plt
-import pandas as pd
-import pdb
 
-
-from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
-from hfm.utils.recorders import get_elogger, rm_ehandler
-from experiment.datasets import PACKAGE_DIR
+from hfm.utils.verifiers import check_zero, DTY_FLT
+from hfm.utils.decorators import elegant_durat
 
 from experiment.utils.draw_hypos import (
-    Friedman_init, _avg_and_stdev, _encode_sign,
+    Friedman_init, _encode_sign,
     comp_t_sing, comp_t_prep, cmp_paired_wtl, cmp_paired_avg)
 from experiment.utils.draw_graph import (
     Friedman_chart, stat_chart_stack)
@@ -135,8 +126,9 @@ class Table2C_comparison(Plot2C_comparison):
         tag_a_f = tmp_a_det + tmp_a_org + tmp_f_vm[0] + tmp_f_vm[1]
 
         for i in range(nb_set):
-            j = 0
-            df_tmp = dframe[tag_a_f].iloc[id_set[i] + 1: id_set[i + 1]]
+            # j = 0
+            df_tmp = dframe[tag_a_f].iloc[
+                id_set[i] + 1: id_set[i + 1]]
 
             if i == 0:
                 for col_Y in tag_a_f[-6:]:
@@ -486,13 +478,14 @@ class Table2C_comparison(Plot2C_comparison):
         suff = suff.replace(
             'iter5_cls7', 'iter5cls7').replace('min_max', 'minmax')
         mode = 'ascend'
-        offset = -2 if dist_df == 'both' else -1
+        # offset = -2 if dist_df == 'both' else -1
         csv_w.writerows([[''], [''], [''], ['']])
         for k in ls_row:
             ans_tex, ans_std, ans_wtl, ans_cmp = self.tabulating_forth_sub3(
                 U_f1_raw, k, ls_row, dist_df, ddof,
                 mode=mode, offset=-1,
-                figname=suff + '_tab4_fairk{}'.format(k))  # offset=-4,arxiv
+                figname=suff + '_tab4_fairk{}'.format(k))
+            # offset=-4,arxiv
             csv_w.writerows([[''], [''], ])
             csv_w.writerow(ans_tex[1][: 2])
             csv_w.writerows(ans_tex + [[''], ['']])
