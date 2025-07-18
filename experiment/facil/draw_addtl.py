@@ -1482,7 +1482,6 @@ def FairGBM_tradeoff_v2(Xs, Ys, annot, label=('X', 'Y'),
         baseline_Ys.append(tmp)
     baseline_Ys = np.array(baseline_Ys).transpose(1, 0, 2)
     # baseline_Ys.shape  (#model, #gap, #iteration)
-    # baseline_Ys = np.array(baseline_Ys)  # (#model, #gap,#..)
 
     kwargs = {'figsize': figsize, 'figname': figname}
     kwargs['alpha_loc'] = alpha_loc

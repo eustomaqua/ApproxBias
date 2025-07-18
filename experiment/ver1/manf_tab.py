@@ -437,7 +437,8 @@ class Table2C_comparison(Plot2C_comparison):
                 compared = U_f1_raw[i, j, :]  # shape= (#iter,) =(5,)
                 sign_B, G_B = comp_t_sing(compared, self._nb_iter, rez)
                 mk_mu, mk_s2 = comp_t_prep(proposed, compared)
-                tmp_wtl.append(cmp_paired_wtl(G_A, G_B, mk_mu, mk_s2, mode=mode))
+                tmp_wtl.append(cmp_paired_wtl(G_A, G_B, mk_mu, mk_s2,
+                                              mode=mode))
                 tmp_cmp.append(cmp_paired_avg(G_A, G_B, mode=mode))
                 tmp_std.append(sign_B)
             ans_wtl.append(tmp_wtl)

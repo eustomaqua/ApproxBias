@@ -11,6 +11,11 @@ import pandas as pd
 from hfm.utils.verifiers import DTY_FLT
 from experiment.datasets import DATASETS, DATASET_NAMES, PACKAGE_DIR
 
+
+# -------------------------------
+# Parameters
+
+
 RAW_EXPT_DIR = os.path.join(PACKAGE_DIR, 'findings')
 DAT_EXPT_NMS = ['ricci', 'german', 'adult', 'ppr', 'ppvr', 'tmp']
 DAT_EXPT_ORG = ['Ricci', 'Credit', 'Income', 'PPR', 'PPVR',
