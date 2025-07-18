@@ -15,6 +15,8 @@ from copy import deepcopy
 # from experiment.datasets import (AVAILABLE_FAIR_DATASET,
 #                                  DATASETS, DATASET_NAMES)
 
+from hfm.utils.verifiers import DTY_BOL
+
 
 # ===============================
 # Data preprocessing
@@ -57,16 +59,16 @@ def transform_unpriv_tag(dataset, processed_original,
 
     if len(belongs_priv) > 1 and joint == 'and':
         belongs_priv_with_joint = np.logical_and(
-            belongs_priv[0], belongs_priv[1]).astype('bool').tolist()
+            belongs_priv[0], belongs_priv[1]).astype(DTY_BOL).tolist()
     elif len(belongs_priv) > 1 and joint == 'or':
         belongs_priv_with_joint = np.logical_or(
-            belongs_priv[0], belongs_priv[1]).astype('bool').tolist()
+            belongs_priv[0], belongs_priv[1]).astype(DTY_BOL).tolist()
     elif len(belongs_priv) > 1 and joint == 'both':
         belongs_priv_with_joint = [
             np.logical_and(belongs_priv[0],
-                           belongs_priv[1]).astype('bool'),
+                           belongs_priv[1]).astype(DTY_BOL),
             np.logical_or(belongs_priv[0],
-                          belongs_priv[1]).astype('bool'),
+                          belongs_priv[1]).astype(DTY_BOL),
         ]
     else:
         belongs_priv_with_joint = []

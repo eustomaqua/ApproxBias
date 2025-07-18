@@ -14,7 +14,7 @@ from hfm.utils.decorators import (elegant_dated, elegant_durat,
                                   elegant_durat_core)
 from hfm.utils.recorders import elegant_print, get_elogger
 from experiment.generic import DataSetup
-from experiment.classifiers import AVAILABLE_CLFS, AVAILABLE_ENSF
+from experiment.classifiers import AVAILABLE_ENSF  # AVAILABLE_CLFS,
 from experiment.datasets import preprocess, adversarial, transform_X_and_y
 
 from experiment.utils.data_split import (
@@ -22,7 +22,8 @@ from experiment.utils.data_split import (
     manual_repetitive, scale_normalize_helper)
 from experiment.ver1.manf_data import (
     binarized_data_set, transform_X_A_and_y, transform_unpriv_tag,
-    transform_disturb_prime, normalise_disturb_whole)
+    transform_disturb_prime, normalise_disturb_prime,
+    normalise_disturb_whole)
 from experiment.ver2.mext_data import (
     renewed_transform_disturb, renewed_normalise_disturb,
     renewed_normalise_separate)

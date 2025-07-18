@@ -6,7 +6,7 @@
 
 import numpy as np
 import pandas as pd
-from copy import deepcopy
+# from copy import deepcopy
 
 # from experiment.datasets import (Ricci, German, Adult,
 #                                  PropublicaRecidivism,
@@ -19,6 +19,7 @@ import time
 from experiment.datasets import (
     process_above, adverse_perturb,
     make_sensitive_attrs_binary, make_class_attr_num)
+from hfm.utils.verifiers import DTY_BOL
 
 
 # ===============================
@@ -44,7 +45,7 @@ def make_bool_feat_numerical(dataframe, boolean_feats=None):
     # dataframe should be `processed_numerical`
     newframe = dataframe.copy()
     for attr in boolean_feats:
-        if newframe[attr].dtype == 'bool':
+        if newframe[attr].dtype == DTY_BOL:  # 'bool':
             newframe[attr] = newframe[attr].replace({True: 1})
             newframe[attr] = newframe[attr].replace({False: 0})
     return newframe
@@ -231,9 +232,9 @@ def renewed_prep_and_adversarial(dataset, data_frame, ratio=.7,
     if len(belongs_priv) > 1:
         belongs_priv_with_joint = [
             np.logical_and(belongs_priv[0],
-                           belongs_priv[1]).astype('bool'),
+                           belongs_priv[1]).astype(DTY_BOL),
             np.logical_or(belongs_priv[0],
-                          belongs_priv[1]).astype('bool'),
+                          belongs_priv[1]).astype(DTY_BOL),
         ]
         belongs_priv.extend(belongs_priv_with_joint)
     marginalised_groups = preproc_mu['marginalised_groups']

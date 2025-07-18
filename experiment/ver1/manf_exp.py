@@ -4,7 +4,6 @@
 
 import time
 import numpy as np
-import pandas as pd
 
 from sklearn.ensemble import (
     BaggingClassifier, AdaBoostClassifier, RandomForestClassifier,
@@ -14,24 +13,23 @@ from fairgbm import FairGBMClassifier
 # from experiment.utils.pkgs_AdaFair_mod import AdaFair
 # from blbm.fairgbm import FairGBMClassifier
 # from blbm.AdaFair_mod3 import AdaFair
-from experiment.classifiers import RelativeFairClsf, INDIVIDUALS
-from experiment.utils.data_classify import EnsembleAlgorithm
+from experiment.classifiers import INDIVIDUALS  # RelativeFairClsf,
 
 from hfm.dist_drt import DirectDist_bin as DirectDist
 from hfm.dist_est_bin import ApproxDist_bin as ApproxDist
-from hfm.dist_est_bin import AcceleDist_bin as AcceleDist
 from hfm.hfm_df import bias_degree as fair_degree
-from hfm.discriminative_risk import (
-    E_rho_L_fair_f, hat_L_fair, E_rho_L_loss_f, hat_L_loss)
+# from hfm.discriminative_risk import (
+#     E_rho_L_fair_f, hat_L_fair, E_rho_L_loss_f, hat_L_loss)
+from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.metrics.contingency_mat import \
     contg_tab_multi_type2 as contingency_table
 from hfm.metrics.performance import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
-    calc_tpr, calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
+    calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
-    imba_Matthew_s_cc, imba_Cohen_s_kappa)
+    imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
 from hfm.metrics.fairness_group import (
     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
@@ -165,9 +163,9 @@ class ComparisonB_setup:
                                  dtype=DTY_FLT)
         X_and_y_hat = np.concatenate([y_hat.reshape(-1, 1), X],
                                      axis=1, dtype=DTY_FLT)
+        '''
         idx_sa = ~non_sa  # non_priv
 
-        '''
         ut_a = time.time()
         Ds_01, t_Ds = DirectDist(X_and_y, idx_sa, non_sa)
         Df_01, t_Df = DirectDist(X_and_y_hat, idx_sa, non_sa)

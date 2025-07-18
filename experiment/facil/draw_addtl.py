@@ -18,7 +18,7 @@ from hfm.utils.verifiers import DTY_FLT
 from experiment.facil.draw_graph import (
     PLT_LOCATION, PLT_FRAMEBOX, _style_set_axis, _setup_config,
     _setup_figsize, _setup_figshow, _setup_rgb_color,
-    _sns_line_err_bars, _sns_line_fit_regs)
+    _sns_line_err_bars)  # , _sns_line_fit_regs)
 
 
 # ===============================
@@ -552,7 +552,7 @@ def _marginal_distr_step4(grid, dfs_pl, columns, col_X, col_Y,
             R = np.corrcoef(tX, tY)[1, 0]
             key = 'Correlation = %.4f' % R
             regr = np.polyfit(tX, tY, deg=1)
-            estimated = np.polyval(regr, tX)
+            # estimated = np.polyval(regr, tX)
 
             ax4.scatter(x=df[col_X], y=df[col_Y], s=_curr_sz[i],
                         alpha=1,  # edgecolors=_curr_mc[i],
@@ -1472,7 +1472,8 @@ def FairGBM_tradeoff_v2(Xs, Ys, annot, label=('X', 'Y'),
         if (alpha_loc == 'b4') and (not alpha_rev):
             tmp = Xs * alpha + (1. - alpha) * Ys
         elif (alpha_loc == 'af') and (not alpha_rev):
-            tmp = Xs * (1. - alpha) + alpha * Ys[i]
+            # tmp = Xs * (1. - alpha) + alpha * Ys[i]
+            tmp = Xs * (1. - alpha) + alpha * Ys
         elif (alpha_loc == 'b4') and alpha_rev:
             tmp = (1. - Xs) * alpha + (1. - alpha) * Ys
         elif (alpha_loc == 'af') and alpha_rev:

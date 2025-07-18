@@ -4,19 +4,15 @@
 
 # from experiment.utils.data_distance import (
 from hfm.metrics.data_distance import (
-    Wasserstein_dis,
-    KL_divergence, JS_divergence, Bhattacharyya_dist,
-    Hellinger_dist_v2, Hellinger_dist_v1, JS_div,
-    f_divergence, _discrete_joint_cnts)
+    Wasserstein_dis, KL_divergence, Bhattacharyya_dist,
+    Hellinger_dist_v2, JS_div, _discrete_joint_cnts
+)  # JS_divergence,Hellinger_dist_v1,f_divergence
 
-from experiment.utils.draw_hypos import (
-    Friedman_test, Nememyi_posthoc_test)
 from experiment.facil.draw_graph import (
-    PLT_FRAMEBOX, PLT_LOCATION, DTY_PLT,
-    _setup_config, _barh_kwargs, _barh_fcolor,
-    _setup_figsize, _setup_figshow,
+    PLT_FRAMEBOX, PLT_LOCATION, PLT_AX_STYLE, DTY_PLT,
+    _setup_config, _barh_kwargs, _setup_figsize, _setup_figshow,
     _setup_locater, _style_set_fig, _style_set_axis,
-    _sns_line_err_bars, PLT_AX_STYLE)
+    _barh_fcolor, _sns_line_err_bars)
 
 
 import itertools
@@ -388,7 +384,7 @@ def analogous_confusion_alternative(Mat, sens,
             ax[k].set_xlabel(sa.upper() + " Attribute")  # sa+
         if normalize:
             cm = cm / cm.sum(axis=1)[:, np.newaxis]
-        thresh = cm.max() / 1.5 if normalize else cm.max() / 2
+        # thresh = cm.max() / 1.5 if normalize else cm.max() / 2
         for i, j in itertools.product(range(num_z),
                                       range(num_z)):
             ax[k].text(j, i, "{:.3f}".format(cm[i, j]),

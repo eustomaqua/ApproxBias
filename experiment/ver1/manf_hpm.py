@@ -3,13 +3,11 @@
 
 
 import time
-import pdb
 import numpy as np
-import pandas as pd
 
 from hfm.dist_drt import DirectDist_bin as DirectDist
 from hfm.dist_est_bin import ApproxDist_bin as ApproxDist
-from hfm.dist_est_bin import AcceleDist_bin as AcceleDist
+# from hfm.dist_est_bin import AcceleDist_bin as AcceleDist
 from hfm.hfm_df import bias_degree as fair_degree
 
 from hfm.utils.verifiers import unique_column, DTY_FLT

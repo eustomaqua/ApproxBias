@@ -124,7 +124,7 @@ def calc_micro_score(confusion, cv=5):
     tp_bar = sum(tp) / cv
     fp_bar = sum(fp) / cv
     fn_bar = sum(fn) / cv
-    tn_bar = sum(tn) / cv
+    # tn_bar = sum(tn) / cv
 
     micro_p = float(tp_bar + fp_bar)
     micro_p = tp_bar / check_zero(micro_p)

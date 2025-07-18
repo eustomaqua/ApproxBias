@@ -1,3 +1,5 @@
+# cf. https://github.com/iosifidisvasileios/AdaFair
+
 """Weight Boosting
 
 This module contains weight boosting estimators for both classification and
@@ -43,7 +45,7 @@ from sklearn.ensemble._forest import BaseEnsemble
 from hfm.utils.verifiers import check_zero
 import six
 import sys
-import pdb
+# import pdb
 sys.modules['sklearn.externals.six'] = six
 
 __all__ = [

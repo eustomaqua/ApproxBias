@@ -9,8 +9,6 @@
 
 
 import csv
-import os
-import pdb
 import numpy as np
 
 from hfm.utils.verifiers import DTY_FLT

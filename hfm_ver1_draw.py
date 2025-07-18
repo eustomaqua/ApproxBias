@@ -6,14 +6,14 @@
 
 import argparse
 import time
-import sys
+# import sys
 
 from hfm.utils.recorders import elegant_print
 from hfm.utils.decorators import elegant_durat, elegant_dated
 
 from experiment.ver1.manf_plt import (
     Plot5A_hyperpm, Plot5B_hyperpm,
-    Plot2A_comparison, Plot2B_comparison, Plot2C_comparison,
+    Plot2A_comparison, Plot2B_comparison,  # Plot2C_comparison,
     Replot2A_comparison, Replot2B_comparison, Replot2C_comparison)
 from experiment.ver1.manf_tab import Table2C_comparison
 

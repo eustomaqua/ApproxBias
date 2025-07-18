@@ -5,8 +5,6 @@
 #
 
 
-import logging
-import time
 import numpy as np
 import pandas as pd
 # import pdb
@@ -325,7 +323,7 @@ class Plot5B_hyperpm(GraphSetup):
                                        curr_loc + self._nb_iter))
 
         df_raw = dframe[[curr_tag_dir] + curr_tag_app].iloc[index_wa]
-        col_X, col_Y = curr_tag_dir, 'Approximation'
+        col_Y = 'Approximation'  # col_X,=curr_tag_dir
         picked_keys = [r'$m_1={:2d}$'.format(i) for i in picked_m1]
         kws = {'snspec': 'sty5b', 'cmap_name': self._cmap_name}
         suff_6 = 'exp5b_minmax_{}_m2_{}'.format(suffix, ind)  # fixed m2
@@ -369,7 +367,7 @@ class Plot5B_hyperpm(GraphSetup):
 
         for i in range(nb_set):
             nb_att = (id_set[i + 1] - id_set[i] - 1) // self._nb_iter
-            curr_dat = raw_dframe['A'].iloc[id_set[i]]
+            # curr_dat = raw_dframe['A'].iloc[id_set[i]]
             tmp_dir, tmp_app, tmp_ut, tmp_key = [], [], [], []
 
             for j in range(nb_att):
@@ -1328,7 +1326,7 @@ class Plot2C_comparison(Plot2B_comparison):
 
         if (ind is None) and split:
             tYs = tmp_f_vm[0]
-            i, k = 0, 0
+            i = 0  # i, k = 0, 0
             df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
                                               id_set[i + 1]]
             _sub_depict_scat(df_raw, tYs, suff_4 + '_aset{}'.format(i))
@@ -1483,7 +1481,7 @@ class RePlot2_comparison(GraphSetup):
 
     def draw_sub_manf_ext_dat2(self, dframe, nb_set, id_set,
                                each_gen, each_att, tmp_f_vm):
-        i = k = 0
+        i = 0  # i = k = 0
         df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1:
                                           id_set[i + 1]]
         for i in range(1, nb_set):
@@ -1531,7 +1529,8 @@ class RePlot2_comparison(GraphSetup):
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
             for j in tmp[1:]:
                 df_tmp = dframe[tmp_f_vm[j]].iloc[curr_set: id_set[i + 1]]
-                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[j])}
+                columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0],
+                                                    tmp_f_vm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
             # curr_loc = list(range())   # 3+4+(3+4*2)*4 =51
@@ -1541,7 +1540,7 @@ class RePlot2_comparison(GraphSetup):
     def draw_sub_manf_dat4_alt2(self,
                                 dframe, nb_set, id_set, drop_gen,
                                 each_gen, each_att, tmp_f_vm):
-        i = j = k = 0
+        i = j = 0  # i = j = k = 0
         curr_set = id_set[i] + 1 + drop_gen
         df_raw = dframe[tmp_f_vm[0]].iloc[curr_set: id_set[i + 1]]
         for i in range(1, nb_set):
@@ -1551,9 +1550,10 @@ class RePlot2_comparison(GraphSetup):
             df_tmp = dframe[tmp_f_vm[0]].iloc[curr_loc]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
 
-            curr_loc = list(range(curr_set + drop_gen, curr_set + each_gen)
-                            ) + list(range(curr_set + each_gen + each_att,
-                                           curr_set + each_gen + each_att * 2))
+            curr_loc = list(range(
+                curr_set + drop_gen, curr_set + each_gen)) + list(range(
+                    curr_set + each_gen + each_att,
+                    curr_set + each_gen + each_att * 2))
             df_tmp = dframe[tmp_f_vm[1]].iloc[curr_loc]
             columns = {t2: t1 for t1, t2 in zip(tmp_f_vm[0], tmp_f_vm[1])}
             df_tmp = df_tmp.rename(columns=columns)
@@ -1686,8 +1686,8 @@ class Replot2B_comparison(RePlot2_comparison):
         tmp, suffix = self.draw_sub2_jt(joint)
         tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(
             tag, ind)
-        col_Y_alt, annotY = 'Fairness', 'Fairness measure'
-        annotX = 'Performance ({})'.format(self._pick_metric[ind])
+        col_Y_alt = 'Fairness'  # ,annotY= 'Fairness measure'
+        # annotX = 'Performance ({})'.format(self._pick_metric[ind])
         # tag_Ys_alt = tag_fm[0][1:]
         suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(
             pre, fig, ind)
