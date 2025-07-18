@@ -80,6 +80,7 @@ if ('expt2' in trial_type) or (
     kwargs['m2'] = args.m2_chosen
     kwargs['ratio'] = args.ratio
     kwargs['nb_cls'] = args.nb_cls
+    # kwargs['nb_iter'] = 5
     kwargs['omitted'] = args.omit
     kwargs['n_e'] = args.n_e_chosen
 
@@ -110,15 +111,16 @@ elif 'expt7' in trial_type:
     kwargs['mp_cores'] = args.mp_cores
 
 
-if 'expt2' in trial_type:
+if data_type.endswith('simulative') or data_type.startswith('tmp'):
+    pass
+elif 'expt2' in trial_type:
     case = ManfExtEmpirical(trial_type, data_type, nb_iter,
                             screen=screen, logged=logged, **kwargs)
 
 elif ('expt3' in trial_type) or ('expt4' in trial_type):
     kwargs['mp_cores'] = args.mp_cores
     case = ManfExtPrime_Empirical(trial_type, data_type, nb_iter,
-                                  screen=screen, logged=logged,
-                                  **kwargs)
+                                  screen=screen, logged=logged, **kwargs)
 elif ('expt5' in trial_type) or ('expt6' in trial_type):
     kwargs['mp_cores'] = args.mp_cores
     case = ManfExtPrime_Empirical(trial_type, data_type, nb_iter,

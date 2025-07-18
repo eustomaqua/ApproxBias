@@ -1283,8 +1283,8 @@ class Plot4_comparison(Plot3_comparison):
     #   # pdb.set_trace()
     #   del col_X, tYs_k2_direct, tYs_k2_approx, tYs_k3_approx
 
-    def drawing_fig4(self, dframe, tag, ind, nb_set, id_set, each_gen, each_att,
-                     joint='none', fig='tst', pre='minmax'):
+    def drawing_fig4(self, dframe, tag, ind, nb_set, id_set, each_gen,
+                     each_att, joint='none', fig='tst', pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
         suff_pre = '_'.join([
             self._figname.replace('iter5_cls7_', '')[:-1],
@@ -1407,11 +1407,13 @@ class Plot4_comparison(Plot3_comparison):
         del kws, kw_alt, tmp_Ys_merge, pikced_keys, tag_Ys_merge, tag_Ys_direct, tag_Ys_approx
         return
 
-    def drawing_fig5_alt4(self, dframe, tag, ind, nb_set, id_set, each_gen,
-                          each_att, joint='none', fig='tst', pre='minmax'):
+    def drawing_fig5_alt4(self, dframe, tag, ind, nb_set, id_set,
+                          each_gen, each_att, joint='none', fig='tst',
+                          pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
-        suff_pre = '_'.join([self._figname.replace('iter5_cls7_', '')[:-1],
-                             pre, suffix, 'mat{}'.format(ind)])
+        suff_pre = '_'.join([
+            self._figname.replace('iter5_cls7_', '')[:-1],
+            pre, suffix, 'mat{}'.format(ind)])
         col_Y, annotY = 'Fairness', 'Fairness measure'
         annotXpz = r'Performance ({})'.format(self._pick_metric[ind])
         annotZ = ' error rate' if ind == 0 else r'$($1$-$ performance$)$'
@@ -1526,7 +1528,6 @@ class Plot4_comparison(Plot3_comparison):
 
 
 # cont.
-
 
 class CurrPlot4B_comparison(Plot4_comparison):
     def __init__(self, nb_iter, nb_cls, m1, m2, n_e, figname='exp4b_'):
@@ -1753,20 +1754,20 @@ def _mp_present_tim_multivar(df_multivar, tag, suff, remark='tim'):
 
 
 class Distributed_GA_mp(Plot7_parallel_computing):
-    def schedule_mspaint(self, raw_dframe, mp_cores=3, pre='minmax'):
+    def schedule_mspaint(self, raw_dframe, mp_cores=3, pre='minmax',
+                         verbose=False):
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=4)
         tag_pm, tag_trn = self.prepare_graph()  # tag_pms
         (tag_bin_sa1, tag_bin_sa2, tag_multivar,
          tag_ut) = self.picking_fig_tags(tag_trn)
 
         df_raw = self.gathering_whole_dat(raw_dframe, nb_set, id_set, tag_trn)
-        # suff = '{}_{}_'.format(self._figname, pre)
         suff = '{}{}_mp{}c'.format(self._figname, pre, mp_cores)
-        # df_raw = self.gathering_whole_dat(raw_dframe, nb_set - 1, id_set[1:], tag_trn)
-        self.draw_distapprox(df_raw, nb_set, id_set, tag_bin_sa1,
-                             tag_bin_sa2, suff)
+        if verbose:
+            self.draw_distapprox(df_raw, nb_set, id_set, tag_bin_sa1,
+                                 tag_bin_sa2, suff)
         self.draw_distextend(df_raw, nb_set, id_set, tag_multivar,
-                             tag_ut, suff)
+                             tag_ut, suff, verbose)
         return
 
     def draw_distapprox(self, dframe, nb_set, id_set,
@@ -1795,7 +1796,7 @@ class Distributed_GA_mp(Plot7_parallel_computing):
         return
 
     def draw_distextend(self, dframe, nb_set, id_set,
-                        tag_multivar, tag_ut, suff):
+                        tag_multivar, tag_ut, suff, verbose=False):
         # Time Cost, `DistExtend` _multivar
         tag_extend = [0, 1, 2]
         tag_extend = [[t[i] for i in tag_extend] for t in tag_multivar]
@@ -1810,6 +1811,8 @@ class Distributed_GA_mp(Plot7_parallel_computing):
         tag = [tag_extend[i] for i in [1, 4, 7]]
         _mp_present_tim_multivar(df_multivar, tag, suff, 'Dsavg')  # 'Ds_avg')
 
+        if not verbose:
+            return
         # each `DistApprox` in DistExtend
         tag_sa1 = tag_multivar[0][3: 6] + tag_multivar[1][
             3: 6] + tag_multivar[2][3: 6]
@@ -2106,8 +2109,8 @@ class Plot5_hyperparameter_renew(Plot7_parallel_computing):
             annots_ext[1] += ' (sec)'
             D_est_alt = np.array([np.log10(
                 D_est[i] / D_drt[1]) for i in range(n_l)])
-            DExt_bin_alt = np.array([
-                np.log10(DExt_binval[i] / D_drt[1]) for i in range(n_l)])
+            DExt_bin_alt = np.array([np.log10(
+                DExt_binval[i] / D_drt[1]) for i in range(n_l)])
         else:
             kw['corr'] = True
             kw['curr_legend_nb_split'] = 6
@@ -2115,12 +2118,15 @@ class Plot5_hyperparameter_renew(Plot7_parallel_computing):
                 D_est[i] / D_drt[1] - 1 for i in range(n_l)])
             DExt_bin_alt = np.array([
                 DExt_binval[i] / D_drt[1] - 1 for i in range(n_l)])
-        suff_1 = suff.replace(remark, 'ecai_{}'.format(remark))
-        suff_2 = suff.replace(remark, 'nips_{}'.format(remark))
+        # suff_1 = suff.replace(remark, 'ecai_{}'.format(remark))
+        # suff_2 = suff.replace(remark, 'nips_{}'.format(remark))
+        suff_1 = suff.replace(remark, 'ver1_{}'.format(remark))
+        suff_2 = suff.replace(remark, 'ver2_{}'.format(remark))
         hyper_params_lin_reg(
             D_drt[1], D_est, tag_ms, picked_m, annots, suff_1, **kw)
         hyper_params_lin_reg(
-            D_drt[1], DExt_binval, tag_ms, picked_m, annots_ext, suff_2, **kw)
+            D_drt[1], DExt_binval, tag_ms, picked_m, annots_ext, suff_2,
+            **kw)
         if not alternative:
             return
 
@@ -2132,8 +2138,10 @@ class Plot5_hyperparameter_renew(Plot7_parallel_computing):
             anotAP_ext = r'\frac{ \hat{\mathbf{D}}_{\mathbf{a}}(S,a_i) }{ \mathbf{D}(S_1,\bar{S}_1) }-1'
         annots[1] = '${}$'.format(anotAP)
         annots_ext[1] = '${}$'.format(anotAP_ext)
-        suff_3 = suff.replace(remark, 'alt_ecai_{}'.format(remark))
-        suff_4 = suff.replace(remark, 'alt_nips_{}'.format(remark))
+        # suff_3 = suff.replace(remark, 'alt_ecai_{}'.format(remark))
+        # suff_4 = suff.replace(remark, 'alt_nips_{}'.format(remark))
+        suff_3 = suff.replace(remark, 'alt_ver1_{}'.format(remark))
+        suff_4 = suff.replace(remark, 'alt_ver2_{}'.format(remark))
         kw['snspec'] = 'sty6'
         hyper_params_lin_reg(D_drt[1], D_est_alt, tag_ms, picked_m,
                              annots, suff_3, **kw)
@@ -2168,7 +2176,7 @@ class HyperEA_renew_m1fix(Plot5_hyperparameter_renew):
             self.present_ext_binval(
                 D_drt, D_est, DExt_bin, n_l, ms_set, picked_m,
                 this_suf + '_prev_' + this_rmk,
-                remark=this_rmk, alternative=True)
+                remark=this_rmk, alternative=False)  # True)
         return
 
 
@@ -2197,7 +2205,7 @@ class HyperEB_renew_m2fix(Plot5_hyperparameter_renew):
             self.present_ext_binval(
                 D_drt, D_est, DExt_bin, n_l, ms_set, picked_m,
                 this_suf + '_prev_' + this_rmk,
-                remark=this_rmk, alternative=True)
+                remark=this_rmk, alternative=False)  # True)
         return
 
 

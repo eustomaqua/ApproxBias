@@ -11,8 +11,8 @@
 
 
 import numpy as np
-from utils.decorators import fantasy_timer
-from utils.verifiers import check_zero
+from hfm.utils.decorators import fantasy_timer
+from hfm.utils.verifiers import check_zero
 
 
 # =============================================
