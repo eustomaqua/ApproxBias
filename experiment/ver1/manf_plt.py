@@ -9,21 +9,18 @@ import logging
 import time
 import numpy as np
 import pandas as pd
-import pdb
+# import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
-from hfm.utils.recorders import (
-    get_elogger, rm_ehandler, elegant_print)
-from hfm.utils.decorators import elegant_dated
 from experiment.generic import GraphSetupVer1 as GraphSetup
 from experiment.generic import DAT_EXPT_ORG
 
-from experiment.utils.draw_addtl import (
+from experiment.facil.draw_addtl import (
     scatter_k_cv_with_real, approximated_dist_comparison,
     multiple_scatter_comparison,
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
     line_reg_with_marginal_distr, single_line_reg_with_distr)
-from experiment.utils.draw_chart import analogous_confusion_extended
+from experiment.facil.draw_chart import analogous_confusion_extended
 
 
 # ===============================
@@ -1001,7 +998,6 @@ class Plot2B_comparison(Plot2_comparison):
                                                     tmp_fm[j])}
                 df_tmp = df_tmp.rename(columns=columns)
                 df_raw = pd.concat([df_raw, df_tmp], axis=0)
-        # pdb.set_trace()
         df_raw = df_raw.reset_index(drop=True)
 
         cmap_name = self._cmap_name  # 'Accent'

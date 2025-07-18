@@ -1,17 +1,39 @@
 # coding: utf-8
 
 
+from copy import deepcopy
 import csv
 import json
 import os
 import sys
 import time
-
 import numpy as np
+import pandas as pd
 
-from hfm.utils.decorators import elegant_dated, elegant_durat
-from hfm.utils.recorders import elegant_print, get_elogger, rm_ehandler
+from hfm.utils.decorators import (elegant_dated, elegant_durat,
+                                  elegant_durat_core)
+from hfm.utils.recorders import elegant_print, get_elogger
 from experiment.generic import DataSetup
+from experiment.classifiers import AVAILABLE_CLFS, AVAILABLE_ENSF
+from experiment.datasets import preprocess, adversarial, transform_X_and_y
+
+from experiment.utils.data_split import (
+    sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
+    manual_repetitive, scale_normalize_helper)
+from experiment.ver1.manf_data import (
+    binarized_data_set, transform_X_A_and_y, transform_unpriv_tag,
+    transform_disturb_prime, normalise_disturb_whole)
+from experiment.ver2.mext_data import (
+    renewed_transform_disturb, renewed_normalise_disturb,
+    renewed_normalise_separate)
+
+from experiment.ver1.manf_hpm import (
+    PartE1_ParaSenAnalysis, PartE2_ParaSenAnalysis, PartE3_ParamsSen,
+    PartF1_ParaSenAnalysis, PartF2_ParaSenAnalysis)
+from experiment.ver1.manf_exp import (
+    ComparisonB1_withDirectComput, ComparisonB2_withDirectComput,
+    ComparisonC2_withDirectComput,
+    ComparisonC4_withDirectComput, ComparisonC5_withDirectComput)
 
 
 # ===============================
@@ -131,7 +153,9 @@ class ManfEmpirical(DataSetup):
         if self._logged:
             if os.path.exists(self._log_document + ".txt"):
                 os.remove(self._log_document + ".txt")
-            logger, formatter, file_handler = get_elogger(
+            # logger, formatter, file_handler = get_elogger(
+            #     "fairmanf", self._log_document + ".txt")
+            logger = get_elogger(
                 "fairmanf", self._log_document + ".txt")
         else:
             logger = None
@@ -163,10 +187,11 @@ class ManfEmpirical(DataSetup):
                        "[ENDED AT {:s}]".format(
                            elegant_dated(time.time()))], logger)
 
-        if self._logged:
-            rm_ehandler(logger, formatter, file_handler)
-        else:
-            del logger
+        del logger
+        # if self._logged:
+        #     rm_ehandler(logger, formatter, file_handler)
+        # else:
+        #     del logger
         if not (self._screen or self._logged):
             fsock.close()
             sys.stdout = saveout
@@ -316,7 +341,7 @@ class ManfEmpirical(DataSetup):
             elif 'expt2e' in self._trial_type:
                 res_aux.append(['bagging', 'adaboost', 'lightgbm'] +
                                ['fairgbm : fpr', 'fairgbm : fnr',
-                                'fairgbm : fpr,fnr', 'adafair'])  # * 2)
+                                'fairgbm : fpr,fnr', 'adafair'])  # *2)
 
         if self._nb_iter <= 0:  # not cv_split
             elegant_print("Running /executing as a whole", logger)
@@ -332,22 +357,29 @@ class ManfEmpirical(DataSetup):
         elegant_print("Not-repetitively, via cv_split?: {}".format(
             'Yes' if self._rep_iter else 'No'), logger)  # cv_split
         if not self._rep_iter:
-            elegant_print("nb_iter={}, repetitive".format(self._nb_iter), logger)
-            split_idx = manual_repetitive(self._nb_iter, y, self._gen_iter)
+            elegant_print("nb_iter={}, repetitive".format(
+                self._nb_iter), logger)
+            split_idx = manual_repetitive(self._nb_iter, y,
+                                          self._gen_iter)
             res_ans = []
             for k, idx in enumerate(split_idx):
-                elegant_print("Iteration {}-th starts.".format(k + 1), logger)
+                elegant_print("Iteration {}-th starts.".format(
+                    k + 1), logger)
                 if self._prep != 'none':
                     scaler = scale_normalize_helper(self._prep)
-                    scaler, Xp, Ap = normalise_disturb_whole(scaler, X, A)
+                    scaler, Xp, Ap = normalise_disturb_whole(
+                        scaler, X, A)
                 else:
                     Xp, Ap = X, A
 
-                ptb = [] if new_attr is None else [tmp[idx] for tmp in idx_jt]
+                ptb = [] if new_attr is None else [
+                    tmp[idx] for tmp in idx_jt]
                 res_iter = self.coding_per_iteration_as_whole(
-                    logger, Xp[idx], Ap[idx], y[idx], [tmp[idx] for tmp in idx_g1], ptb)
+                    logger, Xp[idx], Ap[idx], y[idx], [
+                        tmp[idx] for tmp in idx_g1], ptb)
                 res_ans.append(res_iter)
-                elegant_print("Iteration {}-th done.".format(k + 1), logger)
+                elegant_print("Iteration {}-th done.".format(
+                    k + 1), logger)
             return res_ans, res_aux
 
         elegant_print(
@@ -465,7 +497,8 @@ class ManfEmpirical(DataSetup):
 
             tmp_dis, tmp_app = self._iterator.schedule_content(
                 X_trn, A_trn, y_trn, y_insp, ~g1_trn[0], g1_trn[0],
-                X_tst, A_tst, y_tst, y_pred, ~g1_tst[0], g1_tst[0], **pm_m)
+                X_tst, A_tst, y_tst, y_pred, ~g1_tst[0], g1_tst[0],
+                **pm_m)
             tmp_dis = [tmp_dis]
             tmp_dis.extend(tmp_app)  # siz=(1+21|24,7)
             res_iter.append(tmp_dis)
@@ -525,7 +558,8 @@ class ManfEmpirical(DataSetup):
         disturbed_Xy = disturbed_data['numerical-binsensitive']
         binarized_Xy = binarized_data_set(processed_Xy)
 
-        X, A, y, new_attr = transform_X_A_and_y(self._dataset, binarized_Xy)
+        X, A, y, new_attr = transform_X_A_and_y(self._dataset,
+                                                binarized_Xy)
         _, Aq, _, _ = transform_X_A_and_y(
             self._dataset, binarized_data_set(disturbed_Xy))
         # NB. X, A, y: all pd.DataFrame
@@ -718,7 +752,7 @@ class ManfPrime_Empirical(ManfEmpirical):
             elif 'expt2e' in self._trial_type:
                 res_aux.append(['bagging', 'adaboost', 'lightgbm'] +
                                ['fairgbm : fpr', 'fairgbm : fnr',
-                                'fairgbm : fpr,fnr', 'adafair'])  # * 2)
+                                'fairgbm : fpr,fnr', 'adafair'])  # *2)
 
         if self._nb_iter <= 0:
             elegant_print('Running /executing as a whole', logger)
@@ -736,11 +770,14 @@ class ManfPrime_Empirical(ManfEmpirical):
         elegant_print('Not-repetitively, via cv_split?: {}'.format(
             'Yes' if self._rep_iter else 'No'), logger)  # cv_split
         if not self._rep_iter:
-            elegant_print("nb_iter={}, repetitive".format(self._nb_iter), logger)
-            split_idx = manual_repetitive(self._nb_iter, y, self._gen_iter)
+            elegant_print("nb_iter={}, repetitive".format(
+                self._nb_iter), logger)
+            split_idx = manual_repetitive(self._nb_iter, y,
+                                          self._gen_iter)
             res_ans = []
             for k, idx in enumerate(split_idx):
-                elegant_print("Iteration {}-th starts.".format(k + 1), logger)
+                elegant_print("Iteration {}-th starts.".format(
+                    k + 1), logger)
                 XA_p, _, yp, XAq_p, g1_p, jt_p = renewed_transform_disturb(
                     X_and_A, None, y, X_and_Aq, idx, g1m_indices, idx_jt)
                 g1_p = [t[0] for t in g1_p]
@@ -749,8 +786,10 @@ class ManfPrime_Empirical(ManfEmpirical):
                     scaler, XA_p, _, _, Xp, Ap, _, _, _, _ = renewed_normalise_disturb(
                         scaler, XA_p, [], XA_p, self.saIndex)
                 else:
-                    Xp, Ap, _, _, _, _ = renewed_normalise_separate(XA_p, [], XA_p, self.saIndex)
-                res_iter = self.coding_per_iteration_as_whole(logger, Xp, Ap, yp, g1_p, jt_p)
+                    Xp, Ap, _, _, _, _ = renewed_normalise_separate(
+                        XA_p, [], XA_p, self.saIndex)
+                res_iter = self.coding_per_iteration_as_whole(
+                    logger, Xp, Ap, yp, g1_p, jt_p)
                 res_ans.append(res_iter)
                 elegant_print("Iteration {}-th done.".format(k + 1), logger)
             return res_ans, res_aux
@@ -765,19 +804,23 @@ class ManfPrime_Empirical(ManfEmpirical):
             split_idx = sklearn_k_fold_cv(self._nb_iter, y)
         else:
             raise ValueError("No proper CV (cross-validation).")
-        elegant_print("\t CrossValid  {}\n".format(self._trial_type[: 3]), logger)
+        elegant_print("\t CrossValid  {}\n".format(
+            self._trial_type[: 3]), logger)
         res_ans = []
         for k, (i_trn, i_tst) in enumerate(split_idx):
-            X_A_trn, _, y_trn, X_Aq_trn, s1_trn, jt_trn = renewed_transform_disturb(
+            (X_A_trn, _, y_trn, X_Aq_trn, s1_trn,
+             jt_trn) = renewed_transform_disturb(
                 X_and_A, None, y, X_and_Aq, i_trn, g1m_indices, idx_jt)
-            X_A_tst, _, y_tst, X_Aq_tst, s1_tst, jt_tst = renewed_transform_disturb(
+            (X_A_tst, _, y_tst, X_Aq_tst, s1_tst,
+             jt_tst) = renewed_transform_disturb(
                 X_and_A, None, y, X_and_Aq, i_tst, g1m_indices, idx_jt)
             s1_trn = [t[0] for t in s1_trn]  # g1_trn, non_sa
             s1_tst = [t[0] for t in s1_tst]  # g1_tst, non_sa
             if self._prep in ['standard', 'min_max', 'normalize']:
                 scaler = scale_normalize_helper(self._prep)
-                (scaler, X_A_trn, _, X_A_tst, X_trn, A_trn, _, _, X_tst, A_tst
-                 ) = renewed_normalise_disturb(scaler, X_A_trn, [], X_A_tst, self.saIndex)
+                (scaler, X_A_trn, _, X_A_tst, X_trn, A_trn, _, _,
+                 X_tst, A_tst) = renewed_normalise_disturb(
+                    scaler, X_A_trn, [], X_A_tst, self.saIndex)
             else:
                 X_trn, A_trn, _, _, X_tst, A_tst = renewed_normalise_separate(
                     X_A_trn, [], X_A_tst, self.saIndex)
@@ -789,8 +832,8 @@ class ManfPrime_Empirical(ManfEmpirical):
                 X_A_tst, y_tst, X_Aq_tst, s1_tst, jt_tst,
                 X_trn, A_trn, X_tst, A_tst)
             res_ans.append(res_iter)
-            del X_trn, A_trn, y_trn, s1_trn, X_A_trn, X_Aq_trn, jt_trn  # ,g1m_trn
-            del X_tst, A_tst, y_tst, s1_tst, X_A_tst, X_Aq_tst, jt_tst  # ,g1m_tst
+            del X_trn, A_trn, y_trn, s1_trn, X_A_trn, X_Aq_trn, jt_trn
+            del X_tst, A_tst, y_tst, s1_tst, X_A_tst, X_Aq_tst, jt_tst
         del X_and_A, y, X_and_Aq, idx_g1, idx_jt, g1m_indices, new_attr
         return res_ans, res_aux
 
@@ -834,7 +877,8 @@ class ManfPrime_Empirical(ManfEmpirical):
 
             tmp_dis, tmp_app = self._iterator.schedule_content(
                 X_trn, A_trn, y_trn, y_insp, ~g1_trn[0], g1_trn[0],
-                X_tst, A_tst, y_tst, y_pred, ~g1_tst[0], g1_tst[0], **pm_m)
+                X_tst, A_tst, y_tst, y_pred, ~g1_tst[0], g1_tst[0],
+                **pm_m)
             tmp_dis = [tmp_dis]
             tmp_dis.extend(tmp_app)  # siz= (1+21|24, 9 =7+2)
             res_iter.append(tmp_dis)
@@ -846,7 +890,8 @@ class ManfPrime_Empirical(ManfEmpirical):
 
             tmp_dis, tmp_app = self._iterator.schedule_content(
                 X_trn, A_trn, y_trn, y_insp, ~g1_trn[1], g1_trn[1],
-                X_tst, A_tst, y_tst, y_pred, ~g1_tst[1], g1_tst[1], **pm_m)
+                X_tst, A_tst, y_tst, y_pred, ~g1_tst[1], g1_tst[1],
+                **pm_m)
             tmp_dis = [tmp_dis]
             tmp_dis.extend(tmp_app)  # siz= (1+21|24, 9 =7+2)
             res_iter.append(tmp_dis)
@@ -865,3 +910,50 @@ class ManfPrime_Empirical(ManfEmpirical):
         elegant_print("CV iteration {}-th, consumed {}".format(
             k, elegant_durat_core(tim_elapsed, True)), logger)
         return res_iter
+
+
+# -------------------------------
+# Manifold simulation
+
+
+class ManfSimulative(ManfEmpirical):
+    def __init__(self, trial_type, data_type="simulative",
+                 abbr_cls='DT', nb_iter=0, gen=False, rep=False,
+                 m1=30, m2=10, nb_cls=1, ratio=.5,
+                 constraint_type='FPR,FNR',
+                 prep=False, screen=True, logged=False):
+        self._data_type = data_type
+        self._log_document = data_type  # tmp_simulative
+        self.saIndex = [-2, -1]
+        self.saValue = [1, 1]
+        self._ratio = ratio
+        self.preparing_iterator(
+            trial_type, abbr_cls, nb_iter, gen, rep,
+            m1, m2, nb_cls, constraint_type,
+            prep, screen, logged)
+
+    def preparing_current_data(self, logger=None):
+        nb_inst, nb_feat = 110, 4
+
+        X = np.random.rand(nb_inst, nb_feat)
+        A = np.random.randint(3, size=(nb_inst, 2))
+        y = np.random.randint(2, size=nb_inst)
+
+        # self._m2 = 2 * np.ceil(np.log10(nb_inst))  # len(y)=
+        self._m2 = np.ceil(2 * np.log10(nb_inst))
+        elegant_print("Due to #inst = {}".format(nb_inst), logger)
+        elegant_print("self._m2 = {}".format(self._m2), logger)
+        elegant_print("self._m1 = {}".format(self._m1), logger)
+
+        idx_g1 = [A[:, i] == 1 for i in [0, 1]]
+        idx_jt = [np.logical_and(idx_g1[0], idx_g1[1]),
+                  np.logical_or(idx_g1[0], idx_g1[1])]
+
+        res_aux = [
+            ['tmp_simulative', 2, None, self._nb_iter,
+             self._gen_iter, self._rep_iter, self._m1, self._m2,
+             '#sens= 2'], [], [],
+            ['sens#1', 'sens#2', 'jt_and', 'jt_or']]
+
+        Ap = np.random.randint(3, size=(nb_inst, 2))
+        return X, A, y, idx_g1, idx_jt, 'sens#1-2', res_aux, Ap

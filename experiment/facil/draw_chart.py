@@ -2,7 +2,8 @@
 # Author: Yijun
 
 
-from experiment.utils.data_distance import (
+# from experiment.utils.data_distance import (
+from hfm.metrics.data_distance import (
     Wasserstein_dis,
     KL_divergence, JS_divergence, Bhattacharyya_dist,
     Hellinger_dist_v2, Hellinger_dist_v1, JS_div,
@@ -10,7 +11,7 @@ from experiment.utils.data_distance import (
 
 from experiment.utils.draw_hypos import (
     Friedman_test, Nememyi_posthoc_test)
-from experiment.utils.draw_graph import (
+from experiment.facil.draw_graph import (
     PLT_FRAMEBOX, PLT_LOCATION, DTY_PLT,
     _setup_config, _barh_kwargs, _barh_fcolor,
     _setup_figsize, _setup_figshow,

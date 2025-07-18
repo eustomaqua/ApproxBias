@@ -13,15 +13,12 @@ import os
 import pdb
 import numpy as np
 
-from hfm.utils.verifiers import check_zero, DTY_FLT
-from hfm.utils.decorators import elegant_durat
-
+from hfm.utils.verifiers import DTY_FLT
 from experiment.utils.draw_hypos import (
     Friedman_init, _encode_sign,
     comp_t_sing, comp_t_prep, cmp_paired_wtl, cmp_paired_avg)
-from experiment.utils.draw_graph import (
+from experiment.facil.draw_graph import (
     Friedman_chart, stat_chart_stack)
-
 from experiment.ver1.manf_plt import Plot2C_comparison
 
 

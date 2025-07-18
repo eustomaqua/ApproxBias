@@ -56,3 +56,12 @@ def bias_degree_nonbin(Dy_dis, Df_dis):
 
 
 # ---------------------------------------------
+
+
+@fantasy_timer
+def bias_degree(Dy_dis, Df_dis):
+    if (Dy_dis == 0) and (Df_dis == 0):
+        tmp = 1.
+    else:
+        tmp = Df_dis / check_zero(Dy_dis)
+    return tmp - 1., np.log10(check_zero(tmp))

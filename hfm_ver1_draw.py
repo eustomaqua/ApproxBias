@@ -35,7 +35,8 @@ class ManfDrawing(object):
             trial_type, nb_iter, m1, m2, gen, rep, prep,
             abbr_cls, nb_cls, constraint_type, screen, logged)
 
-    def preparing_iterator(self, trial_type, nb_iter, m1, m2, gen, rep,
+    def preparing_iterator(self,
+                           trial_type, nb_iter, m1, m2, gen, rep,
                            prep, abbr_cls, nb_cls, constraint_type,
                            screen=True, logged=False):
         self._trial_type = trial_type
@@ -63,7 +64,6 @@ class ManfDrawing(object):
         logger = None
         elegant_print(
             "[BEGAN {}]".format(elegant_dated(since)), logger)
-
         # START
 
         if self._trial_type[-6:] in ['expt5a', 'expt5b']:
@@ -78,22 +78,25 @@ class ManfDrawing(object):
 
         elif self._trial_type[-6:] in ['expt2a', 'expt2b', 'expt2c']:
             figname = 'exp{}_iter{}_cls{}_{}'.format(
-                self._trial_type[-2:], self._nb_iter, self._nb_cls, self._prep)
+                self._trial_type[-2:], self._nb_iter, self._nb_cls,
+                self._prep)
 
             if self._trial_type.endswith('expt2a'):
                 self._iterator = Plot2A_comparison(
-                    self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                    self._nb_iter, self._nb_cls, self._m1, self._m2,
+                    figname)
             elif self._trial_type.endswith('expt2b'):
                 self._iterator = Plot2B_comparison(
-                    self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                    self._nb_iter, self._nb_cls, self._m1, self._m2,
+                    figname)
             elif self._trial_type.endswith('expt2c'):
                 self._iterator = Table2C_comparison(
-                    self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                    self._nb_iter, self._nb_cls, self._m1, self._m2,
+                    figname)
 
             self.drawing_expt2(self._ratio, self._prefix)
 
         # END
-
         tim_elapsed = time.time() - since
         elegant_print(["Duration /TimeCost: {}".format(
             elegant_durat(tim_elapsed)),
@@ -123,16 +126,13 @@ class ManfDrawing(object):
             self._nb_iter, self._nb_cls, int(ratio * 100))
         if prefix != '':
             xlsx_name = '{}) '.format(prefix) + xlsx_name
-        sheet_name = 'exp{}_{}'.format(self._trial_type[-2:], self._prep)
+        sheet_name = 'exp{}_{}'.format(self._trial_type[-2:],
+                                       self._prep)
         raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_dframe=raw_df)
 
         if self._trial_type.endswith('expt2c'):
             self._iterator.schedule_spreadsheet(raw_dframe=raw_df)
-
-
-# -------------------------------
-#
 
 
 class Replot_ManfDrawing(ManfDrawing):
@@ -158,19 +158,24 @@ class Replot_ManfDrawing(ManfDrawing):
     def drawing_expt2(self, figname, pre, ratio=.75, prefix=''):
         if self._trial_type.endswith('expt2a'):
             self._iterator = Replot2A_comparison(
-                self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                self._nb_iter, self._nb_cls, self._m1, self._m2,
+                figname)
         elif self._trial_type.endswith('expt2b'):
             self._iterator = Replot2B_comparison(
-                self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                self._nb_iter, self._nb_cls, self._m1, self._m2,
+                figname)
         elif self._trial_type.endswith('expt2c'):
             self._iterator = Replot2C_comparison(
-                self._nb_iter, self._nb_cls, self._m1, self._m2, figname)
+                self._nb_iter, self._nb_cls, self._m1, self._m2,
+                figname)
 
         xlsx_name = '{}_iter{}_cls{}_pms_ratio{}_rep'.format(
-            self._trial_type[:-1], self._nb_iter, self._nb_cls, int(ratio * 100))
+            self._trial_type[:-1], self._nb_iter, self._nb_cls,
+            int(ratio * 100))
         if prefix != '':
             xlsx_name = '{}) {}'.format(prefix, xlsx_name)
-        sheet_name = 'exp{}_{}'.format(self._trial_type[-2:], self._prep)
+        sheet_name = 'exp{}_{}'.format(self._trial_type[-2:],
+                                       self._prep)
         raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_dframe=raw_df, pre=pre)
         return
@@ -260,7 +265,6 @@ if trial_type[-6:] in ['expt2a', 'expt2b', 'expt2c']:
     kwargs['nb_cls'] = args.nb_cls
     kwargs['rep'] = True
     kwargs['ratio'] = .75
-
     # kwargs['prefix'] = 'manfRW_TDbug'
     kwargs['nb_iter'] = 5
 

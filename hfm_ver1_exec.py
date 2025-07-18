@@ -6,7 +6,8 @@
 
 
 import argparse
-from experiment.ver1.manf_sim import ManfPrime_Empirical
+from experiment.ver1.manf_sim import (ManfPrime_Empirical,
+                                      ManfEmpirical, ManfSimulative)
 
 
 def default_parameters():
@@ -16,14 +17,14 @@ def default_parameters():
         help="Type of trial: experiment id")
     parser.add_argument(
         "-dat", "--dataset", type=str, default="ricci",
-        choices=["ricci", "german", "adult", "ppr", "ppvr"])
+        choices=["ricci", "german", "adult", "ppr", "ppvr", 'tmp'])
     parser.add_argument(
         "-prep", "--data-preprocessing", type=str,
-        default='none', choices=[
+        default='min_max', choices=[
             'none', 'standard', 'min_max', 'normalize'])
 
-    parser.add_argument(
-        "--nb-iter", type=int, default=5, help="Cross validation")
+    parser.add_argument('-nk', "--nb-iter", type=int, default=5,
+                        help="Cross validation")
     parser.add_argument(
         '--gen-iter', type=bool, default=False, help="param: gen")
     parser.add_argument(
@@ -75,17 +76,16 @@ elif trial_type[-6:] in ('expt5b', 'expt6b'):
     kwargs['m2'] = args.m2_chosen
 
 if trial_type[-6:] in ['expt5a', 'expt5b', 'expt5c']:
-
     if trial_type.startswith(
             'repetit') or trial_type.startswith('rept'):
         kwargs['gen'] = args.gen_iter
     elif trial_type.startswith('KF') or trial_type[:3] == 'mCV':
         kwargs['rep'] = args.rep_iter
-
 elif trial_type[-6:] in ['expt6a', 'expt6b']:
     kwargs['rep'] = True
     kwargs['nb_cls'] = args.nb_cls
     kwargs['constraint_type'] = args.constraint_type
+
 elif 'expt2' in trial_type:
     kwargs['rep'] = True
     kwargs['nb_iter'] = args.nb_iter
@@ -95,9 +95,16 @@ elif 'expt2' in trial_type:
     kwargs['ratio'] = args.ratio
 
 
-case = ManfPrime_Empirical(
-    trial_type, data_type, abbr_cls,
-    screen=screen, logged=logged, **kwargs)
+if data_type.endswith(
+        'simulative') or data_type.startswith('tmp'):
+    case = ManfSimulative(
+        trial_type, 'simulative', abbr_cls,
+        screen=screen, logged=logged, **kwargs)
+else:
+    # case = ManfEmpirical(
+    case = ManfPrime_Empirical(
+        trial_type, data_type, abbr_cls,
+        screen=screen, logged=logged, **kwargs)
 
 mode = "a" if data_type == 'adult' else "w"
 case.trial_one_process(mode=mode)
@@ -110,5 +117,12 @@ del parser, args, case
 
 # Experiments
 """
-python hfm_ver1_exec.py -exp repetit_expt5a -data ricci --nb-iter 1 -m1 5 --screen
+python hfm_ver1_exec.py -exp rept_expt5a -dat tmp|ricci -nk 0|2 -m1 5
+python hfm_ver1_exec.py -exp rept_expt5b -dat tmp|ricci -nk 0|2 -m2 5
+python hfm_ver1_exec.py -exp rept_expt5c -dat tmp|ricci -nk 1
+
+python hfm_ver1_exec.py -exp mCV_expt6a -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
+python hfm_ver1_exec.py -exp mCV_expt6b -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
+
+python hfm_ver1_exec.py -exp mCV_expt2a|2b|2c|2d|2e -dat ricci --nb-cls 3 -m1 25 -m2 11
 """

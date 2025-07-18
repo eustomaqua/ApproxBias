@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import numpy as np
+
 
 # ---------------------
 # Constants
@@ -13,6 +15,10 @@ DTY_FLT = 'float'
 DTY_INT = 'int'
 DTY_BOL = 'bool'
 DTY_PLT = '.pdf'
+
+GAP_INF = 2 ** 31 - 1
+GAP_MID = 1e8  # 1e16
+GAP_NAN = 1e-16
 
 
 # ---------------------
@@ -44,7 +50,6 @@ def check_sign(x, diff=CONST_ZERO):
 
 
 def non_negative(tmp):
-    import numpy as np
     if check_belong(tmp, list, tuple, np.ndarray):
         return [non_negative(i) for i in tmp]
     return tmp if tmp >= 0 else 0.
@@ -92,6 +97,29 @@ def unique_column(nb_col, alphabet=None):
         return alphabet + double + triple[: index]
 
     return list()
+
+
+def judge_transform_need(y):
+    vY = sorted(set(y))  # list(set(y))
+    dY = len(vY)
+    if dY == 2 and (-1 in vY) and (1 in vY):
+        dY = 1
+    return vY, dY  # 2, or ...
+
+
+def judge_mathcal_Y(nc=1):
+    # vY: list(range(nc)) if nc >= 2 else [-1, +1]
+    if nc == 1:
+        return [-1, +1]
+    return list(range(nc))
+
+
+def random_seed_generator(psed='fixed_tseed'):  # _tim
+    if (psed is not None) or (not isinstance(psed, int)):
+        import time
+        psed = int(time.time() * GAP_MID % GAP_INF)
+    prng = np.random.RandomState(seed=psed)
+    return psed, prng
 
 
 # ---------------------

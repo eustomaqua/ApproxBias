@@ -15,13 +15,10 @@ import numpy as np
 import pandas as pd
 from hfm.utils.verifiers import DTY_FLT
 
-from experiment.utils.draw_graph import (
-    _style_set_axis, _setup_config, _setup_figsize, _setup_figshow,
-    _set_quantile, _sns_line_err_bars,
-    PLT_LOCATION, PLT_FRAMEBOX,
-    cnames, cname_keys, cmap_names, _setup_rgb_color,
-    _backslash_distributed, _barh_patterns,
-    _sns_line_fit_regs, _sns_line_err_bars)
+from experiment.facil.draw_graph import (
+    PLT_LOCATION, PLT_FRAMEBOX, _style_set_axis, _setup_config,
+    _setup_figsize, _setup_figshow, _setup_rgb_color,
+    _sns_line_err_bars, _sns_line_fit_regs)
 
 
 # ===============================
