@@ -5,6 +5,11 @@
 #
 
 
+import argparse
+from experiment.ver2.mext_sim import (
+    ManfExtEmpirical, ManfExtPrime_Empirical)
+
+
 def default_parameters():
     parser = argparse.ArgumentParser()  # -expt,-data,-prep
     parser.add_argument(
@@ -15,7 +20,7 @@ def default_parameters():
         choices=["ricci", "german", "adult", "ppr", "ppvr",
                  "tmp_simulative", "tmp", "simulative"])
     parser.add_argument(
-        '-pre', "--data-preprocessing", type=str, default="none",
+        '-pre', "--data-preprocessing", type=str, default="min_max",
         choices=["none", "standard", "min_max", "normalize"])
     parser.add_argument(
         '--omit', action='store_false', help='--omitted')
@@ -138,3 +143,12 @@ case.trial_one_process(mode=mode)
 del screen, logged, kwargs
 del trial_type, data_type, nb_iter
 del parser, args, case, mode
+
+
+# Experiments
+"""
+python hfm_ver2_exec.py -exp mCV_expt4* -dat * --nb-cls 3 -nk 2
+python hfm_ver2_exec.py -exp rept_expt5a -dat * -nk 5 -m1 20
+python hfm_ver2_exec.py -exp rept_expt5b -dat * -nk 5 -m2 8
+python hfm_ver2_exec.py -exp rept_expt7a -dat * -nk 5 -m1 20 -m2 8 --fix
+"""

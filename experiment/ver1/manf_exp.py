@@ -24,7 +24,7 @@ from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.metrics.contingency_mat import \
-    contg_tab_multi_type2 as contingency_table
+    contg_tab_mu_type2 as contingency_table
 from hfm.metrics.performance import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
     calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,

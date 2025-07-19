@@ -22,17 +22,18 @@ from sklearn.ensemble import (
     VotingClassifier, StackingClassifier)
 import numpy as np
 
+from experiment.utils.data_classify import EnsembleAlgorithm
 # from experiment.ensemble import EnsembleAlgorithm
 # from hfm.pkgs.AdaFair import AdaFair
 # from experiment.utils.pkgs_AdaFair(_mod) import AdaFair
 from lightgbm import LGBMClassifier
 from fairgbm import FairGBMClassifier
-import sklearn.__version__ as skl_ver
+import sklearn
+skl_ver = sklearn.__version__
 if skl_ver.startswith('1.3.0'):
     from experiment.utils.pkgs_AdaFair_py36 import AdaFair
 elif skl_ver.startswith('1.5.1'):
     pass
-from experiment.utils.data_classify import EnsembleAlgorithm
 del skl_ver
 
 
@@ -49,6 +50,10 @@ AVAILABLE_ABBR_CLS = [
     'DT', 'NB', 'SVM', 'linSVM', 'MLP',
     'LR1', 'LR2', 'LM1', 'LM2', 'kNNu', 'kNNd', 
 ]   # ALG_NAMES    # 'lmSGD','LR'
+
+# ENSEM_NAMES = [
+#     "bagging", "adaboost", "rforest", "extrats", "gradbst",
+# ]
 
 
 FAIR_INDIVIDUALS = {

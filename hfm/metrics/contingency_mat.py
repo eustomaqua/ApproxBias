@@ -5,27 +5,25 @@
 #
 
 
-# ---------------------
-#
-# ---------------------
-#
-
-
 import numpy as np
 import numba
 
 from hfm.utils.verifiers import DTY_INT
 
 
+# ---------------------
+# Fairness research
+# ---------------------
+#
+
+
 # ==========================
 # Metrics
-
 
 # --------------------------
 # Contingency table
 # 分类结果混淆矩阵（二分类）
 # input: np.ndarray, not list
-
 '''
 机器学习 周志华
 |True Label| Prediction          |
@@ -44,6 +42,24 @@ i.e.,
 '''
 
 
+@numba.jit(nopython=True)
+def contingency_tab_bi(y, y_hat, pos=1):
+    # For one single classifier
+    tp = np.sum((y == pos) & (y_hat == pos))
+    fn = np.sum((y == pos) & (y_hat != pos))
+    fp = np.sum((y != pos) & (y_hat == pos))
+    tn = np.sum((y != pos) & (y_hat != pos))
+    ''' if neg=0
+    return tn, fn, fp, tp
+
+    P[f()=1 | y=0] = fp/(fp+tn) =g_Cm[2]/g_Cm[2+0]
+    P[f()=1 | y=1] = tp/(tp+fn) =g_Cm[0]/g_Cm[0+2]
+    '''
+    # return tp, fn, fp, tn
+    return tp, fp, fn, tn
+
+
+"""
 @numba.jit(nopython=True)
 def contingency_table_bi_sing(y, y_hat, pos=1, neg=0):
     # For one single classifier
@@ -72,6 +88,7 @@ def contingency_table_bi_pair(ha, hb, pos=1, neg=0):
 def contg_tab_binary(h, hp, pos=1):
     # return a, c, b, d
     return contg_tab_multi_type2(h, hp, pos)
+"""
 
 
 # --------------------------
@@ -90,6 +107,7 @@ def contg_tab_binary(h, hp, pos=1):
 # 第三种：变成 NxN 矩阵
 
 
+"""
 def contingency_table_mu_sing():
     # TODO
     pass
@@ -98,6 +116,7 @@ def contingency_table_mu_sing():
 def contingency_table_mu_pair():
     # TODO
     pass
+"""
 
 
 # --------------------------
@@ -118,6 +137,29 @@ contingency_table_{?} when ?==2
 '''
 
 
+def contg_tab_mu_type3(y, y_hat, vY):
+    dY = len(vY)
+    Cij = np.zeros(shape=(dY, dY), dtype=DTY_INT)  # 'int')
+    for i in range(dY):
+        for j in range(dY):
+            Cij[i, j] = np.sum((y == vY[i]) & (y_hat == vY[j]))
+    return Cij  # Cij.copy(), np.ndarray
+
+
+def contg_tab_mu_merge(Cij, vY, pos=1):
+    k = vY.index(pos)  # idx
+    tp = Cij[k][k]
+    fn = np.sum(Cij[k]) - Cij[k, k]
+    fp = np.sum(Cij[:, k]) - Cij[k, k]
+
+    Kij = Cij.copy()
+    Kij[k] = 0
+    Kij[:, k] = 0
+    tn = np.sum(Kij)
+    return tp, fp, fn, tn
+
+
+"""
 @numba.jit(nopython=True)
 def contg_tab_multi_type3(h, hp, vY):
     dY = len(vY)
@@ -140,6 +182,7 @@ def contg_tab_multi_merge(Cij, vY, pos=1):
     tn = np.sum(Kij)
 
     return tp, fp, fn, tn
+"""
 
 
 '''
@@ -158,6 +201,10 @@ contg_tab_multi_merge()
 '''
 
 
+contg_tab_mu_type2 = contingency_tab_bi
+
+
+"""
 @numba.jit(nopython=True)
 def contg_tab_multi_type2(h, hp, pos=1):
     # namely, def contingency_zh()
@@ -166,6 +213,7 @@ def contg_tab_multi_type2(h, hp, pos=1):
     fp = np.sum((h != pos) & (hp == pos))  # c
     tn = np.sum((h != pos) & (hp != pos))  # d
     return tp, fp, fn, tn
+"""
 
 
 '''
@@ -187,6 +235,18 @@ McNemar test
 '''
 
 
+def contg_tab_mu_type1(y, ha, hb):
+    za = np.array(y == ha, dtype=DTY_INT)  # 'int')
+    zb = np.array(y == hb, dtype=DTY_INT)  # 'int')
+
+    tp = np.sum((za == 1) & (zb == 1))  # N^{11} # e_{00}
+    fn = np.sum((za == 1) & (zb != 1))  # N^{10} # e_{10}
+    fp = np.sum((za != 1) & (zb == 1))  # N^{01} # e_{01}
+    tn = np.sum((za != 1) & (zb != 1))  # N^{00} # e_{11}
+    return tp, fp, fn, tn
+
+
+"""
 def contg_tab_multi_type1(h, ha, hb):
     # namely, def contingency_ku()
     za = np.array(h == ha, dtype=DTY_INT)
@@ -197,3 +257,4 @@ def contg_tab_multi_type1(h, ha, hb):
     fp = np.sum((za != 1) & (zb == 1))  # N^{01}  # e_{01}
     tn = np.sum((za != 1) & (zb != 1))  # N^{00}  # e_{11}
     return tp, fp, fn, tn
+"""

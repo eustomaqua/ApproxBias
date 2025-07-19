@@ -4,8 +4,9 @@
 import numba
 import numpy as np
 from hfm.utils.verifiers import check_zero, non_negative
-from hfm.metrics.contingency_mat import \
-    contingency_table_bi_sing as contingency_table
+# from hfm.metrics.contingency_mat import \
+#     contingency_table_bi_sing as contingency_table
+from hfm.metrics.contingency_mat import contingency_tab_bi
 
 
 # ==========================
@@ -18,8 +19,6 @@ from hfm.metrics.contingency_mat import \
 # NB. for one single classifier
 
 # NB. some doesn't work for multi-class!
-
-
 # --------------------------
 # TP, FP, FN, TN
 # input: np.ndarray, not list
@@ -83,9 +82,17 @@ def calc_f_beta(p, r, beta=1):
     return float(tmp)
 
 
+# ROC curve, AUC
+#
+# def calc_auc_score(y, y_hat):
+#     from sklearn import metrics
+#     return metrics.roc_auc_score(y, y_hat)
+
+
 # --------------------------
 # 在 n 个二分类混淆矩阵上综合考察
 
+"""
 @numba.jit(nopython=True)
 def calc_confusion(y, fx, cv=5, pos=1, neg=0):
     # cross validation
@@ -100,6 +107,22 @@ def calc_confusion(y, fx, cv=5, pos=1, neg=0):
     return list(map(contingency_table,
                     [y] * cv, fx, [pos] * cv, [neg] * cv))
     # return [contingency_table(y, t, pos, neg) for t in fx]
+"""
+
+
+@numba.jit(nopython=True)
+def calc_confusion(y, fx, cv=5, pos=1):
+    # cross validation
+    #  y.shape: (nb_inst,)
+    # fx.shape: (cv, nb_inst)
+    '''
+    confusion = list(map(contingency_tab_bi,
+                    [y] * cv, fx, [pos] * cv, [neg] * cv))
+    tp, fp, fn, tn = zip(*confusion)
+    return tp, fp, fn, tn
+    '''
+    return list(map(contingency_tab_bi,
+                    [y] * cv, fx, [pos] * cv))
 
 
 def calc_macro_score(confusion, cv=5):

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import numpy as np
+import numba
 
 
 # ---------------------
@@ -56,8 +57,8 @@ def non_negative(tmp):
 
 
 def check_equal(tmp_a, tmp_b, diff=CONST_DIFF):
-    flag_a = check_belong(tmp_a, list, tuple)
-    flag_b = check_belong(tmp_b, list, tuple)
+    flag_a = check_belong(tmp_a, list, tuple, set)
+    flag_b = check_belong(tmp_b, list, tuple, set)
     if not (flag_a or flag_b):
         return True if abs(tmp_a - tmp_b) < diff else False
 
@@ -99,6 +100,7 @@ def unique_column(nb_col, alphabet=None):
     return list()
 
 
+@numba.jit(nopython=True)
 def judge_transform_need(y):
     vY = sorted(set(y))  # list(set(y))
     dY = len(vY)

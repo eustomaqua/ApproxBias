@@ -9,7 +9,7 @@ from sklearn import metrics
 # from hfm.metrics.performance import *
 from hfm.utils.verifiers import check_equal
 # from hfm.metrics.perf_bin import *
-from hfm.metrics.perf_bin import (
+from hfm.metrics.excl_perf_bin import (
     contingency_tab_bi, contingency_tab_mu,
     calc_accuracy, calc_precision, calc_recall,
     calc_f1_score, calc_f_beta)
