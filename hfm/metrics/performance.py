@@ -120,7 +120,7 @@ def calc_macro_score(confusion, cv=5):
 
 
 def calc_micro_score(confusion, cv=5):
-    tp, fp, fn, tn = zip(*confusion)
+    tp, fp, fn, _ = zip(*confusion)  # ,tn
     tp_bar = sum(tp) / cv
     fp_bar = sum(fp) / cv
     fn_bar = sum(fn) / cv

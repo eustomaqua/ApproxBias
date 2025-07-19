@@ -148,8 +148,9 @@ class RevPlotZ_comparison(GraphSetup):
 
 class RevP_ZA_efficient(RevPlotZ_comparison):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        nb_set, id_set, each_set, _, _ = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)  # each_att/gen
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=1,
+            nc_sens=0)  # each_set,each_att/gen
         csv_row_1 = unique_column(10 + 30)
         # df_raw = self.sub_dat_merged(raw_dframe, nb_set, id_set)
         df_raw = self.sub_dat_multivar(
@@ -858,7 +859,8 @@ class RevP_YC_embedding(RevPlotY_comparison):
         tag_sa2 = tag[21 * 7: 21 * 7 * 2]
         tag_acc = tag[21 * 14: 147 * 2 + 16]  # not 27*14
         tag_far = tag[147 * 2 + 16: 294 + 16 + 9 * 2]
-        ans, ar_hfm, ar_tim = self.sub_hfm_multivar(df_raw, tag_sa1, tag_sa2)
+        _, ar_hfm, ar_tim = self.sub_hfm_multivar(
+            df_raw, tag_sa1, tag_sa2)  # ans,
         '''
         self.sub_plt_val_tim(ans, ar_hfm, ar_tim, f'{figname}_{flag}')
         '''

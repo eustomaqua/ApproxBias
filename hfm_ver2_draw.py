@@ -136,8 +136,7 @@ class ManfExtDrawing(object):
                 xlsx_name = '{}) {}'.format(prefix, xlsx_name)
             sheet_name = 'exp{}_{}'.format(trial_type[-2:], self._prep)
             raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
-            self._iterator.schedule_mspaint(raw_df, self._mp_cores,
-                                            pre=pre)
+            self._iterator.schedule_mspaint(raw_df, self._mp_cores, pre)
             del xlsx_name, sheet_name, raw_df
 
         elif trial_type[-6:] in ['expt5a', 'expt5b']:

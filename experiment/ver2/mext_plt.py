@@ -738,7 +738,7 @@ class Plot3_comparison(GraphSetup):
         tYs_k3_approx = [16, 19, 18, 21, 17, 20, ]  # vs. ApproxDist
         # tYs_k3_approx = [i + 16 for i in [0, 3, 2, 5, 1, 4, ]]
         # tYs_k2_approx = [i + 10 for i in [0, 2, 1, 3, ]]
-        tmp, suffix = self.draw_sub2_jt(joint)
+        _, suffix = self.draw_sub2_jt(joint)  # tmp,
         tYs_k2 = [0, 10, 3, 12, 26, 27, ] + [2, 11, 5, 13, ]
         tmp_f_vm = [[t[k] for k in tYs_k2] for t in tag_f_man]
         # pdb.set_trace()
@@ -901,7 +901,7 @@ class Plot3_comparison(GraphSetup):
 
         _ext_sub_show_scat(df_raw, tYs, suff_4, '_max', diff=True)
         _ext_sub_show_scat(df_raw, tYs, suff_4, '_avg', diff=True)
-        _ext_sub_show_tim(df_raw, tYs, suff_5, diff=True)
+        # _ext_sub_show_tim(df_raw, tYs, suff_5, diff=True)
         suff_6 = '_'.join([self._figname[:-1], pre, fig, suffix, 'dsep'])
         '''
         _ext_sub_show_sep(df_raw, tYs, suff_6, '_Ds_max')  # ,diff=True)
@@ -959,7 +959,8 @@ class Plot3_comparison(GraphSetup):
         # _, _, _, _, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind=ind)
         # tmp_f_vm = [t[1: -4] for t in tmp_f_vm]
 
-        _, tag_f_vot, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind)
+        # _, tag_f_vot, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind)
+        _, _, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind)
         # tmp_f_vm: 2 (delta,normal) +4 vote (=3+1) +8 manf (=3+3+2) +6 mext (=3+3)
         # tmp_f_vm: delta=abs(adversarial-normal),normal, GF*3(DP/EO/PQP),DR,
         #           df_ecai|hat|hat (DistDirect_bin,ApproxDist_bin,DistApprox)
@@ -1074,9 +1075,9 @@ class CurrPlot3B_comparison(Plot3_comparison):
         super().__init__(nb_iter, nb_cls, m1, m2, n_e, figname)
 
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        nb_set, id_set, each_set, each_att, each_gen = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=3, nc_sens=3 + 1)
-        tag_pm, tag_trn, tag_tst = self.prepare_graph()
+        nb_set, id_set, _, each_att, each_gen = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=3, nc_sens=3 + 1)  # each_set,
+        _, tag_trn, tag_tst = self.prepare_graph()  # tag_pm,
 
         # fairmanf plotting
         '''
@@ -1130,8 +1131,8 @@ class CurrPlot3C_comparison(Plot3_comparison):  # CurrPlot3B
                            'kNNu', 'kNNd', 'MLP', 'linSVM', 'SVM']
 
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        (nb_set, id_set, each_set, each_att, each_gen) = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=11 + 3, nc_sens=3 + 1)
+        (nb_set, id_set, _, each_att, each_gen) = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=11 + 3, nc_sens=3 + 1)  # each_set,
         tag_pm, tag_trn, tag_tst = self.prepare_graph()
 
         # fairmanf plotting
@@ -1264,25 +1265,6 @@ class Plot4_comparison(Plot3_comparison):
             annotXpz, annotY, figname=suff_3p + '_x', invt_a=False, **kws)
         return
 
-    # def drawing_fig2_alt(self, dframe, tag, ind, nb_set, id_set,
-    #                      each_gen, each_att, joint='none', fig='tst',
-    #                      pre='minmax'):
-    #   # part3: 10 direct + 6 manf calculation + 10 manf_ext calculation + 3 =29
-    #   #        [Ds_01, Df_01, t_Ds, t_Df, Ds_avg, Df_avg, ]
-    #   tYs_k2_direct = [0, 3, 2, 5, 1, 4, ]        # DirectDist vs.
-    #   tYs_k2_approx = [10, 12, 11, 13, ]          # vs. ApproxDist
-    #   tYs_k3_approx = [16, 19, 18, 21, 17, 20, ]  # vs. ApproxDist
-    #   # tYs_k3_approx = [i + 16 for i in [0, 3, 2, 5, 1, 4, ]]
-    #   # tYs_k2_approx = [i + 10 for i in [0, 2, 1, 3, ]]
-    #
-    #   _, tag_f_vot, tag_f_man, tag_f_ext, col_X, \
-    #       tmp_f_vm = self.picking_fig_tags(tag, ind=0)
-    #   tmp, suffix = self.draw_sub2_jt(joint)
-    #   tYs_k2 = [0, 10, 3, 12, 26, 27, ] + [2, 11, 5, 13, ]
-    #   tmp_f_vm = [[t[k] for k in tYs_k2] for t in tag_f_man]
-    #   # pdb.set_trace()
-    #   del col_X, tYs_k2_direct, tYs_k2_approx, tYs_k3_approx
-
     def drawing_fig4(self, dframe, tag, ind, nb_set, id_set, each_gen,
                      each_att, joint='none', fig='tst', pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
@@ -1295,18 +1277,8 @@ class Plot4_comparison(Plot3_comparison):
         annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(self._pick_metric[ind])
 
         _, tag_f_vot, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind)
-        # tmp_f_vm: 2+4 vote +8 manf (=3+3+2) +6 manf_ext (=3+3) =6+8+6 =20
-        # tmp_f_vm: normal,delta=abs(adversary-normal), GF*3,DR,
-        #           df_ecai|hat|hat' (DistDirect_bin,ApproxDist_bin,DistApprox),
-        #           df_nips|hat|hat' (DistDirect_bin,ApproxDist_bin,DistApprox),
-        #           df_nips_avg|hat' (DistDirect_bin,DistApprox),
-        #           df_ecai|nips|nips_avg (DistDirect_multivar),
-        #           hat_df_ecai|nips|nips_avg (DistApprox|DistExtend),
         tYs_k4 = [0, 1, 2, 3, 4, 5] + [6, 7, 9, 10, 11, 12, 13] + [14, 15, 16, 17, 18, 19]
         tmp_f_vm = [[t[k] for k in tYs_k4] for t in tmp_f_vm]
-        # tmp_f_vm: 2+4 vote +7 manf (=2 ecai+3 nips+2 avg) +6 mext (=3 direct+3 approx)
-        # tmp_f_vm: normal,delta, GFM*3,DR, df_ecai|hat,df_nips|hat|hat',
-        #           df_nips_avg|hat', df_ecai|nips|nips_avg,hat_df_ecai|nips|nips_avg
         tag_Ys_direct = [tmp_f_vm[0][k] for k in [2, 3, 4, 5] + [6, 8, 11, 14, 15]]  # 13,
         tag_Ys_approx = [tmp_f_vm[0][k] for k in [2, 3, 4, 5] + [7, 10, 12, 17, 18]]  # 16,
         picked_direct = [r'$\mathbf{df}$ ',  # r'$\mathbf{df}$ prev',
@@ -1354,21 +1326,12 @@ class Plot4_comparison(Plot3_comparison):
             figname=suff_pre + '_lc2t', **kws)  # '_pc2t'
         del tYs_k4, tag_Ys_direct, tag_Ys_approx, picked_direct, picked_approx
 
-        # tag_Ys_direct = [tmp_f_vm[][k] for k in [2,3,4,5] + []]
-        # tag_Ys_approx = [tmp_f_vm[][k] for k in [2,3,4,5] + []]
-        # tag_Ys_direct = [tmp_f_vm[0][5], tmp_f_vm[1][5]] + [tmp_f_vm[2][k] for k in []]
-        # tag_Ys_approx = [tmp_f_vm[0][5], tmp_f_vm[1][5]] + [tmp_f_vm[2][k] for k in []]
         tag_Ys_direct = [[t[k] for k in [5, 14, 15, ]] for t in [
             tmp_f_vm[0], tmp_f_vm[1], tmp_f_vm[3]]]  # tmp_f_vm]
         tag_Ys_approx = [[t[k] for k in [5, 17, 18, ]] for t in [
             tmp_f_vm[0], tmp_f_vm[1], tmp_f_vm[3]]]  # tmp_f_vm]
-        # tag_Ys_*: 3x3 --> 9
-        # tag_Ys_*:  DR (sen_att#1), df_nips,df_nips_avg (sa#1 DistApprox),
-        #            DR (sen_att#2), df_nips,df_nips_avg (sa#2 DistApprox),
-        #            DR (joint_or), df_nips,df_nips_avg (both DistExtend)
         tag_Ys_merge = [t_dir + t_app[1:] + [
             tmp_f_vm[0][0], col_X] for t_dir, t_app in zip(tag_Ys_direct, tag_Ys_approx)]
-        # tag_Ys_merge: DR,df_nips,df_nips_avg,hat_df_nips,hat_df_nips_avg, normal,delta
         df_raw = self.draw_sub1_dat2(dframe, nb_set, id_set, tag_Ys_merge[:2], tmp)
         pikced_keys = ['DR', r'$\mathbf{df}$      multival',
                        r'$\mathbf{df}^{avg}$ multival',
@@ -1393,18 +1356,23 @@ class Plot4_comparison(Plot3_comparison):
             **kw_alt)
 
         df_raw, tmp_Ys_merge = self.draw_sub4_dat(dframe, nb_set, id_set, tag_Ys_merge)
-        pikced_keys = ['DR', r'$\mathbf{df}$      extend', r'$\mathbf{df}^{avg}$ extend',
-                       r'$\hat{\mathbf{df}}$      extend', r'$\hat{\mathbf{df}}^{avg}$ extend']
+        pikced_keys = ['DR', r'$\mathbf{df}$      extend',
+                       r'$\mathbf{df}^{avg}$ extend',
+                       r'$\hat{\mathbf{df}}$      extend',
+                       r'$\hat{\mathbf{df}}^{avg}$ extend']
         line_reg_with_marginal_distr(
-            df_raw, col_X, col_Y, tmp_Ys_merge[:-2], pikced_keys, annotX, annotY,
-            figname =suff_pre + '_pc5b', curr_legend_nb_split=6, **kws)
+            df_raw, col_X, col_Y, tmp_Ys_merge[:-2], pikced_keys,
+            annotX, annotY, figname =suff_pre + '_pc5b',
+            curr_legend_nb_split=6, **kws)
         line_reg_with_marginal_distr(
-            df_raw, tmp_f_vm[0][0], col_Y, tmp_Ys_merge[:-2], pikced_keys, annotXpz,
-            annotY, figname =suff_pre + '_pc5a', curr_legend_nb_split=6, **kws)
+            df_raw, tmp_f_vm[0][0], col_Y, tmp_Ys_merge[:-2], pikced_keys,
+            annotXpz, annotY, figname =suff_pre + '_pc5a',
+            curr_legend_nb_split=6, **kws)
         lineplot_with_uncertainty(
             df_raw, tmp_f_vm[0][0], col_Y, tmp_Ys_merge[:-2], pikced_keys,
             figname=suff_pre + '_lc5c', annotY=annotZ, **kw_alt)
-        del kws, kw_alt, tmp_Ys_merge, pikced_keys, tag_Ys_merge, tag_Ys_direct, tag_Ys_approx
+        del kws, kw_alt, tmp_Ys_merge, pikced_keys
+        del tag_Ys_merge, tag_Ys_direct, tag_Ys_approx
         return
 
     def drawing_fig5_alt4(self, dframe, tag, ind, nb_set, id_set,
@@ -1419,7 +1387,7 @@ class Plot4_comparison(Plot3_comparison):
         annotZ = ' error rate' if ind == 0 else r'$($1$-$ performance$)$'
         annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(
             self._pick_metric[ind])
-        (_, tag_f_vot, tag_f_man, tag_f_ext,
+        (_, _, tag_f_man, tag_f_ext,  # tag_f_vot,
          col_X, tmp_f_vm) = self.picking_fig_tags(tag, ind)
 
         tYs_k4 = [0, 1, 2, 3, 4, 5] + [
@@ -1467,10 +1435,12 @@ class Plot4_comparison(Plot3_comparison):
         picked_direct[0] = r'$\mathbf{df}$      prev'
         picked_approx[0] = r'$\hat{\mathbf{df}}$      prev'
         lineplot_with_uncertainty(
-            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct, pikced_keys + picked_direct,
+            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct,
+            pikced_keys + picked_direct,
             figname=suff_pre + '_lc2s', **kws)  # '_pc2s'
         lineplot_with_uncertainty(
-            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx, pikced_keys + picked_approx,
+            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx,
+            pikced_keys + picked_approx,
             figname=suff_pre + '_lc2t', **kws)  # '_pc2t'
         del tYs_k4, tag_Ys_direct, tag_Ys_approx, picked_direct, picked_approx
 
@@ -1538,8 +1508,10 @@ class CurrPlot4B_comparison(Plot4_comparison):
          each_att, each_gen) = self.recap_sub_data(
             raw_dframe, nb_row=4, nc_norm=3, nc_sens=3 + 1)
         tag_pm, tag_trn, tag_tst = self.prepare_graph()
-        self.drawing_fig5_alt4(raw_dframe, tag_tst, 0, nb_set, id_set,
-                               each_gen, each_att, pre=pre)
+        self.drawing_fig3(raw_dframe, tag_tst, None,
+                          nb_set, id_set, each_gen, each_att, pre=pre)
+        # self.drawing_fig5_alt4(raw_dframe, tag_tst, 0, nb_set, id_set,
+        #                        each_gen, each_att, pre=pre)
         return
 
 
@@ -2182,8 +2154,8 @@ class HyperEA_renew_m1fix(Plot5_hyperparameter_renew):
 
 class HyperEB_renew_m2fix(Plot5_hyperparameter_renew):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        n_l = len(self._m1_set)
-        tag_pm, tag_drt, tag_apx, tag_avg, tag_ut = self.prepare_graph(n_l)
+        n_l = len(self._m1_set)  # tag_pm,
+        _, tag_drt, tag_apx, tag_avg, tag_ut = self.prepare_graph(n_l)
         nb_set, id_set, _, _, _ = self.recap_sub_data(raw_dframe, 3)
         n_k = self._nb_iter
         ms_set = [r'$m_1$={}'.format(i) for i in self._m1_set]
@@ -2354,7 +2326,8 @@ class Table4_comparison(Plot4_comparison):
         i, k = 0, 0
         df_trn = dframe[tag_trn_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
         df_tst = dframe[tag_tst_a_f[0]].iloc[id_set[i] + 1: id_set[i + 1]]
-        U_trn_raw, U_tst_raw = self.tabulate_five_sub1_dat(
+        # U_trn_raw, U_tst_raw = self.tabulate_five_sub1_dat(
+        _, U_tst_raw = self.tabulate_five_sub1_dat(
             df_trn, df_trn, nb_clf, nb_ind=len(ind))
         U_f1_raw[k] = U_tst_raw[picked_clf]
         k += 1
@@ -2365,7 +2338,7 @@ class Table4_comparison(Plot4_comparison):
                                   curr_set + each_gen + each_att))
             df_trn = dframe[tag_trn_a_f[0]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[0]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw = self.tabulate_five_sub1_dat(
+            _, U_tst_raw = self.tabulate_five_sub1_dat(
                 df_trn, df_trn, nb_clf, nb_ind=len(ind))
             U_f1_raw[k] = U_tst_raw[picked_clf]
             k += 1
@@ -2374,14 +2347,16 @@ class Table4_comparison(Plot4_comparison):
                 curr_set + each_gen + each_att, curr_set + each_gen + each_att * 2))
             df_trn = dframe[tag_trn_a_f[1]].iloc[curr_loc]
             df_tst = dframe[tag_tst_a_f[1]].iloc[curr_loc]
-            U_trn_raw, U_tst_raw = self.tabulate_five_sub1_dat(
+            _, U_tst_raw = self.tabulate_five_sub1_dat(
                 df_trn, df_trn, nb_clf, nb_ind=len(ind))
             U_f1_raw[k] = U_tst_raw[picked_clf]
             k += 1
 
         suff = suffix + '_tst_each_confusion'  # suff = self._figname.replace()
-        U_cp_raw, Uq1, Uq2 = self.tabulate_five_sub3_plo(U_f1_raw, ind,
-                                                         suff)
+        # U_cp_raw, Uq1, Uq2 = self.tabulate_five_sub3_plo(U_f1_raw, ind,
+        #                                                  suff)
+        U_cp_raw, _, Uq2 = self.tabulate_five_sub3_plo(U_f1_raw, ind,
+                                                       suff)
         # pdb.set_trace()
         if 0 in ind:
             self.tabulate_five_sub4_plo(
@@ -2434,8 +2409,8 @@ class Table4_comparison(Plot4_comparison):
             for j in range(nb_col):
                 tmp_tex.append(_encode_sign(U_avg[i, j], U_std[i, j],
                                             rez))
-                mu, sigma2, sigma = _avg_and_stdev(
-                    U_f1_raw[i, j].tolist(), k)
+                mu, _, sigma = _avg_and_stdev(
+                    U_f1_raw[i, j].tolist(), k)  # _,sigma2,_=
                 tmp_my.append(_encode_sign(mu, sigma, rez))
             ans_tex.append(tmp_tex)
             cmp_tex.append(tmp_my)
@@ -2555,9 +2530,9 @@ class Table4_comparison(Plot4_comparison):
         sen_att_2 = tf_vm[1][: -1] + tf_ext[1][: 3]
         tag_tst_a_f = ta_org + ta_dlt + sen_att_1 + sen_att_2 + tf_ext[2][: 3]
         del ta_org, ta_dlt, tf_vm, tf_ext, tYs_k2_k3
-        # tag_trn/tst_a_f, 23 columns: 5+5 (orgin+delta) +5*2 (DR, df_prev_bin-val,
-        #                              df_prev_multival, df, df_avg) each sen-att
-        #                              +3 (df_prev, df, df_avg) both sen-att
+        # tag_trn/tst_a_f, 23 columns:
+        #       5+5 (orgin+delta) +5*2 (DR, df_prev_bin-val, df_prev_multival,
+        #       df, df_avg) each sen-att +3 (df_prev, df, df_avg) both sen-att
         nb_col = len(ind) * 2 + 5 * 2 + 3  # 23 or (2|3)*2+13 =17|19
         # nb_att = nb_set * 2 - 1
         nb_clf = (each_gen + each_att * 2) // self._nb_iter
@@ -2702,8 +2677,9 @@ class Table4_comparison(Plot4_comparison):
         baseline_Ys = np.zeros((3, num_gap, k * nb_set))  # (3,100,25)
         for j in range(3):
             for kv_a, alpha in enumerate(X):
-                baseline_Ys[j][kv_a] = (1 - U_cp_tmp_norm[loc] / 100
-                                        ) * alpha + (1. - alpha) * U_cp_tmp_fair[j]
+                baseline_Ys[j][kv_a] = (
+                    1 - U_cp_tmp_norm[loc] / 100
+                ) * alpha + (1. - alpha) * U_cp_tmp_fair[j]
         fnm = '{}_both_set_gather'.format(suff)
         _uncertainty_plotting(X, baseline_Ys, tmp_d, annotY, ddof,
                               figname=fnm, **kw_alt)
@@ -2712,17 +2688,19 @@ class Table4_comparison(Plot4_comparison):
     def tabulating_third(self, dframe, tag_trn, tag_tst, nb_set, id_set,
                          each_gen, each_att, ind=[0, 3], ddof=0,
                          alpha=.7, dist_df='both', csv_w=None):
-        tmp_a_org, _, tmp_f_vm, tmp_ext = self.picking_tab_tags(tag_trn, ind, dist_df)
+        tmp_a_org, _, tmp_f_vm, tmp_ext = self.picking_tab_tags(
+            tag_trn, ind, dist_df)
         tag_trn_a_f = (
             tmp_a_org + tmp_f_vm[0] + tmp_ext[0],  # tmp_ext[1],
             tmp_a_org + tmp_f_vm[1] + tmp_ext[1])  # tmp_ext[2])
-        tmp_a_org, _, tmp_f_vm, tmp_ext = self.picking_tab_tags(tag_tst, ind, dist_df)
+        tmp_a_org, _, tmp_f_vm, tmp_ext = self.picking_tab_tags(
+            tag_tst, ind, dist_df)
         tag_tst_a_f = (
             tmp_a_org + tmp_f_vm[0] + tmp_ext[0],  # tmp_ext[1],
             tmp_a_org + tmp_f_vm[1] + tmp_ext[1])  # tmp_ext[2])
         nb_col = 7 if dist_df == 'both' else 5  # 6 or 5 where 6=2+4
         nb_att = (nb_set - 1) * 2 + 1
-        U_f1_raw = np.zeros((nb_att, 1 + nb_col, self._nb_iter))
+        # U_f1_raw = np.zeros((nb_att, 1 + nb_col, self._nb_iter))
         U_cp_raw = np.zeros((nb_att, 1 + nb_col, self._nb_iter))
 
         i, k = 0, 0

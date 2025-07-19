@@ -219,7 +219,7 @@ class Table2C_comparison(Plot2C_comparison):
          U_trn_tmp, U_tst_tmp) = self.tabulating_third_sub1(
             df_trn, df_tst, each_gen, each_att, alpha=alpha,
             dist_df=dist_df)
-        (pick_by_avg, pick_by_bar, choose_avg,
+        (pick_by_avg, pick_by_bar, _,  # choose_avg,
          choose_clf) = self.tabulating_third_sub2(
             U_trn_raw, U_tst_raw, U_trn_tmp, U_tst_tmp, ddof=0)
         U_cp_raw[k] = pick_by_avg

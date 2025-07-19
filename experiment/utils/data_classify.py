@@ -277,7 +277,7 @@ def AdaBoostEnsembleAlgorithm(X_trn, y_trn, name_cls, nb_cls):
 def BoostingEnsemble_multiclass(X_trn, y_trn, name_cls, nb_cls,
                                 name_ens='AdaBoostM1'):
     assert name_ens in ['AdaBoostM1', 'SAMME']
-    vY, dY = judge_transform_need(y_trn)
+    _, dY = judge_transform_need(y_trn)  # vY,
     if dY == 1:
         dY = 2  # \mathcal{Y} = \{-1,+1\}
     #   #   #
