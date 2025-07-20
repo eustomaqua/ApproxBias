@@ -48,7 +48,7 @@ from experiment.classifiers import (
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from prgm.fair_diku.metric_fupda import (
+from experiment.utils.fair_rev_group import (
     UD_grp1_DP, UD_grp2_EO, UD_grp3_PQP)
 DistApprox_nonbin = DistApprox
 DistExtend_multivar = DistExtend

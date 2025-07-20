@@ -13,6 +13,24 @@ from hfm.utils.verifiers import check_zero
 from hfm.metrics.contingency_mat import contingency_tab_bi
 
 
+class _elem:
+    @staticmethod
+    def _indices(vA, idx, ex):
+        tmp = list(range(len(vA)))
+        tmp.remove(idx)
+        n = sum(ex) - ex[idx]
+        return tmp, n, sum(ex)  # =nt
+
+
+def zero_division(dividend, divisor):
+    # divided_by_zero
+    if divisor == 0 and dividend == 0:
+        return 0.
+    elif divisor == 0:
+        return 10.  # return 1.
+    return dividend / divisor
+
+
 # =====================================
 # Fairness research & oracle bounds
 # =====================================

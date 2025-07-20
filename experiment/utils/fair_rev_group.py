@@ -2,32 +2,22 @@
 
 
 import numpy as np
-
+# import numba
+# from hfm.utils.verifiers import check_zero
 from hfm.utils.decorators import fantasy_timer
+from hfm.metrics.contingency_mat import contingency_tab_bi
+from hfm.metrics.fair_grp_ext import (
+    marginalised_np_mat, marginalised_np_gen, _elem, zero_division)
 
-
-from prgm.fair_diku.metric_addl import (
-    marginalised_np_mat, marginalised_np_gen)
-from prgm.fair_diku.metric_utils import (
-    check_zero, contingency_tab_bi)
-from prgm.fair_diku.metric_group import _elem
-from prgm.fair_diku.metric_indiv import (
-    GEI_Theil, prop_L_loss, prop_L_fair,
-    gammaSubgroup, BoundedGrpLos,
-    DistDirect, HFM_Approx_bin, HFM_DistApprox)
+# from prgm.fair_diku.metric_indiv import (
+#     GEI_Theil, prop_L_loss, prop_L_fair,
+#     gammaSubgroup, BoundedGrpLos,
+#     DistDirect, HFM_Approx_bin, HFM_DistApprox)
 
 
 # =====================================
 # Fairness research
 # =====================================
-
-
-def zero_division(dividend, divisor):
-    if divisor == 0 and dividend == 0:
-        return 0.
-    elif divisor == 0:
-        return 10.  # return 1.
-    return dividend / divisor
 
 
 # =====================================
@@ -50,6 +40,7 @@ class UD_grp1_DP(_elem):
     @staticmethod
     def _core_alt(g_Cm):
         # (tp+fp)/n where n=tp+fp+fn+tn
+        # return tmp / sum(g_Cm)
         tmp = g_Cm[0] + g_Cm[1]
         return zero_division(tmp, sum(g_Cm))
 
@@ -104,10 +95,7 @@ class UD_grp1_DP(_elem):
             y, y_hat, A, vals_in_A[0], pos_label)  # priv_val
         g = [cls._core_alt(k) for k in g_Cm]
         ans = alt = 0.
-        # tmp, n1, nt = cls._indices(vA, idx, ex)
-        # del idx
         ans_mediator, n_a = [], len(vA)
-        # for i in range(n_a):
         for i in range(n_a - 1):
             for j in range(i + 1, n_a):
                 ans_mediator.append(abs(g[j] - g[i]))
@@ -131,7 +119,6 @@ class UD_grp1_DisI(UD_grp1_DP):
             y, y_hat, A, priv_val, pos_label)
         g = [cls._core_alt(k) for k in g_Cm]
         ans = alt = 0.
-
         tmp, nt, n = cls._indices(vA, idx, ex)
         for i in tmp:
             tk = zero_division(g[i], g[idx])
@@ -217,6 +204,11 @@ class UD_grp1_DisT(UD_grp1_DP):
 
 # Definition 2.7 (Conditional statistical parity)
 
+# class group1_CSP(group1_DP):
+#     @classmethod
+#     def _core(cls, g1_Cm, g0_Cm):
+#         pass
+
 
 # -------------------------------------
 # Separation
@@ -235,6 +227,7 @@ class UD_grp2_EO(_elem):
     @staticmethod
     def _core_alt(g_Cm):
         # tp/(tp+fn)
+        # return g_Cm[0] / check_zero(tmp)
         tmp = g_Cm[0] + g_Cm[2]
         return zero_division(g_Cm[0], tmp)
 
@@ -308,6 +301,7 @@ class UD_grp2_EOdd(UD_grp2_EO):
 
     @staticmethod
     def _neg_label(y, y_hat, pos_label):
+        # only for binary classification
         neg_label = set(y) | set(y_hat)
         if pos_label in neg_label:
             neg_label.remove(pos_label)
@@ -326,9 +320,16 @@ class UD_grp2_EOdd(UD_grp2_EO):
         z1, z0 = float(z1), float(z0)
 
         n_pos, n = sum(y == pos_label), len(y)
-        n_neg = n - n_pos
+        n_neg = n - n_pos  # sum(y != pos_label)
         ans = g_delta * n_pos / n + z_delta * n_neg / n
         return ans, (g_delta, z_delta), (g1, g0, z1, z0)
+
+    @classmethod
+    @fantasy_timer
+    def mu_sp(cls, y, y_hat, A, priv_val=1, pos_label=1):
+        priv_idx = A == priv_val
+        tmp, _ = cls.bival(y, y_hat, priv_idx, pos_label)
+        return tmp[0]
 
     @classmethod
     @fantasy_timer
@@ -353,13 +354,6 @@ class UD_grp2_EOdd(UD_grp2_EO):
         ans = g_ans * n_pos / n + z_ans * n_neg / n
         alt = g_alt * n_pos / n + z_alt * n_neg / n
         return ans, alt
-
-    @classmethod
-    @fantasy_timer
-    def mu_sp(cls, y, y_hat, A, priv_val=1, pos_label=1):
-        priv_idx = A == priv_val
-        tmp, _ = cls.bival(y, y_hat, priv_idx, pos_label)
-        return tmp[0]
 
     @classmethod
     @fantasy_timer
@@ -391,7 +385,6 @@ class UD_grp2_EOdd(UD_grp2_EO):
         g_ans /= n_ai * (n_ai - 1.)
 
         z = [cls._corrected_neg(k) for k in g_Cm]
-        # z_ans = z_alt = 0.
         z_ans = z_alt = z_alt_alt = 0.
         for i in range(n_ai):
             for j in range(n_ai):
@@ -484,6 +477,7 @@ class UD_grp3_PQP(_elem):
     @staticmethod
     def _core_alt(g_Cm):
         # tp/(tp+fp)
+        # return g_Cm[0] / check_zero(tmp)
         tmp = g_Cm[0] + g_Cm[1]
         return zero_division(g_Cm[0], tmp)
 
@@ -552,8 +546,6 @@ class UD_grp3_PQP(_elem):
 
 # =====================================
 # Individual fairness
-
-
 # -------------------------------------
 # Definition 2.10 (General entropy indices)
 
@@ -565,8 +557,8 @@ class UD_gammaSubgroup(_elem):
     @staticmethod
     def _corrected_neg(g_Cm):
         # fp/(fp+tn)
-        tmp = g_Cm[1] + g_Cm[3]
         # return g_Cm[1] / check_zero(tmp)
+        tmp = g_Cm[1] + g_Cm[3]
         return zero_division(g_Cm[1], tmp)
 
     @classmethod
@@ -604,7 +596,7 @@ class UD_gammaSubgroup(_elem):
         g = [cls._corrected_neg(k) for k in g_Cm]
         z_Cm = contingency_tab_bi(y, y_hat, pos_label)
         z = cls._corrected_neg(z_Cm)
-        n = float(sum(ex))  # ex: n?
+        n = float(sum(ex))
 
         ans = alt = 0.
         tmp, nt, _ = cls._indices(vA, idx, ex)
@@ -614,13 +606,6 @@ class UD_gammaSubgroup(_elem):
             ans += alph_f * beta_f * ex[i] / n
             alt += alph_f * beta_f * ex[i] / nt
         return ans, alt
-
-    @staticmethod
-    def _indices(vA, idx, ex):
-        tmp = list(range(len(vA)))
-        tmp.remove(idx)
-        n = sum(ex) - ex[idx]
-        return tmp, n, sum(ex)
 
     @classmethod
     @fantasy_timer
@@ -648,7 +633,32 @@ class UD_gammaSubgroup(_elem):
 
 # Definition 2.16 (Bounded group loss)
 
-class UD_BoundedGrpLos(BoundedGrpLos):
+class UD_BoundedGrpLos(_elem):
+    @classmethod
+    def _core(cls, g1_Cm, g0_Cm):
+        g1 = cls._los4accuracy(g1_Cm)
+        g0 = cls._los4accuracy(g0_Cm)
+        n1, n0 = sum(g1_Cm), sum(g0_Cm)
+        n = float(n1 + n0)
+        ans = 0.
+        ans += g1 * n1 / n
+        ans += g0 * n0 / n
+        return ans, g1, g0
+
+    @classmethod
+    @fantasy_timer
+    def bival(cls, y, y_hat, priv_idx, pos_label=1):
+        g1_Cm, g0_Cm = marginalised_np_mat(
+            y, y_hat, pos_label, priv_idx)
+        return cls._core(g1_Cm, g0_Cm)
+
+    @classmethod
+    @fantasy_timer
+    def mu_sp(cls, y, y_hat, A, priv_val=1, pos_label=1):
+        g1_Cm, g0_Cm = marginalised_np_mat(
+            y, y_hat, pos_label, A == priv_val)
+        return cls._core(g1_Cm, g0_Cm)[0]
+
     @staticmethod
     def _los4accuracy(g_Cm):
         tmp = g_Cm[0] + g_Cm[3]
@@ -661,7 +671,7 @@ class UD_BoundedGrpLos(BoundedGrpLos):
         g_Cm, vA, idx, ex = marginalised_np_gen(
             y, y_hat, A, priv_val, pos_label)
         g = [cls._los4accuracy(k) for k in g_Cm]
-        ans, n = 0, float(sum(ex))  # =len(y | y_hat)
+        ans, n = 0., float(sum(ex))  # =len(y | y_hat)
         for i in range(len(vA)):
             ans += g[i] * ex[i] / n
         return ans
