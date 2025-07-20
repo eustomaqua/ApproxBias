@@ -7,7 +7,8 @@ import pdb
 import numpy as np
 
 from hfm.utils.verifiers import unique_column, DTY_FLT, DTY_INT
-from experiment.classifiers import RelativeFairClsf, IndividualClsf, INDIVIDUALS
+from experiment.classifiers import (
+    RelativeFairClsf, IndividualClsf, INDIVIDUALS)
 
 from hfm.dist_drt import DirectDist_bin as DistDirect_bin
 # from hfm.dist_drt import DirectDist_nonbin as DistDirect_nonbin

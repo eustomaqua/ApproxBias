@@ -14,7 +14,7 @@ from hfm.dist_est_nonbin import (
 
 import numpy as np
 from pathos import multiprocessing as pp
-# import pdb
+import pdb
 from hfm.dist_drt import (
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
 # from utils.verifiers import check_equal
@@ -116,6 +116,10 @@ def compare_approx(nai, m1, m2, n_e=2):
     ans_4, _ = ans_4
     ans_5, _ = ans_5
     ans_6, _ = ans_6
+
+    tmp_2, _ = ApproxDist_bin_revised(X_nA_y, Aq, ~idx_S1, m1, m2)
+    tmp_5, _ = ApproxDist_bin_revised(X_nA_y, Ap, ~idx_S1, m1, m2)
+    assert ans_2[0] == ans_5[0] == tmp_2[0] == tmp_5[0]
 
     # pdb.set_trace()
     for i in [0, 1]:  # max, avg

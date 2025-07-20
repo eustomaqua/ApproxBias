@@ -18,7 +18,7 @@ from experiment.utils.data_split import (
     sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
     manual_repetitive, scale_normalize_helper)
 
-
+from experiment.generic import DataSetup
 from experiment.datasets import (
     process_above, transform_X_and_y)
 from experiment.ver1.manf_data import (
@@ -39,12 +39,6 @@ from experiment.ver2.rev_mext_exp_mp import (
 # fairmanf_ext
 # mext_sim.py
 
-# from prgm.fairvote.oracle_data import DATASET_NAMES, DATASETS
-# from prgm.fairvote.oracle_clsf import INDIVIDUALS
-# from prgm.fairmanf_ext.mext_sim import (
-from prgm.fair_sgl_rev.mext_utils import (
-    # from prgm.fair_sgl.revmext_utils import (
-    AVAILABLE_CLFS, AVAILABLE_ENSF, DataSetup)
 
 # AVAILABLE_CLFS = list(INDIVIDUALS.keys())
 # AVAILABLE_ENSF = [

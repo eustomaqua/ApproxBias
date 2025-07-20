@@ -16,14 +16,16 @@ from hfm.hfm_df import bias_degree_nonbin as fair_degree_v4
 from hfm.dist_est_nonbin import ApproxDist_nonbin_mpver as DistApprox
 from hfm.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
 from hfm.dist_est_bin import ApproxDist_bin
+from hfm.dist_est_bin import ApproxDist_bin_revised as ApproxDist_alter
 
 
-from experiment.utils.fair_grp_ext import (
+# from experiment.utils.fair_grp_ext import (
+from hfm.metrics.fair_grp_ext import (
     StatsParity_sing, StatsParity_mult,
     extGrp1_DP_sing, extGrp2_EO_sing, extGrp3_PQP_sing,
     alterGrps_sing)
 from hfm.metrics.contingency_mat import \
-    contg_tab_multi_type2 as contingency_tab
+    contg_tab_mu_type2 as contingency_tab
 from hfm.metrics.performance import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
     calc_tpr, calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
@@ -38,7 +40,10 @@ from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 from hfm.earlybreak import Naive_bin as NaiveHD_bin
 from hfm.earlybreak import Naive_nonbin as NaiveHD_nonbin
 from hfm.earlybreak import Naive_multivar as NaiveHD_multivar
-from hfm.earlybreak import EffHD_bin, EffHD_nonbin, EffHD_multivar
+from hfm.earlybreak import EffHD_bin as EffHDD_bin
+from hfm.earlybreak import EffHD_nonbin as EffHDD_nonbin
+from hfm.earlybreak import EffHD_multivar as EffHDD_multivar
+# from hfm.earlybreak import EffHD_bin, EffHD_nonbin, EffHD_multivar
 from sklearn.ensemble import (
     BaggingClassifier, AdaBoostClassifier, RandomForestClassifier,
     ExtraTreesClassifier, GradientBoostingClassifier)
@@ -105,12 +110,16 @@ class ComparisonD_setup:
         del df_ecai, df_nips, v3_df_avg, v4_df_avg
 
         ut_b = time.time()
+        '''
         idx_sa = ~non_sa  # actually, doesn't need A here
         Ds_01, t_Ds = ApproxDist_bin(X_y, A_j, idx_sa, non_sa, m1, m2)
         Df_01, t_Df = ApproxDist_bin(X_y_hat, A_j, idx_sa, non_sa, m1, m2)
+        '''
+        Ds_01, t_Ds = ApproxDist_bin(X_y, A_j, non_sa, m1, m2)
+        Df_01, t_Df = ApproxDist_bin(X_y_hat, A_j, non_sa, m1, m2)
         df_ecai, _ = fair_degree_v3(Ds_01, Df_01)
         df_nips, _ = fair_degree_v4(Ds_01, Df_01)
-        # TODO: 这里应该加上 df_nips, avg，也不对，这是时间耗时，
+        # TODO: 这里应该加上 df_nips, avg，也不用，这是时间耗时，
         # 这个实验虽然没直接算出来，但是我可以在绘图代码里手动计算
         ut_b = time.time() - ut_b
         ans_fair.extend([Ds_01, t_Ds, Df_01, t_Df, df_ecai, df_nips])
@@ -450,8 +459,12 @@ class RevCompZ_setup:
     def subproc_bin(self, X_nA_y, A_j, non_sa, m1, m2, n_e):
         luo_1 = DistDirect_bin(X_nA_y, non_sa)
         luo_2 = DistDirect_nonbin(X_nA_y, [non_sa, ~non_sa])
+        '''
         app_0 = ApproxDist_bin(X_nA_y, A_j, ~non_sa, non_sa, m1, m2)
         app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)
+        '''
+        app_0 = ApproxDist_bin(X_nA_y, A_j, non_sa, m1, m2)
+        app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)  # ~non_sa
         app_2 = DistApprox_nonbin(
             X_nA_y, non_sa.astype('int'), m1, m2, n_e)
 
@@ -464,7 +477,7 @@ class RevCompZ_setup:
                    luo_1[1], luo_2[1], app_0[1], app_1[1], app_2[1]]
         ans_max = [hdd_1[0], hdd_2[0], eff_1[0], eff_2[0],
                    luo_1[0][0], luo_2[0][0],
-                   app_0[0], app_1[0], app_2[0][0]]
+                   app_0[0], app_1[0][0], app_2[0][0]]
         ans_avg = [luo_1[0][1], luo_2[0][1], app_2[0][1]]
         return ans_tim + ans_max + ans_avg  # (21,) =(9+9+3,)
 
@@ -474,8 +487,12 @@ class RevCompZ_setup:
         luo_1 = DistDirect_bin(X_nA_y, non_sa)
         luo_2 = DistDirect_nonbin(X_nA_y, [non_sa, ~non_sa])
         luo_3 = DistDirect_nonbin(X_nA_y, g1m)
+        '''
         app_0 = ApproxDist_bin(X_nA_y, A_j, ~non_sa, non_sa, m1, m2)
         app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)
+        '''
+        app_0 = ApproxDist_bin(X_nA_y, A_j, non_sa, m1, m2)
+        app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)  # ~non_sa
         app_2 = DistApprox_nonbin(X_nA_y, Aj_bin, m1, m2, n_e)
         app_3 = DistApprox_nonbin(X_nA_y, A_j, m1, m2, n_e)
 
@@ -493,7 +510,7 @@ class RevCompZ_setup:
         ans_max = [hdd_1[0], hdd_2[0], hdd_3[0],
                    eff_1[0], eff_2[0], eff_3[0],
                    luo_1[0][0], luo_2[0][0], luo_3[0][0],
-                   app_0[0], app_1[0], app_2[0][0], app_3[0][0]]
+                   app_0[0], app_1[0][0], app_2[0][0], app_3[0][0]]
         ans_avg = [luo_1[0][1], luo_2[0][1], luo_3[0][1],
                    app_2[0][1], app_3[0][1]]
         # pdb.set_trace()
@@ -1162,7 +1179,8 @@ class RevCompYC_NN(RevCompYB_NN):
         result.extend(self.subproc_df(
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, Ds_avg, Df_avg, Dh_avg))
 
-        pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
+        # pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
+        pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')
         Ds, t_Ds = ApproxDist_bin(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_bin(X_nA_fx, A_j, **pm)
         Dh, t_Dh = ApproxDist_bin(embed_fx, A_j, **pm)
@@ -1170,9 +1188,11 @@ class RevCompYC_NN(RevCompYB_NN):
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, None, None, None))
 
         pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}
+        # pm = {'non_sa': ~non_sa, 'm1': m1, 'm2': m2}
         Ds, t_Ds = ApproxDist_alter(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_alter(X_nA_fx, A_j, **pm)
         Dh, t_Dh = ApproxDist_alter(embed_fx, A_j, **pm)
+        Ds, Df, Dh = Ds[0], Df[0], Dh[0]
         result.extend(self.subproc_df(
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, None, None, None))
 
@@ -1430,15 +1450,17 @@ class RevCompXB_NN(RevCompX_setup, RevCompYC_NN):
         (Df, Df_avg), t_Df = DistDirect_bin(X_nA_fx, non_sa)
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, Ds_avg, Df_avg))
 
-        pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
+        # pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
+        pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')
         Ds, t_Ds = ApproxDist_bin(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_bin(X_nA_fx, A_j, **pm)
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, None, None))
-        del pm['idx_S0']
-        del pm['idx_S1']
-        pm['non_sa'] = non_sa
+        # del pm['idx_S0']
+        # del pm['idx_S1']
+        pm['non_sa'] = non_sa  # pm['non_sa'] = ~non_sa
         Ds, t_Ds = ApproxDist_alter(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_alter(X_nA_fx, A_j, **pm)
+        Ds, Df = Ds[0], Df[0]
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, None, None))
 
         (Ds, Ds_avg), t_Ds = DistDirect_nonbin(X_nA_y, [non_sa, ~non_sa])
