@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import os
+
 import pdb
 import pandas as pd
 import numpy as np
@@ -25,7 +25,7 @@ from hfm.hfm_df import bias_degree_nonbin as fair_degree_v4
 
 class GraphSetup(GraphSetupVer2):  # REVISION S
     def sub_dat_multivar(self, dframe, nb_set, id_set, tag):
-        i, k = 0, 0
+        i = 0  # i, k = 0, 0
         df_raw = dframe[tag].iloc[id_set[i] + 1: id_set[i + 1]]
         for i in range(1, nb_set):
             df_tmp = dframe[tag].iloc[id_set[i] + 1: id_set[i + 1]]

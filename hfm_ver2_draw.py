@@ -228,7 +228,7 @@ class Rev_ManfExtDrawing(object):
         return
 
     def preparing_iterator_core(self, trial_type, prefix=''):
-        pre = self._prep.replace('_', '')
+        # pre = self._prep.replace('_', '')
         pms = {'m1': self._m1, 'm2': self._m2, 'n_e': self._n_e}
         figname = 'exp{}_'.format(trial_type[-2:])
 
@@ -386,7 +386,7 @@ if args.revision_plt:
     kwargs['n_e'] = args.n_e_chosen
     kwargs['m2_fixed'] = args.m2_fixed  # args.fix
     kwargs['mp_cores'] = args.mp_cores  # args.mp
-    kwargs['ratio'] = args.ratio
+    kwargs['ratio'] = .97  # args.ratio
 
     kwargs['gen'] = args.gen  # args.gen_iter
     kwargs['rep'] = args.rep  # args.rep_iter

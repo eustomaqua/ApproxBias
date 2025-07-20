@@ -743,13 +743,13 @@ def line_reg_with_marginal_distr(df, col_X, col_Y, tag_Ys,
         _marginal_distrib_step1(grid, df_all, col_X, mycolor)
         _marginal_distrib_step2(grid, df_all, col_Y, mycolor)
     if snspec == 'sty0':
-        # ax3 = 
+        # ax3 = ..
         _marginal_distrib_step3(grid, dfs_pl, picked_keys,
                                 col_X, col_Y, annotX, annotY,
                                 mycolor)  # , distrib=distrib)
     elif snspec in ['sty1', 'sty2', 'sty3',  # 'sty4', 'sty5',
                     'sty6', 'sty4a', 'sty4b', 'sty5a', 'sty5b']:
-        # ax4 = 
+        # ax4 = ..
         _marginal_distr_step4(
             grid, dfs_pl, picked_keys, col_X, col_Y,
             annotX, annotY, mycolor, snspec,

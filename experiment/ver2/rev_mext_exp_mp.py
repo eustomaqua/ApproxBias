@@ -21,16 +21,16 @@ from hfm.dist_est_bin import ApproxDist_bin_revised as ApproxDist_alter
 
 # from experiment.utils.fair_grp_ext import (
 from hfm.metrics.fair_grp_ext import (
-    StatsParity_sing, StatsParity_mult,
+    # StatsParity_sing, StatsParity_mult,
     extGrp1_DP_sing, extGrp2_EO_sing, extGrp3_PQP_sing,
     alterGrps_sing)
 from hfm.metrics.contingency_mat import \
     contg_tab_mu_type2 as contingency_tab
 from hfm.metrics.performance import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
-    calc_tpr, calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
+    calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
-    imba_Matthew_s_cc, imba_Cohen_s_kappa)
+    imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
 from hfm.metrics.fairness_group import (
     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
@@ -53,8 +53,8 @@ from experiment.classifiers import (
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from experiment.utils.fair_rev_group import (
-    UD_grp1_DP, UD_grp2_EO, UD_grp3_PQP)
+# from experiment.utils.fair_rev_group import (
+#     UD_grp1_DP, UD_grp2_EO, UD_grp3_PQP)
 DistApprox_nonbin = DistApprox
 DistExtend_multivar = DistExtend
 
@@ -482,7 +482,7 @@ class RevCompZ_setup:
         return ans_tim + ans_max + ans_avg  # (21,) =(9+9+3,)
 
     def subproc_nonbin(self, X_nA_y, A_j, g1m, m1, m2, n_e, pool):
-        non_sa, n_ai = g1m[0], len(g1m)
+        non_sa = g1m[0]  # non_sa, n_ai = g1m[0], len(g1m)
         Aj_bin = non_sa.astype('int')
         luo_1 = DistDirect_bin(X_nA_y, non_sa)
         luo_2 = DistDirect_nonbin(X_nA_y, [non_sa, ~non_sa])
@@ -789,16 +789,15 @@ class RevCompY_setup:
         n_a = len(g1m_indices)
 
         '''
-    result = self.subproc_bin(
-        X_nA_y, X_nA_fx, embed_fx, A[:, 1], g1m_indices[1][0],
-        m1, m2, n_e)
-    result = self.subproc_nonbin(
-        X_nA_y, X_nA_fx, embed_fx, A[:, 1], g1m_indices[1],
-        m1, m2, n_e)
-    result = self.subproc_multivar(
-        X_nA_y, X_nA_fx, embed_fx, A, g1m_indices, m1, m2, n_e)
-    '''
-        # pdb.set_trace()
+        result = self.subproc_bin(
+            X_nA_y, X_nA_fx, embed_fx, A[:, 1], g1m_indices[1][0],
+            m1, m2, n_e)
+        result = self.subproc_nonbin(
+            X_nA_y, X_nA_fx, embed_fx, A[:, 1], g1m_indices[1],
+            m1, m2, n_e)
+        result = self.subproc_multivar(
+            X_nA_y, X_nA_fx, embed_fx, A, g1m_indices, m1, m2, n_e)
+        '''
         return
 
     def subproc_bin(self, X_nA_y, X_nA_fx, embed_fx,
@@ -1389,22 +1388,21 @@ class RevCompX_setup:
             fx.reshape(-1, 1).astype(DTY_FLT), embedding], axis=1)
         n_a = len(g1m_indices)
         '''
-    fx, acc, ut = self.sklearn_regular(X_wA, y)
-    X_nA_y = np.concatenate([
+        fx, acc, ut = self.sklearn_regular(X_wA, y)
+        X_nA_y = np.concatenate([
         y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
-    X_nA_fx = np.concatenate([
+        X_nA_fx = np.concatenate([
         fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
-    '''
+        '''
 
         positive_label = 1
         # self.count_sing_part3(y, fx, g1m_indices[1], positive_label)
         '''
-    tmp = self.subproc_bin(X_nA_y, X_nA_fx, embed_fx, A[:, 1],
+        tmp = self.subproc_bin(X_nA_y, X_nA_fx, embed_fx, A[:, 1],
                            g1m_indices[1][0], m1, m2, n_e, pool)
-    tmp = self.subproc_nonbin(X_nA_y, X_nA_fx, embed_fx, A[:, 1], 
+        tmp = self.subproc_nonbin(X_nA_y, X_nA_fx, embed_fx, A[:, 1], 
                               g1m_indices[1], m1, m2, n_e, pool)
-    '''
-        # pdb.set_trace()
+        '''
         return
 
     def count_sing_part3(self, y, y_hat, g1m, positive_label):

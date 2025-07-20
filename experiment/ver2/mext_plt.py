@@ -7,21 +7,14 @@
 #
 
 
-from copy import deepcopy
-import json
-import time
-import os
-import logging
-
+import csv
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pdb
 
-
-from hfm.utils.verifiers import unique_column, check_zero
-from hfm.utils.recorders import get_elogger, rm_ehandler
-
+from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
+# from hfm.utils.recorders import get_elogger, rm_ehandler
 
 from experiment.facil.draw_addtl import (
     # boxplot_k_cv_with_real, multiple_scatter_comparison,
@@ -32,12 +25,10 @@ from experiment.facil.draw_addtl import (
     scatter_parl_chart_renew, hyper_params_lin_reg,
     _uncertainty_plotting)
 
-import csv
 from experiment.utils.draw_hypos import _avg_and_stdev, _encode_sign
 from experiment.facil.draw_chart import (
-    analogous_confusion, analogous_confusion_extended)
+    analogous_confusion_extended)  # analogous_confusion,
 # from experiment.facil.draw_graph import scatter_parl_chart
-from hfm.utils.verifiers import DTY_FLT
 from experiment.generic import GraphSetupVer2 as GraphSetup
 
 
@@ -51,7 +42,6 @@ from experiment.generic import GraphSetupVer2 as GraphSetup
 
 
 def _sub_depict_scat(df_raw, tYs, suff, diff=False):
-    # pdb.set_trace()
     scat_X = np.concatenate([df_raw[tYs[0]].values.astype(DTY_FLT),
                              df_raw[tYs[2]].values.astype(DTY_FLT)], axis=0)
     scat_Y = np.concatenate([df_raw[tYs[1]].values.astype(DTY_FLT),
@@ -77,7 +67,6 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
 
 
 def _sub_depict_tim(df_raw, tYs, suff, diff=False, log_taken=False):
-    # pdb.set_trace()
     scat_X = df_raw[tYs[4]].values.astype(DTY_FLT)  # direct,ut
     scat_Y = df_raw[tYs[5]].values.astype(DTY_FLT)  # approx,ut
     annotX = r'T_{\mathbf{D}}+T_{\mathbf{D}_f}'
@@ -322,14 +311,13 @@ def _ext_sub_show_tim(df_raw, tYs, suff, diff=False):
     scat_Z_bin = df_raw[tYs[18]].values.astype(DTY_FLT)  # mext approx.bin
     scat_X_mu = df_raw[tYs[31]].values.astype(DTY_FLT)  # direct.multivar
     scat_Y_mu = df_raw[tYs[32]].values.astype(DTY_FLT)  # approx.multivar
-    # pdb.set_trace()
     '''
-  annotX = r'T_{\mathbf{D}} + T_{\mathbf{D}_f}'
-  annotY = r'T_{\hat{\mathbf{D}}} + T_{\hat{\mathbf{D}}_f}'
-  annotZ = [
-      r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1',
-      r'\lg(\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} })']
-  '''
+    annotX = r'T_{\mathbf{D}} + T_{\mathbf{D}_f}'
+    annotY = r'T_{\hat{\mathbf{D}}} + T_{\hat{\mathbf{D}}_f}'
+    annotZ = [
+        r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1',
+        r'\lg(\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} })']
+    '''
     annotX = r'T_{\mathbf{D}_\mathbf{a}(S,a_i)} + T_{\mathbf{D}_{f,\mathbf{a}}(S,a_i)}'
     annotY = r'T_{\hat{\mathbf{D}}_\mathbf{a}(S,a_i)} + T_{\hat{\mathbf{D}}_{f,\mathbf{a}}(S,a_i)}'
     annotZ = [
@@ -409,7 +397,6 @@ def _ext_sub_show_scat(df_raw, tYs, suff, fig='_max', diff=False,
         Zs_abbr_y1 = r'\hat{\mathbf{D}}_\cdot'  # (S_1,\bar{S}_1)
         Zs_abbr_y2 = r'\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^{avg}'  # (S,a_i)
         Zs_abbr_x2 = r'\mathbf{D}_{\cdot,\mathbf{a}}^{avg}'  # (S,a_i)  # Zs_abbr_y3
-    # pdb.set_trace()
 
     Xs = [scat_X_bin, scat_X_mu]
     Ys = [[scat_Y_bin, scat_Z_bin], scat_Y_mu]
@@ -741,7 +728,6 @@ class Plot3_comparison(GraphSetup):
         _, suffix = self.draw_sub2_jt(joint)  # tmp,
         tYs_k2 = [0, 10, 3, 12, 26, 27, ] + [2, 11, 5, 13, ]
         tmp_f_vm = [[t[k] for k in tYs_k2] for t in tag_f_man]
-        # pdb.set_trace()
         del col_X, tYs_k2_direct, tYs_k2_approx, tYs_k3_approx
 
         # if ind is None:
@@ -793,7 +779,6 @@ class Plot3_comparison(GraphSetup):
         # scatter_with_marginal_distrib(
         #     df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
         #     annotX, annotY, figname=suff_1 + '_s', **kws)
-        # pdb.set_trace()
         scatter_with_marginal_distrib(
             df_raw, tmp_f_vm[0][0], col_Y, tag_Ys, self._picked_keys,
             annotXpz, annotY, figname=suff_3 + '_s', **kws)
@@ -805,16 +790,14 @@ class Plot3_comparison(GraphSetup):
 
     def draw_sub2_dat2(self, dframe, nb_set, id_set, each_gen, each_att,
                        tmp_f_vm):
-        i, k = 0, 0
+        i = 0  # i, k = 0, 0
         df_raw = dframe[tmp_f_vm[0]].iloc[id_set[i] + 1: id_set[i + 1]]
         for i in range(1, nb_set):
             curr_set = id_set[i] + 1
-            # pdb.set_trace()
             curr_loc = list(range(curr_set,
                                   curr_set + each_gen + each_att))
             df_tmp = dframe[tmp_f_vm[0]].iloc[curr_loc]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
-            # pdb.set_trace()
             curr_loc = list(range(
                 curr_set, curr_set + each_gen)) + list(range(
                     curr_set + each_gen + each_att,
@@ -886,7 +869,6 @@ class Plot3_comparison(GraphSetup):
                         tYs_k4[2] + tYs_k4[5] + tim_ext[: 2]]
         tYs_k4_multivar = tYs_k4[0] + tYs_k4[3] + tim_ext[: 2]  # DistExtend
         tmp_f_vm = [t1 + t2 for t1, t2 in zip(tYs_k3_att01, tYs_k4_att01)]
-        # pdb.set_trace()
         del tYs_k4, tYs_k3, tim_ext, tYs_k3_att01, tYs_k4_att01
 
         suff_4 = '_'.join([self._figname[:-1], pre, fig, suffix, 'scat'])
@@ -896,7 +878,6 @@ class Plot3_comparison(GraphSetup):
         # df_raw = self.draw_sub3_dat(
         df_raw = self.draw_sub1_dat2(
             dframe, nb_set, id_set, tmp_f_vm, tmp)  # , each_gen, each_att
-        # pdb.set_trace()
         tYs = tmp_f_vm[0]  # 19 manf (=6+4+6+3) + 14 manf_ext (=6+6+2)
 
         _ext_sub_show_scat(df_raw, tYs, suff_4, '_max', diff=True)
@@ -1051,7 +1032,6 @@ class Plot3_comparison(GraphSetup):
             df_raw, col_X, col_Y, tmp_Ys_merge[:-1], pikced_keys,
             # figname=suff_pre + '_pc5c', annotY=annotZ, **kw_alt)
             figname=suff_pre + '_lc5c', annotY=annotZ, **kw_alt)
-        # pdb.set_trace()
         del kws, kw_alt, tmp_Ys_merge, pikced_keys, tag_Ys_merge, tag_Ys_direct, tag_Ys_approx
         return
 
@@ -1232,7 +1212,6 @@ class Plot4_comparison(Plot3_comparison):
         df_raw = self.draw_sub2_dat2(
             dframe, nb_set, id_set, each_gen, each_att, tmp_f_vm)
         kws = {'cmap_name': self._cmap_name}
-        # pdb.set_trace()
         scatter_with_marginal_distrib(
             df_raw, col_X, col_Y, tag_Ys, self._picked_keys,
             annotX, annotY, figname=suff_1 + '_s', **kws)
@@ -2357,7 +2336,6 @@ class Table4_comparison(Plot4_comparison):
         #                                                  suff)
         U_cp_raw, _, Uq2 = self.tabulate_five_sub3_plo(U_f1_raw, ind,
                                                        suff)
-        # pdb.set_trace()
         if 0 in ind:
             self.tabulate_five_sub4_plo(
                 U_cp_raw, nb_ind=len(ind), loc=0,
@@ -2543,7 +2521,6 @@ class Table4_comparison(Plot4_comparison):
         df_tst = dframe[tag_tst_a_f].iloc[id_set[i] + 1: id_set[i + 1]].fillna(0)
         U_trn_raw, U_tst_raw = self.tabulate_five_sub1_dat(
             df_trn, df_tst, nb_clf - 4, nb_ind=len(ind))
-        # pdb.set_trace()
         # U_f1_raw[k] = U_tst_raw[picked_clf]
         loc_a, loc_b = nb_col - 13, nb_col - 8
         U_f1_raw[k][:-4] = U_tst_raw[picked_clf][:-3]  # nb_col-3
@@ -2565,7 +2542,6 @@ class Table4_comparison(Plot4_comparison):
             U_f1_raw[k][-3:] = U_tst_raw[picked_clf][-3:]
             k += 1
 
-        # pdb.set_trace()
         # U_cp_raw = self.tabulate_six_sub3_plo(U_f1_raw, ind, suff + '_confusion')
         suff = suffix + '_tst_both_confusion'  # sing/pl # suffix + '_confusion'
         U_cp_raw = self.tabulate_six_sub3_plo(U_f1_raw, ind, suff)

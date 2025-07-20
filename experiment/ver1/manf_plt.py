@@ -1791,7 +1791,7 @@ class Replot2C_comparison(Replot2B_comparison):
             tag, ind)  # ,tag_fv,
         tag_non = tag[: 13 - 1]  # non_adversarial_acc
         col_Y_alt = 'Fairness'  # ,annotY='Fairness measure'
-        annotX = 'Performance ({})'.format(self._pick_metric[ind])
+        # annotX = 'Performance ({})'.format(self._pick_metric[ind])
         suff_2 = self._figname + '{}_{}_lc2_mat{}'.format(
             pre, fig, ind)
         suff_3 = self._figname + '{}_{}_each_confusion'.format(

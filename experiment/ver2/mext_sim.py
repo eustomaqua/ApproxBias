@@ -11,9 +11,9 @@ import os
 import sys
 import time
 
-import pdb
+# import pdb
 import numpy as np
-import pandas as pd
+# import pandas as pd
 from pathos import multiprocessing as pp
 
 
@@ -24,11 +24,11 @@ from experiment.utils.data_split import (
     sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
     manual_repetitive, scale_normalize_helper)
 from experiment.datasets import (
-    process_above, transform_X_and_y, DATASET_NAMES, DATASETS)
+    transform_X_and_y, DATASET_NAMES, DATASETS)  # process_above,
 from experiment.ver1.manf_data import (
     transform_unpriv_tag, normalise_disturb_prime)
 from experiment.ver2.mext_data import (
-    process_addtl, process_addtl_multivalue,
+    # process_addtl, process_addtl_multivalue,
     renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
     check_marginalised_indices, renewed_transform_disturb,
     renewed_normalise_disturb, renewed_normalise_separate)
@@ -381,7 +381,6 @@ class ManfExtEmpirical(DataSetup):
             row_tmp = [''] * 8
             if n_a == 1:
                 sens_att.append('~BLANK~')
-            # pdb.set_trace()
             if not self._alternative:
                 for i, sa_val in enumerate(sens_att):  # first row: 'DistDirect_bin'
                     csv_w.writerow(row_tmp + [sa_val, 'ApproxDist_bin', 0] + res_data[0][2 * i])
@@ -435,7 +434,6 @@ class ManfExtEmpirical(DataSetup):
                 sens_att.append('~BLANK~')
             # res_data= (#iter, 7|9 *4, (3+ 21|24 *3) *2) =(#iter, 36, 66|75 *2)
             # res_data= (#iter, 4, 9, 66|75 *2)    # change to this one!
-            # pdb.set_trace()
             # for i_c, curr_m in enumerate(['Ds', 'Df', 'df_ver3', 'df_ver4']):
             for i_c, curr_m in enumerate(['Ds', 'Df', 'df_ecai', 'df_neurips']):
                 for i, sa_val in enumerate(sens_att):
@@ -483,13 +481,11 @@ class ManfExtEmpirical(DataSetup):
             csv_w.writerow(row_tmp + [0] + res_data[0])
             for i_k in range(1, n_k):
                 csv_w.writerow(row_tmp + [i_k] + res_data[i_k])
-            # pdb.set_trace()
 
         else:
             pass
 
         # END
-
         return
 
     def coding_per_dataset(self, logger):
@@ -603,7 +599,6 @@ class ManfExtEmpirical(DataSetup):
             len(sa_val)) + 2).tolist() for sa_val in marginalised_group]
         # self.saValue = [(
         #   np.arange(len(sa_val)) + 2).tolist() for sa_val in margin_indices]
-        # pdb.set_trace()
         margin_indices = check_marginalised_indices(
             processed_data['original'], sens_att, priv_val,
             marginalised_group)
@@ -734,7 +729,6 @@ class ManfExtPrime_Empirical(ManfExtEmpirical):
         #         marginalised_group, margin_indices, new_attr, res_aux,
         #         belongs_priv, ptb_with_joint,
         #         X_and_A.values, X_and_Aq.values)  # X_and_Ap.values)
-        # pdb.set_trace()
         del tmp_cls, tmp_ens
         return (X_A.values, y.values, X_Aq.values,
                 marginalised_group, margin_indices, new_attr, res_aux,
@@ -907,7 +901,7 @@ class ManfExtPrime_Empirical(ManfExtEmpirical):
             #                                               g1m_indices, **pm_k)
             res_data = self.coding_per_iteration_as_whole(
                 logger, pool, X, A, y, g1m_indices, **pm_k)
-            # pdb.set_trace()  # currently res_data.shape =(7, 3+ 63|72)
+            # currently res_data.shape =(7, 3+ 63|72)
             del X, A, Xq, Aq, X_and_A, X_and_Aq
             return [res_data], res_aux
 
@@ -1054,7 +1048,6 @@ class ManfExtPrime_Empirical(ManfExtEmpirical):
         elif 'expt6' in self._trial_type:
             self._iterator.initialize_clf(self._abbr_cls)
             clf = self._iterator.member
-            # pdb.set_trace()
             if self._abbr_cls in ['FairGBM', 'fairGBM']:
                 non_sa_idx = g1m_trn[0] if len(g1m_trn) == 0 else jt_trn[1]
                 clf.fit(X_A_trn, y_trn, constraint_group=~non_sa_idx)
@@ -1125,7 +1118,6 @@ class ManfExtPrime_Empirical(ManfExtEmpirical):
             X_A_tst, _, _, _, _, _ = renewed_transform_disturb(
                 X_and_A, Aq, y, Aq, i_tst, g1m_indices, idx_jt)
             clf = self._iterator.member
-            # pdb.set_trace()
             if self._abbr_cls in ['FairGBM', 'fairGBM']:
                 non_sa_idx = g1m_trn[0] if len(g1m_trn) == 1 else jt_trn[1]
                 # non_sa_idx = g1m_trn[0] if len(g1m_trn) == 1 else jt_trn[1]  # jt_|

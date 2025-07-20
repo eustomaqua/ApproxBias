@@ -6,7 +6,6 @@ import os
 import sys
 import time
 
-import pdb
 import numpy as np
 from pathos import multiprocessing as pp
 
@@ -19,12 +18,11 @@ from experiment.utils.data_split import (
     manual_repetitive, scale_normalize_helper)
 
 from experiment.generic import DataSetup
-from experiment.datasets import (
-    process_above, transform_X_and_y)
+from experiment.datasets import transform_X_and_y  # process_above,
 from experiment.ver1.manf_data import (
     transform_unpriv_tag, normalise_disturb_prime)
 from experiment.ver2.mext_data import (
-    process_addtl, process_addtl_multivalue,
+    # process_addtl, process_addtl_multivalue,
     renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
     check_marginalised_indices, renewed_transform_disturb,
     renewed_normalise_disturb, renewed_normalise_separate)
@@ -235,7 +233,6 @@ class Rev_ManfExtEmpir(DataSetup):
                         f'sa #{i+1}', sa, 0, jk] + res_data[0][i * 4 + j + 3])
                     for k in range(1, nk):
                         csv_w.writerow([''] * 9 + [k, ''] + res_data[k][i * 4 + j + 3])
-            # pdb.set_trace()
             # pass
 
         del nk, sens_att, priv_val, mrg_grp
@@ -318,7 +315,6 @@ class Rev_ManfExtEmpir(DataSetup):
             "\t BINARY? Y= {}".format(set(y.values)),
             "\t ori.label= {}".format(set(tmp.values)),
             ""], logger)
-        # pdb.set_trace()
         for tt in range(A.shape[1]):
             tmp = set(A.values[:, tt])
             elegant_print(
@@ -355,7 +351,6 @@ class Rev_ManfExtEmpir(DataSetup):
             res_aux.append(sens_att)
         else:
             res_aux.append(sens_att + [new_attr] + ['joint_and,or'])
-        # pdb.set_trace()
         return (X.values, A.values, y.values, Aq.values,
                 marginalised_group, mrg_indices, new_attr, res_aux,
                 belongs_priv, ptb_with_joint)
@@ -414,7 +409,6 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             self._log_document += '_{}'.format(abbr_cls)  # formatted
         elif trial_type.endswith('rexp3e'):
             self._log_document += '_cf{}'.format(nb_cls)
-        # pdb.set_trace()
         return
 
     def preparing_current_data(self, logger=None):
@@ -467,7 +461,6 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                     self._m1, self._m2, self._n_e, ''],
                    sens_att, priv_val, marginalised_group]  # = ''
         # del tmp_cls, tmp_ens
-        # pdb.set_trace()
         return (X_A.values, y.values, X_Aq.values,
                 marginalised_group, margin_indices, new_attr, res_aux,
                 belongs_priv, ptb_with_joint)
@@ -521,7 +514,6 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                         prim_X_A, [], prim_X_Aq, self.saIndex)
                 # pm_k['X_and_A'] = prim_X_A
                 pm_k['X_wAq'] = prim_X_Aq  # pm_k['X_wA'] = prim_X_A
-                # pdb.set_trace()
                 res_iter = self.coding_per_iteration_as_whole(
                     logger, pool, X, A, prim_y, prim_X_A, prim_g1m, **pm_k)
                 res_data.append(res_iter)
@@ -567,7 +559,6 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             del X_tst, A_tst, y_tst, g1m_tst, jt_tst, X_A_tst, X_Aq_tst
         del X_and_A, y, X_and_Aq, idx_g1, idx_jt
         del pool
-        # pdb.set_trace()
         return res_ans, res_aux
 
     def coding_per_iteration_cv_split(
@@ -610,7 +601,7 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             self, logger, pool,
             X, A, y, X_wA, g1m_indices, idx_jt=None,
             Aq=None, X_wAq=None):  # X_wA=None,
-        since = time.time()
+        # since = time.time()
         res_iter = []
 
         if 'rexp1' in self._trial_type:

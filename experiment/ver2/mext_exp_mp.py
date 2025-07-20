@@ -3,7 +3,6 @@
 
 
 import time
-import pdb
 import numpy as np
 
 from hfm.utils.verifiers import unique_column, DTY_FLT, DTY_INT
@@ -1581,7 +1580,6 @@ class ParameterF_setup(RelativeFairClsf, ParameterE_setup):
         nb_row, nb_col = np.shape(curr_Ds)  # curr_Df
         df_ver3 = np.zeros_like(curr_Ds).tolist()
         df_ver4 = df_ver3.copy()
-        # pdb.set_trace()
         for i in range(nb_row):
             for j in range(nb_col):
                 if (curr_Ds[i][j] == '') or (curr_Df[i][j] == ''):
