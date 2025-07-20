@@ -539,8 +539,8 @@ def _discrete_illustrate(IndexSlices, SubIndices):
     dis_2 = JS_div(SubIndices, IndexSlices)
     dist = "EMD= {:.4f}\nJS = {:.4f}".format(dis_1, dis_2)
 
-    px, py, vXY = _discrete_joint_cnts(
-        IndexSlices, SubIndices, density=True)
+    px, py, _ = _discrete_joint_cnts(
+        IndexSlices, SubIndices, density=True)  # ,vXY
 
     ans_1 = KL_divergence(py, px)
     # ans_2 = JS_divergence(py, px)

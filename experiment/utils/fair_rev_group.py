@@ -281,7 +281,7 @@ class UD_grp2_EO(_elem):
         g_Cm, vA, idx, ex = marginalised_np_gen(
             y, y_hat, A, vals_in_Ai[0], pos_label)
         g = [cls._core_alt(k) for k in g_Cm]
-        ans = alt = 0.
+        ans = 0.  # ans = alt = 0.
         ans_mediator, n_a = [], len(vA)
         for i in range(n_a - 1):
             for j in range(i + 1, n_a):

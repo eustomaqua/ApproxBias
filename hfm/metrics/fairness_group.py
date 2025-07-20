@@ -36,7 +36,7 @@ def contingency_table_binary(ha, hb):
             "The shapes of two individual classifiers are different.")
 
     tem = np.concatenate([ha, hb]).tolist()
-    vY, dY = judge_transform_need(tem)
+    _, dY = judge_transform_need(tem)  # vY,
     if dY > 2:
         raise AssertionError(
             "`contingency_table` works for binary classification only.")

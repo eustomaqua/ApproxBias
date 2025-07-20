@@ -47,7 +47,7 @@ def _diff_between(approx, direct):
     # difference: abs(approx - direct) / direct
     # Yss.shape= (#att_sen, nb_iter, #num)
     # zs .shape= (#att_sen, nb_iter)
-    nb_att, nb_iter, num = approx.shape
+    nb_att, nb_iter, _ = approx.shape  # ,num
     diff = np.zeros_like(approx) - 1.
     for j in range(nb_att):
         for i in range(nb_iter):
@@ -83,7 +83,7 @@ class Plot5A_hyperpm(GraphSetup):
 
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=3)
         # nb_set, id_set = nb_set - 1, id_set[:-1]
-        tag_pm, tag_direct, tag_approx, tag_ut = self.prepare_graph()
+        _, tag_direct, tag_approx, tag_ut = self.prepare_graph()  # tag_pm,
         picked_set = [0, 1, 2, 3, 4, 5]
         picked_set.remove(5)  # simulative data
         picked_m2 = [3, 7, 11, 15, 19]  # [3, 6, 9, 12, 15, 18]  # self._m2_set
@@ -362,7 +362,7 @@ class Plot5B_hyperpm(GraphSetup):
 
     def painting_prep(self, raw_dframe):
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=3)
-        tag_pm, tag_dir, tag_app, tag_ut = self.prepare_graph()
+        _, tag_dir, tag_app, tag_ut = self.prepare_graph()  # tag_pm,
         Ys_dir, Ys_app, Ys_ut, picked_keys = [], [], [], []
 
         for i in range(nb_set):
@@ -761,8 +761,8 @@ class Plot2A_comparison(Plot2_comparison):
         return params, tag_trn, tag_tst
 
     def painting_fig1(self, dframe, tag, index, ind=0, split=False):
-        _, tag_fair, tag_manf, tag_Ys, col_X = self.picking_fig_tags(
-            tag, ind)  # tag_acc,
+        _, _, tag_manf, tag_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # tag_acc,tag_fair,
         cmap_name, col_Y, df_raw = 'Accent', 'Fairness', dframe.iloc[index]
 
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
@@ -788,7 +788,8 @@ class Plot2A_comparison(Plot2_comparison):
 
     def painting_fig2(self, dframe, nb_set, tag, id_att,
                       each_att, ind=0):
-        tag_acc, tag_fair, tag_manf, tag_Ys, col_X = self.picking_fig_tags(tag, ind)
+        _, tag_fair, tag_manf, tag_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # tag_acc,
         col_Y = 'Fairness'
 
         annotX = '{} performance'.format(self._pick_metric[ind])
@@ -829,8 +830,8 @@ class Plot2A_comparison(Plot2_comparison):
 
     def drawing_fig1_alt(self, dframe, tag, index, ind=0,
                          fig='tst', split=False, linreg=False):
-        _, tag_f_vot, tag_f_man, tag_Ys, col_X = self.picking_fig_tags(
-            tag, ind)  # _:tag_acc,
+        _, _, tag_f_man, tag_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # _:tag_acc,tag_f_vot,
         col_Y = 'Fairness'
 
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
@@ -871,7 +872,7 @@ class Plot2A_comparison(Plot2_comparison):
         nb_set, id_set, id_att, \
             each_att = self.recap_sub_data(raw_dframe, nb_row=4)
         each_gen = 0  # each generic / non-sensitive attribute?
-        _, tag_trn, tag_tst = self.prepare_graph()  # tag_pm,
+        _, _, tag_tst = self.prepare_graph()  # tag_pm,tag_trn,
         index_overall = []
         for i in id_att:
             index_overall += list(range(i, i + each_att))
@@ -976,7 +977,8 @@ class Plot2B_comparison(Plot2_comparison):
 
     def painting_fig1(self, dframe, tag, nb_set, id_set,
                       ind=0, joint='and|or', fig='tst'):
-        tag_acc, tag_fair, tag_manf, tmp_fm, col_X = self.picking_fig_tags(tag, ind)
+        _, tag_fair, tag_manf, tmp_fm, col_X = self.picking_fig_tags(
+            tag, ind)  # tag_acc,
         tmp, _ = self.draw_sub2_jt(joint)
         col_Y, annotY = 'Fairness', 'Fairness measure'
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
@@ -1079,7 +1081,8 @@ class Plot2B_comparison(Plot2_comparison):
     def drawing_fig1_alt(self, dframe, tag, nb_set, id_set, ind=0,
                          joint='and|or', dist='direct', fig='tst',
                          linreg=True, split=True):
-        tag_acc, tag_f_vot, tag_f_man, tmp_f_vm, col_X = self.picking_fig_tags(tag, ind)
+        _, tag_f_vot, tag_f_man, tmp_f_vm, col_X = self.picking_fig_tags(
+            tag, ind)  # tag_acc,
         tmp, suffix = self.draw_sub2_jt(joint)
         col_Y, annotY = 'Fairness', 'Fairness measure'
         annotX = 'Performance ({})'.format(self._pick_metric[ind])
@@ -1137,7 +1140,7 @@ class Plot2B_comparison(Plot2_comparison):
         nb_set, id_set, _, each_att = self.recap_sub_data(
             raw_dframe, nb_row=4)  # _:id_att
         each_gen = 0
-        tag_pm, tag_trn, tag_tst = self.prepare_graph()
+        _, tag_trn, tag_tst = self.prepare_graph()  # tag_pm,
 
         self.drawing_fig2_alt(raw_dframe, tag_tst, nb_set, id_set,
                               each_gen, each_att)
@@ -1316,8 +1319,8 @@ class Plot2C_comparison(Plot2B_comparison):
     def drawing_fig2_alt(self, dframe, tag, nb_set, id_set,
                          each_gen, each_att, joint='none', fig='tst',
                          ind=0, linreg=False, split=False):
-        _, tag_f_vot, tag_f_man, _, _ = self.picking_fig_tags(
-            tag, ind=0)
+        _, _, tag_f_man, _, _ = self.picking_fig_tags(
+            tag, ind=0)  # ,tag_f_vot,
         # tYs_k2 = [0, 3, 1, 4, 6, 7]  # direct,approx,direct,approx,d_ut,a_ut
         tYs_k2 = [0, 7, 1, 8, 14, 15, ] + [4, 11, 5, 12, ]
         tmp_f_vm = [[t[k] for k in tYs_k2] for t in tag_f_man]
@@ -1608,7 +1611,8 @@ class Replot2A_comparison(RePlot2_comparison):
 
     def drawing_fig4_fig1_alt(self, dframe, tag, ind, nb_set, id_set,
                               each_att, fig='tst', pre='minmax'):
-        tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(tag, ind)
+        tag_acc, _, tag_fm, col_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # ,tag_fv,
         col_Y_alt = 'Fairness'  # ,annotY='Fairness measure'
         # annotX = 'Performance ({})'.format(self._pick_metric[ind])
         '''
@@ -1672,8 +1676,8 @@ class Replot2B_comparison(RePlot2_comparison):
         return tag_acc, tag_f_vot, tag_f_man, tmp_f_vm, col_X
 
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        nb_set, id_set, id_att, each_att = self.recap_sub_data(
-            raw_dframe, nb_row=4)
+        nb_set, id_set, _, each_att = self.recap_sub_data(
+            raw_dframe, nb_row=4)  # ,id_att,
         each_gen = 0
         tag_pm, tag_trn, tag_tst = self.prepare_graph()
         kws = {'joint': 'none', 'fig': 'tst', 'pre': pre}  # ={}
@@ -1687,8 +1691,8 @@ class Replot2B_comparison(RePlot2_comparison):
                               each_gen, each_att, joint='none',
                               fig='tst', pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
-        tag_acc, tag_fv, tag_fm, col_Ys, col_X = self.picking_fig_tags(
-            tag, ind)
+        tag_acc, _, tag_fm, col_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # ,tag_fv,
         col_Y_alt = 'Fairness'  # ,annotY= 'Fairness measure'
         # annotX = 'Performance ({})'.format(self._pick_metric[ind])
         # tag_Ys_alt = tag_fm[0][1:]
@@ -1787,8 +1791,8 @@ class Replot2C_comparison(Replot2B_comparison):
                               joint='none', fig='tst',
                               pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
-        tag_acc, _, tag_fm, col_Ys, col_X = self.picking_fig_tags(
-            tag, ind)  # ,tag_fv,
+        tag_acc, _, _, col_Ys, col_X = self.picking_fig_tags(
+            tag, ind)  # ,tag_fv,tag_fm,
         tag_non = tag[: 13 - 1]  # non_adversarial_acc
         col_Y_alt = 'Fairness'  # ,annotY='Fairness measure'
         # annotX = 'Performance ({})'.format(self._pick_metric[ind])

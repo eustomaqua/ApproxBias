@@ -716,8 +716,8 @@ class Plot3_comparison(GraphSetup):
     def drawing_fig2_alt(self, dframe, tag, ind, nb_set, id_set,
                          each_gen, each_att, joint='none', fig='tst',
                          pre='minmax'):
-        _, tag_f_vot, tag_f_man, tag_f_ext, col_X, \
-            tmp_f_vm = self.picking_fig_tags(tag, ind=0)
+        _, _, tag_f_man, tag_f_ext, col_X, \
+            tmp_f_vm = self.picking_fig_tags(tag, ind=0)  # ,tag_f_vot,
         # part3: 10 direct + 6 manf calculation + 10 manf_ext calculation + 3 =29
         #        [Ds_01, Df_01, t_Ds, t_Df, Ds_avg, Df_avg, ]
         tYs_k2_direct = [0, 3, 2, 5, 1, 4, ]        # DirectDist vs.
@@ -849,7 +849,8 @@ class Plot3_comparison(GraphSetup):
         del tYs_k2_approx, tYs_k2_direct, tYs_k3_approx
         del tYs_k2, tYs_k3, tYs_k4, tYs_k3_avg, tYs_k4_avg
 
-        _, tag_f_vot, tag_f_man, tag_f_ext, _, _ = self.picking_fig_tags(tag, 0)
+        _, _, tag_f_man, tag_f_ext, _, _ = self.picking_fig_tags(
+            tag, 0)  # ,tag_f_vot,
         tmp, suffix = self.draw_sub2_jt(joint)
         # tYs_ext_tim*: 6 direct (=2 both, 2 sing#1, 2 sing#2) + 6 approx + 2
         tYs_ext_max = [0, 3, 10, 13, 20, 23, ] + [30, 33, 40, 43, 50, 53, ]
@@ -919,7 +920,7 @@ class Plot3_comparison(GraphSetup):
         '''
 
     def draw_sub3_dat(self, dframe, nb_set, id_set, tYs_k4_multivar):
-        i, k = 0, 0
+        i = 0  # i, k = 0, 0
         df_raw = dframe[tYs_k4_multivar].iloc[id_set[i] + 1: id_set[i + 1]]
         for i in range(1, nb_set):
             df_tmp = dframe[tYs_k4_multivar].iloc[id_set[i] + 1: id_set[i + 1]]
@@ -1057,7 +1058,7 @@ class CurrPlot3B_comparison(Plot3_comparison):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
         nb_set, id_set, _, each_att, each_gen = self.recap_sub_data(
             raw_dframe, nb_row=4, nc_norm=3, nc_sens=3 + 1)  # each_set,
-        _, tag_trn, tag_tst = self.prepare_graph()  # tag_pm,
+        _, _, tag_tst = self.prepare_graph()  # tag_pm,tag_trn,
 
         # fairmanf plotting
         '''
@@ -1083,9 +1084,9 @@ class CurrPlot3D_comparison(Plot3_comparison):  # CurrPlot3C
                            'kNNu', 'kNNd', 'MLP', 'linSVM', 'SVM']
 
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        nb_set, id_set, each_set, each_att, each_gen = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=11 + 3, nc_sens=0)
-        tag_pm, tag_trn, tag_tst = self.prepare_graph()
+        nb_set, id_set, _, each_att, each_gen = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=11 + 3, nc_sens=0)  # each_set,
+        _, _, tag_tst = self.prepare_graph()  # tag_pm,tag_trn,
 
         # fairmanf plotting
         '''
@@ -1255,7 +1256,8 @@ class Plot4_comparison(Plot3_comparison):
         annotZ = ' error rate' if ind == 0 else r'$($1$-$ performance$)$'
         annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(self._pick_metric[ind])
 
-        _, tag_f_vot, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(tag, ind)
+        _, _, tag_f_man, tag_f_ext, col_X, tmp_f_vm = self.picking_fig_tags(
+            tag, ind)  # ,tag_f_vot,
         tYs_k4 = [0, 1, 2, 3, 4, 5] + [6, 7, 9, 10, 11, 12, 13] + [14, 15, 16, 17, 18, 19]
         tmp_f_vm = [[t[k] for k in tYs_k4] for t in tmp_f_vm]
         tag_Ys_direct = [tmp_f_vm[0][k] for k in [2, 3, 4, 5] + [6, 8, 11, 14, 15]]  # 13,
@@ -1366,7 +1368,7 @@ class Plot4_comparison(Plot3_comparison):
         annotZ = ' error rate' if ind == 0 else r'$($1$-$ performance$)$'
         annotX = r'$\Delta$ Performance ($\Delta$ {})'.format(
             self._pick_metric[ind])
-        (_, _, tag_f_man, tag_f_ext,  # tag_f_vot,
+        (_, _, _, tag_f_ext,  # ,tag_f_vot,tag_f_man,
          col_X, tmp_f_vm) = self.picking_fig_tags(tag, ind)
 
         tYs_k4 = [0, 1, 2, 3, 4, 5] + [
@@ -1708,7 +1710,7 @@ class Distributed_GA_mp(Plot7_parallel_computing):
     def schedule_mspaint(self, raw_dframe, mp_cores=3, pre='minmax',
                          verbose=False):
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=4)
-        tag_pm, tag_trn = self.prepare_graph()  # tag_pms
+        _, tag_trn = self.prepare_graph()  # tag_pm, /tag_pms
         (tag_bin_sa1, tag_bin_sa2, tag_multivar,
          tag_ut) = self.picking_fig_tags(tag_trn)
 
@@ -2104,9 +2106,9 @@ class Plot5_hyperparameter_renew(Plot7_parallel_computing):
 class HyperEA_renew_m1fix(Plot5_hyperparameter_renew):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
         n_l = len(self._m2_set)
-        tag_pm, tag_drt, tag_apx, tag_avg, tag_ut = self.prepare_graph(
-            n_l)
-        nb_set, id_set, _, _, _ = self.recap_sub_data(raw_dframe, 3)
+        _, tag_drt, tag_apx, tag_avg, tag_ut = self.prepare_graph(
+            n_l)  # tag_pm,
+        _, id_set, _, _, _ = self.recap_sub_data(raw_dframe, 3)  # nb_set,
         n_k = self._nb_iter
         ms_set = [r'$m_2$={}'.format(i) for i in self._m2_set]
         picked_m = [2, 4, 6, 8, 10]  # [4,6,8,10,12]

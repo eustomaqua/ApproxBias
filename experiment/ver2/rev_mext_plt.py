@@ -253,8 +253,9 @@ class RevP_ZB_efficient(RevPlotZ_comparison):
 
     def schedule_mspaint(self, raw_dframe, pre='minmax',
                          omitted=True):
-        nb_set, id_set, each_set, _, _ = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)  # each_att/gen
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4,
+            nc_norm=1, nc_sens=0)  # each_set, each_att/gen
         csv_row_1 = unique_column(10 + 31 * 2)
 
         tag_sa1 = csv_row_1[10: 10 + 31]
@@ -859,8 +860,8 @@ class RevP_YC_embedding(RevPlotY_comparison):
         tag_sa2 = tag[21 * 7: 21 * 7 * 2]
         tag_acc = tag[21 * 14: 147 * 2 + 16]  # not 27*14
         tag_far = tag[147 * 2 + 16: 294 + 16 + 9 * 2]
-        _, ar_hfm, ar_tim = self.sub_hfm_multivar(
-            df_raw, tag_sa1, tag_sa2)  # ans,
+        _, ar_hfm, _ = self.sub_hfm_multivar(
+            df_raw, tag_sa1, tag_sa2)  # ans,,ar_tim
         '''
         self.sub_plt_val_tim(ans, ar_hfm, ar_tim, f'{figname}_{flag}')
         '''
@@ -1353,8 +1354,8 @@ class RevP_XD_statsParity(RevP_XC_statsParity):
 
 class RevP_XE_statsParity(RevPlotX_extendSP):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        nb_set, id_set, each_set, per_att, per_gen = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=3, nc_sens=4)
+        nb_set, id_set, _, per_att, per_gen = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=3, nc_sens=4)  # ,each_set,
         csv_row_1 = unique_column(11 + 4 + 226 * 2)
         df_raw = self.sub_dat_multivar(
             raw_dframe, nb_set, id_set, csv_row_1[11:])
@@ -1374,8 +1375,8 @@ class RevP_XE_statsParity(RevPlotX_extendSP):
         tag_far_sa1 = tag[184:184 + 21]  # tag[184: 184 + 21 * 2]
         tag_far_sa2 = tag[184 + 21:]  # tag[184 + 21 * 2:]
 
-        ans, ar_hfm, ar_tim = self.sub_hfm_multivar(
-            df_raw, tag_sa1, tag_sa2, per_gen, per_att)
+        _, ar_hfm, ar_tim = self.sub_hfm_multivar(
+            df_raw, tag_sa1, tag_sa2, per_gen, per_att)  # ans,
         ar_acc, ar_far, ar_alt = self.sub_get_acc_fair(
             df_raw, tag_acc, tag_far_sa1, tag_far_sa2, per_gen, per_att)
         self.sub_plt_val_corr(
@@ -1478,7 +1479,7 @@ class RevP_XE_statsParity(RevPlotX_extendSP):
         nc_norm = per_gen // self._nb_iter
         nc_sens = per_att // self._nb_iter
         each_set_prim = per_att * 2 + per_gen
-        nb_set, num = 5, 7
+        num = 7  # nb_set, num = 5, 7
 
         ans_far = np.zeros((overall_rows, 3 + 2 + 6 + 6))
         ans_far_alt = np.zeros((overall_rows, 2, 3 + 6 + 6))

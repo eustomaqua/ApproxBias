@@ -307,8 +307,10 @@ class ComparisonDp_setup:
 
     def count_sing_part2(self, y, y_hat, y_qtb, non_sa,
                          positive_label=1, *, omitted=True):
-        g1_Cij, g0_Cij, gones_Cm, gzero_Cm = \
-            marginalised_pd_mat(y, y_hat, positive_label, non_sa)
+        _, _, gones_Cm, gzero_Cm = marginalised_pd_mat(
+            y, y_hat, positive_label, non_sa)
+        # g1_Cij, g0_Cij, gones_Cm, gzero_Cm = \
+        #     marginalised_pd_mat(y, y_hat, positive_label, non_sa)
         cmp_fair = []
         if not omitted:
             tmp_0 = unpriv_unaware(gones_Cm, gzero_Cm)
@@ -834,7 +836,7 @@ class RevCompY_setup:
 
     def subproc_nonbin(self, X_nA_y, X_nA_fx, embed_fx,
                        A_j, g1m, m1, m2, n_e, pool=None):
-        non_sa, n_ai = g1m[0], len(g1m)
+        non_sa = g1m[0]  # non_sa, n_ai = g1m[0], len(g1m)
         result = self.subproc_bin(
             X_nA_y, X_nA_fx, embed_fx, A_j, non_sa, m1, m2, n_e)
 

@@ -136,8 +136,10 @@ class ComparisonB_setup:
 
     def count_sing_part2(self, y, y_hat, y_qtb,
                          non_sa, positive_label=1):
-        g1_Cij, g0_Cij, gones_Cm, gzero_Cm = \
-            marginalised_pd_mat(y, y_hat, positive_label, non_sa)
+        _, _, gones_Cm, gzero_Cm = marginalised_pd_mat(
+            y, y_hat, positive_label, non_sa)
+        # g1_Cij, g0_Cij, gones_Cm, gzero_Cm = \
+        #     marginalised_pd_mat(y, y_hat, positive_label, non_sa)
         cmp_fair = []
 
         tmp_0 = unpriv_unaware(gones_Cm, gzero_Cm)

@@ -40,7 +40,7 @@ class Table2C_comparison(Plot2C_comparison):
     def schedule_spreadsheet(self, raw_dframe, logger=None):
         nb_set, id_set, each_gen, \
             each_att = self.recap_sub_data(raw_dframe, nb_row=4)
-        tag_pm, tag_trn, tag_tst = self.prepare_graph()
+        _, tag_trn, tag_tst = self.prepare_graph()  # tag_pm,
 
         suff = self._figname.replace('exp2c_', 'exp1c_')
         log_document = suff + '_table_third.csv'

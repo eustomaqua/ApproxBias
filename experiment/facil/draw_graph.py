@@ -1284,7 +1284,7 @@ _hist_linsty = [
 
 
 def _hist_calc_XY(X, Ys):
-    N, k = np.shape(Ys)
+    k = np.shape(Ys)[1]  # N, k = np.shape(Ys)
 
     X_avg = None if X is None else np.mean(X, axis=0).tolist()
     Y_avg = np.mean(Ys, axis=0)

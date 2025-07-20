@@ -81,7 +81,7 @@ def multiple_lines_with_errorbar(X, Ys, picked_keys=('Baseline #1',),
     fig = plt.figure(figsize=_setup_config['M-NT'])
     ax = fig.gca()
 
-    cs, cl = _setup_rgb_color(pick_baseline, cmap_name)
+    cs, _ = _setup_rgb_color(pick_baseline, cmap_name)  # ,cl
     kws = {'color': 'navy', 'lw': 1}  # plt.plot(.5, 0.5)
     for j in range(pick_baseline):
         kws['color'] = cs[j]
@@ -106,7 +106,8 @@ def box_plot(Ys, picked_keys, annotY='Acc',
              figname='box_lam', figsize='M-WS', rotate=60):
     # Ys.shape (#baseline_for_comparison, #iter)
 
-    pick_baseline, nb_iter = Ys.shape  # picked_ways/method,
+    # pick_baseline, nb_iter = Ys.shape  # picked_ways/method,
+    pick_baseline = Ys.shape[0]
     fig, ax = plt.subplots(figsize=_setup_config['M-NT'])
     ax.boxplot(Ys.T, patch_artist=patch_artist)  # bp=
 
@@ -158,7 +159,7 @@ def scatter_k_cv_with_real(X, Ys, z,  # y/z: real values
     # Ys.shape= (nb_iter, #num)  # Ys.shape= (#num, nb_iter)
     # z .shape= (nb_iter,)
 
-    nb_iter, num = Ys.shape
+    nb_iter = Ys.shape[0]  # nb_iter, num = Ys.shape
     fig, ax = plt.subplots(figsize=_setup_config['M-NT'])
 
     kws = {'color': '#F65F47', 'lw': 1}
@@ -254,30 +255,7 @@ def boxplot_k_cv_with_real(X, Ys, z,
 
 # -------------------------------
 # fairmanf
-#   for 若干个数据集放在一起
-
-
-'''
-def _diff_between_approx_and_direct(Yss, zs):
-    # difference: abs(approx - direct) / direct
-    # Yss.shape= (#att_sens, nb_iter, #num)
-    # zs .shape= (#att_sens, nb_iter)
-
-    nb_att, nb_iter, num = Yss.shape
-    diff = np.zeros_like(Yss) - 1.
-    for j in range(nb_att):
-        for i in range(nb_iter):
-            diff[j][i] = np.abs(Yss[j][i] - zs[j][i])
-            diff[j][i] /= check_zero(zs[j][i])
-    return diff
-
-
-def approximated_dist_comparison(X, Yss, zs, picked_keys,
-                                 figsize='M-WS',
-                                 figname='hyperpm_multi'):
-    # nb_att, nb_iter, num = Yss.shape
-    diff = _diff_between_approx_and_direct(Yss, zs)
-'''
+#   for multiple datasets 若干个数据集放在一起
 
 
 def approximated_dist_comparison(
@@ -296,7 +274,7 @@ def approximated_dist_comparison(
     # Ys = abs(Yss - zs) / zs
     # Ys .shape= (#att_sen, #iter, #num)
 
-    nb_att, nb_iter, num = Ys.shape
+    nb_att, nb_iter, _ = Ys.shape  # ,num
     fig, ax = plt.subplots(figsize=_setup_config['M-NT'])
 
     # cs, cl = _setup_rgb_color(nb_iter, cmap_name)
@@ -551,7 +529,7 @@ def _marginal_distr_step4(grid, dfs_pl, columns, col_X, col_Y,
             tY = df[col_Y].values.astype(DTY_FLT)
             R = np.corrcoef(tX, tY)[1, 0]
             key = 'Correlation = %.4f' % R
-            regr = np.polyfit(tX, tY, deg=1)
+            # regr = np.polyfit(tX, tY, deg=1)
             # estimated = np.polyval(regr, tX)
 
             ax4.scatter(x=df[col_X], y=df[col_Y], s=_curr_sz[i],
