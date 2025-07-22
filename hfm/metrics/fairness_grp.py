@@ -1,4 +1,5 @@
 # coding: utf-8
+# fairness_group.py
 #
 # TARGET:
 #   Oracle bounds regarding fairness for majority vote
@@ -405,7 +406,7 @@ def marginalised_pd_mat(y, hx, pos=1, idx_priv=list()):
 # 假设不同群体成员具有同样的工作潜能
 # aka. (TP+FN)/N = P[y=1]
 
-def unpriv_unaware(gones_Cm, gzero_Cm):
+def prev_unpriv_unaware(gones_Cm, gzero_Cm):
     # aka. prerequisite
     N1 = np.sum(gones_Cm)
     N0 = np.sum(gzero_Cm)
@@ -430,7 +431,7 @@ def unpriv_unaware(gones_Cm, gzero_Cm):
 # 人口统计均等
 # aka. (TP+FP)/N = P[h(x)=1]
 
-def unpriv_group_one(gones_Cm, gzero_Cm):
+def prev_unpriv_grp_one(gones_Cm, gzero_Cm):
     N1 = np.sum(gones_Cm)
     N0 = np.sum(gzero_Cm)
     N1 = check_zero(N1.tolist())
@@ -445,7 +446,7 @@ def unpriv_group_one(gones_Cm, gzero_Cm):
 # aka. TP/(TP+FN) = recall
 #                 = P[h(x)=1, y=1 | y=1]
 
-def unpriv_group_two(gones_Cm, gzero_Cm):
+def prev_unpriv_grp_two(gones_Cm, gzero_Cm):
     t1 = gones_Cm[0, 0] + gones_Cm[0, 1]
     t0 = gzero_Cm[0, 0] + gzero_Cm[0, 1]
     g1 = gones_Cm[0, 0] / check_zero(t1)
@@ -458,7 +459,7 @@ def unpriv_group_two(gones_Cm, gzero_Cm):
 # aka. TP/(TP+FP) = precision
 #                 = P[h(x)=1, y=1 | h(x)=1]
 
-def unpriv_group_thr(gones_Cm, gzero_Cm):
+def prev_unpriv_grp_thr(gones_Cm, gzero_Cm):
     t1 = gones_Cm[0, 0] + gones_Cm[1, 0]
     t0 = gzero_Cm[0, 0] + gzero_Cm[1, 0]
     g1 = gones_Cm[0, 0] / check_zero(t1)
@@ -469,7 +470,7 @@ def unpriv_group_thr(gones_Cm, gzero_Cm):
 # 自定义 = accuracy 准确度
 # aka. (TP+TN)/N = P[h(x)=y]
 
-def unpriv_manual(gones_Cm, gzero_Cm):
+def prev_unpriv_manual(gones_Cm, gzero_Cm):
     N1 = np.sum(gones_Cm)
     N0 = np.sum(gzero_Cm)
     N1 = check_zero(N1.tolist())

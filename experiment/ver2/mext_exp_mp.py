@@ -27,11 +27,14 @@ from hfm.metrics.performance import (
     calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
     imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
-from hfm.metrics.fairness_group import (
-    marginalised_pd_mat, unpriv_unaware, unpriv_manual,
-    unpriv_group_one, unpriv_group_two, unpriv_group_thr)
+# from hfm.metrics.fairness_group import (
+#     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
+#     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
 # from hfm.discriminative_risk import (
 #     E_rho_L_fair_f, hat_L_fair, E_rho_L_loss_f, hat_L_loss)
+from hfm.metrics.fairness_grp import (
+    marginalised_pd_mat, prev_unpriv_unaware, prev_unpriv_manual,
+    prev_unpriv_grp_one, prev_unpriv_grp_two, prev_unpriv_grp_thr)
 from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 
 
@@ -40,6 +43,14 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, GradientBoostingClassifier)
 from experiment.classifiers import (
     LGBMClassifier, FairGBMClassifier, AdaFair)
+
+unpriv_group_one = prev_unpriv_grp_one
+unpriv_group_two = prev_unpriv_grp_two
+unpriv_group_thr = prev_unpriv_grp_thr
+unpriv_unaware = prev_unpriv_unaware
+unpriv_manual = prev_unpriv_manual
+del prev_unpriv_unaware, prev_unpriv_manual
+del prev_unpriv_grp_one, prev_unpriv_grp_two, prev_unpriv_grp_thr
 
 
 # ===============================

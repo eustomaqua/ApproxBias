@@ -5,6 +5,18 @@ import logging
 import pandas as pd
 
 
+def _get_tmp_name_ens(name_ens):
+    tmp = name_ens[: 3]
+    if name_ens == "AdaBoostM1":  # "AoM", "ABM"
+        tmp = tmp[: 1] + name_ens[-2:]
+    return tmp
+
+
+def _get_tmp_document(name_ens, nb_cls):
+    nmens_tmp = _get_tmp_name_ens(name_ens)
+    return nmens_tmp + str(nb_cls)
+
+
 # ---------------------
 # Printer
 
