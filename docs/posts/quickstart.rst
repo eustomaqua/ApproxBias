@@ -34,7 +34,7 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
   $ source activate test
   $
   $ # Install packages
-  $ pip install --upgrate pip
+  $ pip install --upgrade pip
   $ pip install -r requirements.txt  # Python 3.11
   $ # pip install -r reqs_dev.txt    # Python 3.8
   $ # python -m pytest

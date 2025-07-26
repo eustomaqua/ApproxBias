@@ -2,6 +2,7 @@ sphinx
 sphinx-rtd-theme
 recommonmark
 sphinx_markdown_tables
+renku-sphinx-theme
 
 mkdocs
 mkdocs-material
