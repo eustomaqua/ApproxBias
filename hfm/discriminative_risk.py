@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 # TARGET:
-#   Oracle bounds regarding fairness for majority vote
+#   Oracle bounds regarding fairness for weighted vote
 #
 
 
@@ -10,92 +10,8 @@ import numpy as np
 
 
 # =====================================
-# Preliminaries
+# Discriminative risk (DR)
 # =====================================
-# original instance : (xneg, xpos, y )
-# slightly disturbed: (xneg, xqtb, y')
-#
-# X, X': list, shape (nb_inst, nb_feat)
-# y, y': list, shape (nb_inst,)
-# sensitive attributes: list, (nb_feat,)
-#       \in {0,1}^nb_feat
-#       represent: if it is a sensitive attribute
-#
-
-
-def disturb_slightly(X, sens=None, ratio=.4):
-    if (not sens) or (not isinstance(sens, list)):
-        return X
-    dim = np.shape(X)
-    # noise = np.random.randint(2, size=dim)
-    # noise = np.multiply(noise, sens)
-    # return np.subtract(X, noise).tolist()
-
-    X = np.array(X)
-    ''' # ratio=?
-    for k in range(dim[1]):
-        if not sens[k]:
-            continue
-        Tk = X[:, k]  # xpos
-        Tq = 1 - Tk   # xqtb
-        Ti = np.random.rand(dim[0])
-        T = [q if i <= ratio else j for j, q, i in zip(Tk, Tq, Ti)]
-        X[:, k] = T
-    '''  # ratio=?
-
-    for i in range(dim[0]):
-        Ti = X[i]    # xpos
-        Tq = 1 - Ti  # xqtb
-        # T = [q if j else k for k, q, j in zip(Ti, Tq, sens)]
-        Tk = np.random.rand(dim[1])
-        Tk = np.logical_and(Tk, sens)
-        T = [q if k else j for j, q, k in zip(Ti, Tq, Tk)]
-        X[i] = T
-
-    return X.tolist()
-
-
-# def disturb_predicts(X, sens, clf, mu=0, sigma=.01):
-#   Xp = disturb_slightly(X, sens, mu=mu, sigma=sigma)
-#   return yt, ys
-def disturb_predicts(X, sens, clf, ratio=.4):
-    Xp = disturb_slightly(X, sens, ratio)
-    yt = clf.predict(X).tolist()
-    yp = clf.predict(Xp).tolist()
-    return yt, yp
-
-
-# -------------------------------------
-# Ensemble methods / Majority vote
-# -------------------------------------
-# weights of individual classifiers / coefficients
-#   $\rho = [w_1,w_2,...,w_m]^\mathsf{T}$
-#
-# \begin{equation}
-#   MV_\rho(bmx) =
-#     \argmax_{y\in\mathcal{y}}
-#       \sum_{j=1}^m w_j \mathbb{I}(f_j(x) = y)
-# \end{equation}
-#
-# NB. Ties are resolved arbitrarily.
-#
-
-# def majority_voting_subscript_rho(y, yt, weight):
-def majority_vote_subscript_rho(y, yt, weight):
-    # that is, weighted_voting()
-
-    # yt: list, shape (nb_cls, nb_inst)
-    # y : list, shape (nb_inst,)
-    # weight: list, shape (nb_cls,)
-    vY = np.unique(np.concatenate([[y], yt]))
-
-    coef = np.array([weight]).T
-    weig = [  # weighted
-        np.sum(coef * np.equal(yt, i), axis=0) for i in vY]
-    loca = np.array(weig).argmax(axis=0)  # location
-
-    # TODO: ties? or what?
-    return [vY[i] for i in loca]  # i.e., fens
 
 
 # For one single individual or the ensemble classifier,
@@ -514,3 +430,109 @@ def ED_Erho_I_loss(yt, y, wgt):
 # -------------------------------------
 # Theorem 3.5.
 # -------------------------------------
+
+
+# =====================================
+# Preliminaries
+# =====================================
+# original instance : (xneg, xpos, y )
+# slightly disturbed: (xneg, xqtb, y')
+#
+# X, X': list, shape (nb_inst, nb_feat)
+# y, y': list, shape (nb_inst,)
+# sensitive attributes: list, (nb_feat,)
+#       \in {0,1}^nb_feat
+#       represent: if it is a sensitive attribute
+#
+
+
+def perturb_numpy_ver(X, sen_att, priv_val, ratio=.5):
+    """ params
+    X       : a np.ndarray
+    sen_att : list, column index of sensitive attribute(s)
+    priv_val: list, privileged value for each sen-att
+    """
+    unpriv_dict = [list(set(X[:, sa])) for sa in sen_att]
+    for sa_list, pv in zip(unpriv_dict, priv_val):
+        if pv in sa_list:
+            sa_list.remove(pv)
+
+    X_qtb = X.copy()
+    num, dim = len(X_qtb), len(sen_att)
+
+    for i in range(num):
+        prng = np.random.rand(dim)
+        prng = prng <= ratio
+
+        for j, sa, pv, un in zip(range(
+                dim), sen_att, priv_val, unpriv_dict):
+            if not prng[j]:
+                continue
+
+            if X_qtb[i, sa] != pv:
+                X_qtb[i, sa] = pv
+            else:
+                X_qtb[i, sa] = np.random.choice(un) 
+
+    return X_qtb  # np.ndarray
+
+
+def perturb_pandas_ver(X, sen_att, priv_val, ratio=.5):
+    """ params
+    X       : a pd.DataFrame
+    sen_att : list, column name(s) of sensitive attribute(s)
+    priv_val: list, privileged value for each sen-att
+    """
+    unpriv_dict = [X[sa].unique().tolist() for sa in sen_att]
+    for sa_list, pv in zip(unpriv_dict, priv_val):
+        if pv in sa_list:
+            sa_list.remove(pv)
+
+    X_qtb = X.copy()
+    dim = len(sen_att)
+
+    for i, ti in enumerate(X.index):
+        prng = np.random.rand(dim)
+        prng = prng <= ratio
+
+        for j, sa, pv, un in zip(range(
+                dim), sen_att, priv_val, unpriv_dict):
+            if not prng[j]:
+                continue
+
+            if X_qtb.iloc[i][sa] != pv:
+                X_qtb.loc[ti, sa] = pv
+            else:
+                X_qtb.loc[ti, sa] = np.random.choice(un)
+
+    return X_qtb  # pd.DataFrame
+
+
+# -------------------------------------
+# Ensemble methods / Majority vote
+# -------------------------------------
+# weights of individual classifiers / coefficients
+#   $\rho = [w_1,w_2,...,w_m]^\mathsf{T}$
+#
+# \begin{equation}
+#   MV_\rho(bmx) =
+#     \argmax_{y\in\mathcal{y}}
+#       \sum_{j=1}^m w_j \mathbb{I}(f_j(x) = y)
+# \end{equation}
+#
+# NB. Ties are resolved arbitrarily.
+#
+
+
+def weighted_vote_subscript_rho(y, yt, weight):
+    # yt: list, shape (nb_cls, nb_inst)
+    # y : list, shape (nb_inst,)
+    # weight: list, shape (nb_cls,)
+    vY = np.unique(np.concatenate([[y], yt]))
+
+    coef = np.array([weight]).T
+    weig = [np.sum(  # weighted
+        coef * np.equal(yt, i), axis=0) for i in vY]
+    loca = np.array(weig).argmax(axis=0)  # location
+
+    return [vY[i] for i in loca]        # i.e., fens

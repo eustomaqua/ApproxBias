@@ -7,9 +7,9 @@
 
 import argparse
 import sys
-from experiment.ver2.mext_sim import (
+from experiment.df_nonbin.mext_sim import (
     ManfExtEmpirical, ManfExtPrime_Empirical)
-from experiment.ver2.rev_mext_sim import Rev_ManfExtPrime_Empir
+from experiment.df_nonbin.rev_mext_sim import Rev_ManfExtPrime_Empir
 
 
 def default_parameters():

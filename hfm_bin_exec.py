@@ -6,9 +6,8 @@
 
 
 import argparse
-from experiment.ver1.manf_sim import (ManfPrime_Empirical,
-                                      # ManfEmpirical, ManfSimulative)
-                                      ManfSimulative)
+from experiment.df_bin.manf_sim import (
+    ManfPrime_Empirical, ManfSimulative)  # ManfEmpirical
 
 
 def default_parameters():

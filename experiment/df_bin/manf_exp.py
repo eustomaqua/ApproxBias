@@ -6,46 +6,30 @@ import time
 import numpy as np
 
 from sklearn.ensemble import (
-    BaggingClassifier, AdaBoostClassifier, RandomForestClassifier,
-    ExtraTreesClassifier, GradientBoostingClassifier)
-import lightgbm
-from fairgbm import FairGBMClassifier
-# from experiment.utils.pkgs_AdaFair_mod import AdaFair
-# from blbm.fairgbm import FairGBMClassifier
-# from blbm.AdaFair_mod3 import AdaFair
-from experiment.classifiers import INDIVIDUALS  # RelativeFairClsf,
+    BaggingClassifier, AdaBoostClassifier,
+    RandomForestClassifier, ExtraTreesClassifier,
+    GradientBoostingClassifier)
+from experiment.utils_learner import (
+    INDIVIDUALS, LGBMClassifier, FairGBMClassifier, AdaFair)
 
+
+from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.dist_drt import DirectDist_bin as DirectDist
 from hfm.dist_est_bin import ApproxDist_bin as ApproxDist
 from hfm.hfm_df import bias_degree as fair_degree
-# from hfm.discriminative_risk import (
-#     E_rho_L_fair_f, hat_L_fair, E_rho_L_loss_f, hat_L_loss)
 from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 
-from hfm.utils.verifiers import unique_column, DTY_FLT
-from hfm.metrics.contingency_mat import \
+from pyfair.facil.metric_cont import \
     contg_tab_mu_type2 as contingency_table
-from hfm.metrics.performance import (
+from pyfair.marble.metric_perf import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
     calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
-    imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
-# from hfm.metrics.fairness_group import (
-#     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
-#     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
-from hfm.metrics.fairness_grp import (
+    imba_Matthew_s_cc, imba_Cohen_s_kappa)
+from pyfair.marble.metric_fair import (
     marginalised_pd_mat, prev_unpriv_unaware, prev_unpriv_manual,
     prev_unpriv_grp_one, prev_unpriv_grp_two, prev_unpriv_grp_thr)
 
-
-# import sklearn.__version__ as skl_ver
-import sklearn
-skl_ver = sklearn.__version__
-if skl_ver.startswith('1.3.0'):
-    from experiment.utils.pkgs_AdaFair_py36 import AdaFair
-elif skl_ver.startswith('1.5.1'):
-    pass
-del skl_ver
 
 unpriv_group_one = prev_unpriv_grp_one
 unpriv_group_two = prev_unpriv_grp_two
@@ -100,7 +84,7 @@ class ComparisonB_setup:
     def get_fair_ens(self, name_ens, nb_cls=2, constraint='',
                      saIndex=None, saValue=None):
         if name_ens == 'lightgbm':
-            return lightgbm.LGBMClassifier(n_estimators=nb_cls)
+            return LGBMClassifier(n_estimators=nb_cls)
         elif name_ens == 'fairgbm':
             return FairGBMClassifier(n_estimators=nb_cls,
                                      constraint_type=constraint)
@@ -394,7 +378,7 @@ class ComparisonB1_withDirectComput(ComparisonB_setup):
             clf = AdaBoostClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
         elif name_ens == 'lightgbm':
-            clf = lightgbm.LGBMClassifier(n_estimators=nb_cls)
+            clf = LGBMClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
 
         elif name_ens == 'fairgbm':
@@ -652,7 +636,7 @@ class ComparisonB2_withDirectComput(ComparisonB_setup):
             clf = AdaBoostClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
         elif name_ens == 'lightgbm':
-            clf = lightgbm.LGBMClassifier(n_estimators=nb_cls)
+            clf = LGBMClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
 
         elif name_ens == 'fairgbm':

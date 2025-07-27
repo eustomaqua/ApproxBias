@@ -14,10 +14,8 @@ from hfm.dist_est_nonbin import (
 
 import numpy as np
 from pathos import multiprocessing as pp
-# import pdb
 from hfm.dist_drt import (
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
-# from utils.verifiers import check_equal
 from hfm.dist_drt_test import no_less_than_check
 
 
@@ -104,10 +102,10 @@ def compare_approx(nai, m1, m2, n_e=2):
     assert res_1[0][1] == res_2[0][1]  # avg
 
     ans_1 = ApproxDist_bin(X_nA_y, Aq, idx_S1, m1, m2)
-    ans_2 = ApproxDist_bin_revised(X_nA_y, Aq, idx_S1, m1, m2)
+    ans_2 = ApproxDist_bin_revised(X_nA_y, idx_S1, m1, m2)  # Aq,
     ans_3 = ApproxDist_nonbin(X_nA_y, Aq, m1, m2, n_e)
     ans_4 = ApproxDist_bin(X_nA_y, Ap, idx_S1, m1, m2)
-    ans_5 = ApproxDist_bin_revised(X_nA_y, Ap, idx_S1, m1, m2)
+    ans_5 = ApproxDist_bin_revised(X_nA_y, idx_S1, m1, m2)  # Ap,
     ans_6 = ApproxDist_nonbin(X_nA_y, Ap, m1, m2, n_e)
 
     ans_1, _ = ans_1
@@ -117,8 +115,8 @@ def compare_approx(nai, m1, m2, n_e=2):
     ans_5, _ = ans_5
     ans_6, _ = ans_6
 
-    tmp_2, _ = ApproxDist_bin_revised(X_nA_y, Aq, ~idx_S1, m1, m2)
-    tmp_5, _ = ApproxDist_bin_revised(X_nA_y, Ap, ~idx_S1, m1, m2)
+    tmp_2, _ = ApproxDist_bin_revised(X_nA_y, ~idx_S1, m1, m2)  # Aq,
+    tmp_5, _ = ApproxDist_bin_revised(X_nA_y, ~idx_S1, m1, m2)  # Ap,
     # assert ans_2[0] == ans_5[0] == tmp_2[0] == tmp_5[0]
 
     # pdb.set_trace()
@@ -183,7 +181,7 @@ def compare_multiver(nai, m1, m2, n_e=2):
     assert tmp_1[1] == tmp_3[1] and tmp_4[1] == tmp_7[1][k]  # avg
 
     res_1 = ApproxDist_bin(X_nA_y, A_j, idx_S1, m1, m2)
-    res_2 = ApproxDist_bin_revised(X_nA_y, A_j, idx_S1, m1, m2)
+    res_2 = ApproxDist_bin_revised(X_nA_y, idx_S1, m1, m2)  # A_j,
     res_4 = ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e)
     res_5 = ApproxDist_nonbin_mpver(X_nA_y, A_j, m1, m2, n_e)
     res_6 = ApproxDist_nonbin_mpver(X_nA_y, A_j, m1, m2, n_e, pool)

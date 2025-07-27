@@ -12,12 +12,13 @@ import csv
 import numpy as np
 
 from hfm.utils.verifiers import DTY_FLT
-from experiment.utils.draw_hypos import (
+from experiment.df_bin.manf_plt import Plot2C_comparison
+
+from pyfair.marble.draw_hypos import (
     Friedman_init, _encode_sign,
     comp_t_sing, comp_t_prep, cmp_paired_wtl, cmp_paired_avg)
-from experiment.facil.draw_graph import (
+from pyfair.granite.draw_graph import (
     Friedman_chart, stat_chart_stack)
-from experiment.ver1.manf_plt import Plot2C_comparison
 
 
 # ===============================

@@ -139,7 +139,7 @@ class GraphSetupVer1:
 
     def load_raw_dataset(self, filename, sheetname):
         filepath = os.path.join(
-            RAW_EXPT_DIR, 'ver1', filename + '.xlsx')
+            RAW_EXPT_DIR, 'df_bin', filename + '.xlsx')
         dframe = pd.read_excel(filepath, sheetname)
         return dframe
 
@@ -185,7 +185,7 @@ class GraphSetupVer2(GraphSetupVer1):
 
     def load_raw_dataset(self, filename, sheetname):
         filepath = os.path.join(
-            RAW_EXPT_DIR, 'ver2', filename + '.xlsx')
+            RAW_EXPT_DIR, 'df_nonbin', filename + '.xlsx')
         dframe = pd.read_excel(filepath, sheetname)
         return dframe
 

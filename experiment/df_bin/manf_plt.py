@@ -7,18 +7,17 @@
 
 import numpy as np
 import pandas as pd
-# import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
-from experiment.generic import GraphSetupVer1 as GraphSetup
-from experiment.generic import DAT_EXPT_ORG
+from experiment.utils_empirical import GraphSetupVer1 as GraphSetup
+from experiment.utils_empirical import DAT_EXPT_ORG
 
-from experiment.facil.draw_addtl import (
+from pyfair.granite.draw_addtl import (
     scatter_k_cv_with_real, approximated_dist_comparison,
     multiple_scatter_comparison,
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
     line_reg_with_marginal_distr, single_line_reg_with_distr)
-from experiment.facil.draw_chart import analogous_confusion_extended
+from pyfair.granite.draw_chart import analogous_confusion_extended
 
 
 # ===============================

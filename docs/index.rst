@@ -45,6 +45,7 @@ We proposed a fairness measure named *harmonic fairness measure via manifolds (H
 SHORTCUTS
 ^^^^^^^^^^
 .. toctree::
+   :caption: ApproxBias
    :maxdepth: 1
 
    posts/quickstart.rst
@@ -55,3 +56,13 @@ SHORTCUTS
 ..    posts/reproduction.rst
 ..    posts/documentation.rst
 .. static/methodology.rst
+
+
+.. toctree::
+    :hidden:
+    :caption: Reproduction
+
+    placeholder-three
+    placeholder-four
+    Sphinx Theme Gallery <https://sphinx-themes.org>
+

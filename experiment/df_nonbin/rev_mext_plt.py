@@ -5,11 +5,11 @@ import pdb
 import pandas as pd
 import numpy as np
 
-from experiment.facil.draw_addtl import (
+from pyfair.granite.draw_addtl import (
     multi_lin_reg_without_distr, lineplot_with_uncertainty)
-from experiment.facil.draw_graph import scatter_id_chart
-from experiment.facil.draw_chart import analogous_confusion_extended
-from experiment.generic import GraphSetupVer2
+from pyfair.granite.draw_graph import scatter_id_chart
+from pyfair.granite.draw_chart import analogous_confusion_extended
+from experiment.utils_empirical import GraphSetupVer2
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.hfm_df import bias_degree_bin as fair_degree_v3

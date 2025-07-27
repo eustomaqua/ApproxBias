@@ -7,6 +7,7 @@ import numpy as np
 
 from hfm.utils.verifiers import unique_column, DTY_FLT, DTY_INT
 
+
 from hfm.dist_drt import DirectDist_bin as DistDirect_bin
 from hfm.dist_drt import DirectDist_nonbin as DistDirect_nonbin
 from hfm.dist_drt import DirectDist_multiver as DistDirect_multivar
@@ -19,25 +20,23 @@ from hfm.dist_est_bin import ApproxDist_bin
 from hfm.dist_est_bin import ApproxDist_bin_revised as ApproxDist_alter
 
 
-# from experiment.utils.fair_grp_ext import (
-from hfm.metrics.fair_grp_ext import (
-    # StatsParity_sing, StatsParity_mult,
-    extGrp1_DP_sing, extGrp2_EO_sing, extGrp3_PQP_sing,
-    alterGrps_sing)
-from hfm.metrics.contingency_mat import \
+from pyfair.facil.metric_cont import \
     contg_tab_mu_type2 as contingency_tab
-from hfm.metrics.performance import (
+from pyfair.marble.metric_perf import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
     calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
-    imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
-# from hfm.metrics.fairness_group import (
-#     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
-#     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
-from hfm.metrics.fairness_grp import (
+    imba_Matthew_s_cc, imba_Cohen_s_kappa)
+from pyfair.marble.metric_fair import (
     marginalised_pd_mat, prev_unpriv_unaware, prev_unpriv_manual,
     prev_unpriv_grp_one, prev_unpriv_grp_two, prev_unpriv_grp_thr)
 from hfm.discriminative_risk import hat_L_fair, hat_L_loss
+# from experiment.utils.fair_grp_ext import (
+# from hfm.metrics.fair_grp_ext import (
+from pyfair.marble.metric_fair import (
+    # StatsParity_sing, StatsParity_mult,
+    extGrp1_DP_sing, extGrp2_EO_sing, extGrp3_PQP_sing,
+    alterGrps_sing)
 
 
 from hfm.earlybreak import Naive_bin as NaiveHD_bin
@@ -50,7 +49,7 @@ from hfm.earlybreak import EffHD_multivar as EffHDD_multivar
 from sklearn.ensemble import (
     BaggingClassifier, AdaBoostClassifier, RandomForestClassifier,
     ExtraTreesClassifier, GradientBoostingClassifier)
-from experiment.classifiers import (
+from experiment.utils_learner import (
     INDIVIDUALS, LGBMClassifier, FairGBMClassifier, AdaFair)
 
 import torch
@@ -275,7 +274,6 @@ class ComparisonDp_setup:
     def get_fair_ens(self, name_ens, nb_cls=2, constraint='',
                      saIndex=None, saValue=None):
         if name_ens == 'lightgbm':
-            # return lightgbm.LGBMClassifier(n_estimators=nb_cls)
             return LGBMClassifier(n_estimators=nb_cls)
         elif name_ens == 'fairgbm':
             return FairGBMClassifier(n_estimators=nb_cls,
@@ -402,7 +400,6 @@ class ComparisonD2_withDirectComput(ComparisonD_setup):
             clf = AdaBoostClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
         elif name_ens == 'lightgbm':
-            # clf = lightgbm.LGBMClassifier(n_estimators=nb_cls)
             clf = LGBMClassifier(n_estimators=nb_cls)
             clf.fit(X_A_trn, y_trn)
 
@@ -477,7 +474,7 @@ class RevCompZ_setup:
         app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)
         '''
         app_0 = ApproxDist_bin(X_nA_y, A_j, non_sa, m1, m2)
-        app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)  # ~non_sa
+        app_1 = ApproxDist_alter(X_nA_y, non_sa, m1, m2)  # ~non_sa
         app_2 = DistApprox_nonbin(
             X_nA_y, non_sa.astype('int'), m1, m2, n_e)
 
@@ -505,7 +502,7 @@ class RevCompZ_setup:
         app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)
         '''
         app_0 = ApproxDist_bin(X_nA_y, A_j, non_sa, m1, m2)
-        app_1 = ApproxDist_alter(X_nA_y, A_j, non_sa, m1, m2)  # ~non_sa
+        app_1 = ApproxDist_alter(X_nA_y, non_sa, m1, m2)  # ~non_sa
         app_2 = DistApprox_nonbin(X_nA_y, Aj_bin, m1, m2, n_e)
         app_3 = DistApprox_nonbin(X_nA_y, A_j, m1, m2, n_e)
 
@@ -1192,18 +1189,18 @@ class RevCompYC_NN(RevCompYB_NN):
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, Ds_avg, Df_avg, Dh_avg))
 
         # pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
-        pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')
+        pm = {'idx_S1': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')  # 'non_sa'
         Ds, t_Ds = ApproxDist_bin(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_bin(X_nA_fx, A_j, **pm)
         Dh, t_Dh = ApproxDist_bin(embed_fx, A_j, **pm)
         result.extend(self.subproc_df(
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, None, None, None))
 
-        pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}
+        pm = {'idx_S1': non_sa, 'm1': m1, 'm2': m2}  # 'non_sa'
         # pm = {'non_sa': ~non_sa, 'm1': m1, 'm2': m2}
-        Ds, t_Ds = ApproxDist_alter(X_nA_y, A_j, **pm)
-        Df, t_Df = ApproxDist_alter(X_nA_fx, A_j, **pm)
-        Dh, t_Dh = ApproxDist_alter(embed_fx, A_j, **pm)
+        Ds, t_Ds = ApproxDist_alter(X_nA_y, **pm)    # A_j,
+        Df, t_Df = ApproxDist_alter(X_nA_fx, **pm)   # A_j,
+        Dh, t_Dh = ApproxDist_alter(embed_fx, **pm)  # A_j,
         Ds, Df, Dh = Ds[0], Df[0], Dh[0]
         result.extend(self.subproc_df(
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, None, None, None))
@@ -1214,7 +1211,7 @@ class RevCompYC_NN(RevCompYB_NN):
         result.extend(self.subproc_df(
             t_Ds, t_Df, t_Dh, Ds, Df, Dh, Ds_avg, Df_avg, Dh_avg))
 
-        del pm['non_sa']
+        del pm['idx_S1']  # del pm['non_sa']
         pm['n_e'] = n_e
         pm['pool'] = pool
         Aj_bin = non_sa.astype('int')
@@ -1462,22 +1459,22 @@ class RevCompXB_NN(RevCompX_setup, RevCompYC_NN):
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, Ds_avg, Df_avg))
 
         # pm = {'idx_S0': ~non_sa, 'idx_S1': non_sa, 'm1': m1, 'm2': m2}
-        pm = {'non_sa': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')
+        pm = {'idx_S1': non_sa, 'm1': m1, 'm2': m2}  # pm.pop('idx_S0')  # 'non_sa'
         Ds, t_Ds = ApproxDist_bin(X_nA_y, A_j, **pm)
         Df, t_Df = ApproxDist_bin(X_nA_fx, A_j, **pm)
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, None, None))
         # del pm['idx_S0']
         # del pm['idx_S1']
-        pm['non_sa'] = non_sa  # pm['non_sa'] = ~non_sa
-        Ds, t_Ds = ApproxDist_alter(X_nA_y, A_j, **pm)
-        Df, t_Df = ApproxDist_alter(X_nA_fx, A_j, **pm)
+        pm['idx_S1'] = non_sa  # pm['non_sa'] = ~non_sa
+        Ds, t_Ds = ApproxDist_alter(X_nA_y, **pm)   # A_j,
+        Df, t_Df = ApproxDist_alter(X_nA_fx, **pm)  # A_j,
         Ds, Df = Ds[0], Df[0]
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, None, None))
 
         (Ds, Ds_avg), t_Ds = DistDirect_nonbin(X_nA_y, [non_sa, ~non_sa])
         (Df, Df_avg), t_Df = DistDirect_nonbin(X_nA_fx, [non_sa, ~non_sa])
         result.extend(self.subproc_df(t_Ds, t_Df, Ds, Df, Ds_avg, Df_avg))
-        del pm['non_sa']
+        del pm['idx_S1']  # del pm['non_sa']
         pm['n_e'] = n_e
         pm['pool'] = pool
         Aj_bin = non_sa.astype('int')
@@ -1805,7 +1802,6 @@ class RevCompXE_ensemble(RevCompXB_NN):
             clf = AdaBoostClassifier(n_estimators=nb_cls)
             clf.fit(X_wA_trn, y_trn)
         elif name_ens in ['lightgbm', 'LightGBM', 'lightGBM']:
-            # clf = lightgbm.LGBMClassifier(n_estimators=nb_cls)
             clf = LGBMClassifier(n_estimators=nb_cls)
             clf.fit(X_wA_trn, y_trn)
 

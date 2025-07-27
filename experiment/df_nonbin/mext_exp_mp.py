@@ -5,9 +5,15 @@
 import time
 import numpy as np
 
+from sklearn.ensemble import (
+    BaggingClassifier, AdaBoostClassifier,
+    RandomForestClassifier,
+    ExtraTreesClassifier, GradientBoostingClassifier)
+from experiment.utils_learner import (
+    RelativeFairClsf, IndividualClsf, INDIVIDUALS,
+    LGBMClassifier, FairGBMClassifier, AdaFair)
 from hfm.utils.verifiers import unique_column, DTY_FLT, DTY_INT
-from experiment.classifiers import (
-    RelativeFairClsf, IndividualClsf, INDIVIDUALS)
+
 
 from hfm.dist_drt import DirectDist_bin as DistDirect_bin
 # from hfm.dist_drt import DirectDist_nonbin as DistDirect_nonbin
@@ -20,29 +26,18 @@ from hfm.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
 from hfm.dist_est_bin import ApproxDist_bin
 
 
-from hfm.metrics.contingency_mat import \
+from pyfair.facil.metric_cont import \
     contg_tab_mu_type2 as contingency_table
-from hfm.metrics.performance import (
+from pyfair.marble.metric_perf import (
     calc_accuracy, calc_precision, calc_recall, calc_f1_score,
     calc_fpr, calc_fnr, calc_sensitivity, calc_specificity,
     imba_geometric_mean, imba_discriminant_power,
-    imba_Matthew_s_cc, imba_Cohen_s_kappa)  # calc_tpr,
-# from hfm.metrics.fairness_group import (
-#     marginalised_pd_mat, unpriv_unaware, unpriv_manual,
-#     unpriv_group_one, unpriv_group_two, unpriv_group_thr)
-# from hfm.discriminative_risk import (
-#     E_rho_L_fair_f, hat_L_fair, E_rho_L_loss_f, hat_L_loss)
-from hfm.metrics.fairness_grp import (
+    imba_Matthew_s_cc, imba_Cohen_s_kappa)
+from pyfair.marble.metric_fair import (
     marginalised_pd_mat, prev_unpriv_unaware, prev_unpriv_manual,
     prev_unpriv_grp_one, prev_unpriv_grp_two, prev_unpriv_grp_thr)
 from hfm.discriminative_risk import hat_L_fair, hat_L_loss
 
-
-from sklearn.ensemble import (
-    BaggingClassifier, AdaBoostClassifier, RandomForestClassifier,
-    ExtraTreesClassifier, GradientBoostingClassifier)
-from experiment.classifiers import (
-    LGBMClassifier, FairGBMClassifier, AdaFair)
 
 unpriv_group_one = prev_unpriv_grp_one
 unpriv_group_two = prev_unpriv_grp_two

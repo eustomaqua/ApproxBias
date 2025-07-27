@@ -100,28 +100,28 @@ def unique_column(nb_col, alphabet=None):
     return list()
 
 
-@numba.jit(nopython=True)
-def judge_transform_need(y):
-    vY = sorted(set(y))  # list(set(y))
-    dY = len(vY)
-    if dY == 2 and (-1 in vY) and (1 in vY):
-        dY = 1
-    return vY, dY  # 2, or ...
+# @numba.jit(nopython=True)
+# def judge_transform_need(y):
+#     vY = sorted(set(y))  # list(set(y))
+#     dY = len(vY)
+#     if dY == 2 and (-1 in vY) and (1 in vY):
+#         dY = 1
+#     return vY, dY  # 2, or ...
 
 
-def judge_mathcal_Y(nc=1):
-    # vY: list(range(nc)) if nc >= 2 else [-1, +1]
-    if nc == 1:
-        return [-1, +1]
-    return list(range(nc))
+# def judge_mathcal_Y(nc=1):
+#     # vY: list(range(nc)) if nc >= 2 else [-1, +1]
+#     if nc == 1:
+#         return [-1, +1]
+#     return list(range(nc))
 
 
-def random_seed_generator(psed='fixed_tseed'):  # _tim
-    if (psed is not None) or (not isinstance(psed, int)):
-        import time
-        psed = int(time.time() * GAP_MID % GAP_INF)
-    prng = np.random.RandomState(seed=psed)
-    return psed, prng
+# def random_seed_generator(psed='fixed_tseed'):  # _tim
+#     if (psed is not None) or (not isinstance(psed, int)):
+#         import time
+#         psed = int(time.time() * GAP_MID % GAP_INF)
+#     prng = np.random.RandomState(seed=psed)
+#     return psed, prng
 
 
 # ---------------------

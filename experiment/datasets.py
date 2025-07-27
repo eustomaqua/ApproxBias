@@ -692,28 +692,28 @@ def transform_X_and_y(dataset, processed_binsensitive):
     return X, y
 
 
-def transform_unpriv_tag(dataset, processed_data):
+def transform_unpriv_tag(dataset, processed_data,
+                         joint='and'):
+    assert joint in (
+        'and', 'or', 'both'), "Improper joint-parameter"
+
     # belongs_priv, belongs_priv_with_joint = find_group(
     #     dataset, processed_data)
-
     belongs_priv = dataset.find_where_belongs(processed_data)
-    if len(belongs_priv) > 1:
-        # belongs_priv_with_joint = np.logical_and(
-        #     belongs_priv[0], belongs_priv[1]).tolist()
 
-        """
-        belongs_priv_with_joint = np.logical_or(
-            belongs_priv[0], belongs_priv[1]
-        ).astype('bool').tolist()  # DTY_INT
-        """
-
-        belongs_priv_with_joint = np.logical_and(
-            belongs_priv[0], belongs_priv[1]
-        ).astype('bool').tolist()  # DTY_INT
-
-    else:
+    if len(belongs_priv) <= 1:  # if len(belongs_priv) > 1:
         belongs_priv_with_joint = []
+        return belongs_priv, belongs_priv_with_joint
 
-    # belongs_priv = [i.astype(DTY_INT) for i in belongs_priv]
-    # belongs_priv = [i.astype(DTY_BOL) for i in belongs_priv]
+    if joint == 'and':
+        belongs_priv_with_joint = np.logical_and(
+            belongs_priv[0], belongs_priv[1]).tolist()
+    elif joint == 'or':
+        belongs_priv_with_joint = np.logical_or(
+            belongs_priv[0], belongs_priv[1]).tolist()
+    else:
+        belongs_priv_with_joint = [
+            np.logical_and(belongs_priv[0], belongs_priv[1]),
+            np.logical_or(belongs_priv[0], belongs_priv[1]),
+        ]
     return belongs_priv, belongs_priv_with_joint

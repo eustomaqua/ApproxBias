@@ -13,21 +13,20 @@ from pathos import multiprocessing as pp
 from hfm.utils.recorders import get_elogger, elegant_print
 from hfm.utils.decorators import (
     elegant_dated, fantasy_durat, fantasy_durat_major)
-from experiment.utils.data_split import (
+from pyfair.facil.data_split import (
     sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
     manual_repetitive, scale_normalize_helper)
 
-from experiment.generic import DataSetup
-from experiment.datasets import transform_X_and_y  # process_above,
-from experiment.ver1.manf_data import (
-    transform_unpriv_tag, normalise_disturb_prime)
-from experiment.ver2.mext_data import (
-    # process_addtl, process_addtl_multivalue,
+from experiment.utils_empirical import DataSetup
+from experiment.datasets import (
+    transform_X_and_y, transform_unpriv_tag)
+from experiment.preprocessing_bin import normalise_disturb_prime
+from experiment.preprocessing_nonbin import (
     renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
     check_marginalised_indices, renewed_transform_disturb,
     renewed_normalise_disturb, renewed_normalise_separate)
 
-from experiment.ver2.rev_mext_exp_mp import (
+from experiment.df_nonbin.rev_mext_exp_mp import (
     RevCompZA_efficient, RevCompZB_efficient, RevCompZC_efficient,
     RevCompYA_NN, RevCompYB_NN, RevCompYC_NN, RevCompXB_NN, RevCompXD_NN,
     RevCompXE_ensemble, RevCompXF_learner)

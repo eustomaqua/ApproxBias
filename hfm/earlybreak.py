@@ -90,7 +90,7 @@ def EffHD_bin(X_nA_y, idx_Si):
 
 
 @fantasy_timer
-@numba.jit(nopython=True)
+# @numba.jit(nopython=True)
 def Naive_bin(X_nA_y, idx_Si):
     Sj, Sj_c = X_nA_y[idx_Si], X_nA_y[~idx_Si]
     half_1 = NaiveHDD(Sj, Sj_c)

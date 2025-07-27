@@ -22,19 +22,18 @@ from sklearn.ensemble import (
     VotingClassifier, StackingClassifier)
 import numpy as np
 
-from experiment.utils.data_classify import EnsembleAlgorithm
-# from experiment.ensemble import EnsembleAlgorithm
-# from hfm.pkgs.AdaFair import AdaFair
-# from experiment.utils.pkgs_AdaFair(_mod) import AdaFair
 from lightgbm import LGBMClassifier
 from fairgbm import FairGBMClassifier
-import sklearn
-skl_ver = sklearn.__version__
-if skl_ver.startswith('1.3.0'):
-    from experiment.utils.pkgs_AdaFair_py36 import AdaFair
-elif skl_ver.startswith('1.5.1'):
-    pass
-del skl_ver
+from experiment.pkgs_AdaFair_py36 import AdaFair
+from pyfair.marble.data_classify import EnsembleAlgorithm
+
+# import sklearn
+# skl_ver = sklearn.__version__
+# if skl_ver.startswith('1.3'):
+#     from experiment.utils.pkgs_AdaFair_py36 import AdaFair
+# elif skl_ver.startswith('1.5.1'):
+#     pass
+# del skl_ver
 
 
 # =====================================
@@ -129,21 +128,21 @@ CONCISE_INDIVIDUALS = {
 #   prgm/nucleus/data_classify.py
 
 
-def achieve_ensemble_from_train_set(name_ens, abbr_cls, nb_cls,
-                                    X_trn, y_trn, X_val, X_tst):
-    """
-    X/y_trn/val/tst: list, np.ndarray, pd.DataFrame? 
-    """
-    name_cls = INDIVIDUALS[abbr_cls]
-    coef, clfs, indices = EnsembleAlgorithm(name_ens, name_cls, nb_cls,
-                                            X_trn, y_trn)
-
-    y_insp = [j.predict(X_trn).tolist() for j in clfs]  # inspect
-    y_pred = [j.predict(X_tst).tolist() for j in clfs]  # predict
-    y_cast = [j.predict(X_val).tolist() for j in clfs] if X_val else []
-
-    # return y_insp, y_cast, y_pred, coef, clfs, indices
-    return coef, clfs, indices, y_insp, y_cast, y_pred
+# def achieve_ensemble_from_train_set(name_ens, abbr_cls, nb_cls,
+#                                     X_trn, y_trn, X_val, X_tst):
+#     """
+#     X/y_trn/val/tst: list, np.ndarray, pd.DataFrame? 
+#     """
+#     name_cls = INDIVIDUALS[abbr_cls]
+#     coef, clfs, indices = EnsembleAlgorithm(name_ens, name_cls, nb_cls,
+#                                             X_trn, y_trn)
+#
+#     y_insp = [j.predict(X_trn).tolist() for j in clfs]  # inspect
+#     y_pred = [j.predict(X_tst).tolist() for j in clfs]  # predict
+#     y_cast = [j.predict(X_val).tolist() for j in clfs] if X_val else []
+#
+#     # return y_insp, y_cast, y_pred, coef, clfs, indices
+#     return coef, clfs, indices, y_insp, y_cast, y_pred
 
 
 # -------------------------------
@@ -151,8 +150,8 @@ def achieve_ensemble_from_train_set(name_ens, abbr_cls, nb_cls,
 #   prgm/nucleus/ensem_voting.py
 
 
-def plurality_voting(y, yt):
-    vY = np.unique(np.concatenate([[y], yt]))
+def plurality_voting(yt):
+    vY = np.unique(yt)  # np.concatenate([[y], yt])
 
     vote = [np.sum(
         np.equal(yt, i), axis=0).tolist() for i in vY]
@@ -161,8 +160,8 @@ def plurality_voting(y, yt):
     return fens
 
 
-def majority_voting(y, yt):
-    vY = np.unique(np.concatenate([[y], yt]))
+def majority_voting(yt):
+    vY = np.unique(yt)  # np.concatenate([[y], yt])
 
     vote = [np.sum(
         np.equal(yt, i), axis=0).tolist() for i in vY]
@@ -176,8 +175,8 @@ def majority_voting(y, yt):
     return fens
 
 
-def weighted_voting(y, yt, wgt):
-    vY = np.unique(np.concatenate([[y], yt]))
+def weighted_voting(yt, wgt):
+    vY = np.unique(yt)  # np.concatenate([[y], yt])
 
     coef = np.array([wgt]).transpose()
     weig = [np.sum(
@@ -212,7 +211,6 @@ class ClsfSetup:
 
 class IndividualClsf(ClsfSetup):
     def __init__(self, abbr_cls):
-        # self._abbr_cls = abbr_cls
         super().__init__(abbr_cls)
         self._member = INDIVIDUALS[abbr_cls]
 
@@ -230,7 +228,8 @@ class IndividualClsf(ClsfSetup):
 
 
 class EnsembleClsf(ClsfSetup):
-    def __init__(self, name_ens, abbr_cls, nb_cls, nb_pru=None):
+    def __init__(self, name_ens, abbr_cls, nb_cls,
+                 nb_pru=None):
         super().__init__(abbr_cls)
         self._name_ens = name_ens
         self._nb_cls = nb_cls
@@ -268,57 +267,32 @@ class EnsembleClsf(ClsfSetup):
 # Experiments: Classifier(s)
 
 
-# class FairRelativeClsf(EnsembleClsf):
-#   def __init__(self, abbr_cls, name_ens=None, nb_cls=0, nb_pru=None):
-#     pass
-
-
 AVAILABLE_CLFS = list(INDIVIDUALS.keys())
-# AVAIL_CLFS = list(INDIVIDUALS.keys())
 AVAILABLE_ENSF = [
-    'bagging', 'AdaBoost',  # 'Bagging@SK', 'AdaBoost@SK',
+    'bagging', 'AdaBoost',
     'LightGBM', 'FairGBM', 'AdaFair',
-    # 'lightGBM', 'fairGBM', 'AdaFair',  # LightGBM, FairGBM
-]  # fair ensemble
+]  # fair ensemble  # 'lightGBM','fairGBM'
 
 
-# class FairRelativeClsf(IndividualClsf):
 class RelativeFairClsf(IndividualClsf):
     def __init__(self, abbr_cls, nb_cls=3,
                  constraint_type='FPR,FNR',
                  saIndex=list(), saValue=list()):
         self._abbr_cls = abbr_cls
 
-        '''
-    if abbr_cls in AVAILABLE_CLFS:
-      self._member = INDIVIDUALS[abbr_cls]
-    else:
-      self._member = self.prepare_fair_relative(
-          # abbr_cls, nb_cls, constraint_type, saIndex, saValues)
-          abbr_cls, nb_cls, constraint_type, saIndex, saValue)
-    '''
-        self._initial_pm = {  # 'abbr_cls': abbr_cls,
+        self._initial_pm = {
+            # 'abbr_cls': abbr_cls,
             'nb_cls': nb_cls,
             'constraint_type': constraint_type,
             'saIndex': saIndex,
             'saValue': saValue}
-        self.initialize_clf(abbr_cls)  # **self._initial_pm)
-        # self.initialize_clf(abbr_cls, nb_cls, constraint_type, saIndex, saValue)
+        self.initialize_clf(abbr_cls)
 
         if abbr_cls in AVAILABLE_ENSF:
             self._abbr_cls += '_cls{}'.format(nb_cls)
         if abbr_cls == 'FairGBM':
             self._abbr_cls += '_{}'.format(constraint_type)
 
-    # def initialize_clf(self, abbr_cls, nb_cls, constraint_type,
-    #                    saIndex, saValue):
-    #   if abbr_cls in AVAILABLE_CLFS:
-    #     self._member = INDIVIDUALS[abbr_cls]
-    #   else:
-    #     self._member = self.prepare_fair_relative(
-    #         # abbr_cls, nb_cls, constraint_type, saIndex, saValues)
-    #         abbr_cls, nb_cls, constraint_type, saIndex, saValue)
-    #   return
     def initialize_clf(self, abbr_cls):
         if abbr_cls in AVAILABLE_CLFS:
             self._member = INDIVIDUALS[abbr_cls]
@@ -331,21 +305,18 @@ class RelativeFairClsf(IndividualClsf):
     def prepare_fair_relative(self, abbr_cls, nb_cls=3,
                               constraint_type='FPR,FNR',
                               saIndex=list(), saValue=list()):
-        if abbr_cls in ['Bagging@SK', 'bagging',
-                        'Bagging']:
+        if abbr_cls in ['bagging', 'Bagging']:
             clf = BaggingClassifier(n_estimators=nb_cls)
-        elif abbr_cls in ['AdaBoost@SK', 'AdaBoost',
-                          'adaboost']:
+        elif abbr_cls in ['AdaBoost', 'adaboost']:
             clf = AdaBoostClassifier(n_estimators=nb_cls)
         elif abbr_cls in ['lightGBM', 'LightGBM']:
-            # clf = lightgbm.LGBMClassifier(n_estimators=nb_cls)
             clf = LGBMClassifier(n_estimators=nb_cls)
         elif abbr_cls in ['fairGBM', 'FairGBM']:
-            clf = FairGBMClassifier(n_estimators=nb_cls,
-                                    constraint_type=constraint_type)
+            clf = FairGBMClassifier(
+                n_estimators=nb_cls,
+                constraint_type=constraint_type)
         elif abbr_cls == 'AdaFair':
             clf = AdaFair(n_estimators=nb_cls,
-                          # saIndex=sa_idx, saValues=sa_val)
                           saIndex=saIndex, saValue=saValue)
         return clf
 

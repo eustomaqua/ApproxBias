@@ -12,13 +12,13 @@ import sys
 from hfm.utils.decorators import elegant_dated, fantasy_durat
 from hfm.utils.recorders import elegant_print
 
-from experiment.ver2.mext_plt import (
+from experiment.df_nonbin.mext_plt import (
     CurrPlot3B_comparison, CurrPlot3C_comparison, CurrPlot3D_comparison,
     CurrPlot4B_comparison, CurrPlot4C_comparison, CurrPlot4D_comparison,
     Distributed_GA_mp, HyperEA_renew_m1fix, HyperEB_renew_m2fix,
     CurrTab4B_comparison)
 
-from experiment.ver2.rev_mext_plt import (
+from experiment.df_nonbin.rev_mext_plt import (
     RevP_ZA_efficient, RevP_ZB_efficient, RevP_ZC_efficient,
     RevP_YA_embedding, RevP_YB_embedding, RevP_YC_embedding,
     RevP_XC_statsParity, RevP_XD_statsParity,

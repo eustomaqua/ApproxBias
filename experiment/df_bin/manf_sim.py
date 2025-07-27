@@ -13,25 +13,28 @@ import pandas as pd
 from hfm.utils.decorators import (elegant_dated, elegant_durat,
                                   elegant_durat_core)
 from hfm.utils.recorders import elegant_print, get_elogger
-from experiment.generic import DataSetup
-from experiment.classifiers import AVAILABLE_ENSF  # AVAILABLE_CLFS,
-from experiment.datasets import preprocess, adversarial, transform_X_and_y
-
-from experiment.utils.data_split import (
+from pyfair.facil.data_split import (
     sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
     manual_repetitive, scale_normalize_helper)
-from experiment.ver1.manf_data import (
-    binarized_data_set, transform_X_A_and_y, transform_unpriv_tag,
+
+from experiment.utils_empirical import DataSetup
+from experiment.utils_learner import AVAILABLE_ENSF
+from experiment.datasets import (
+    preprocess, adversarial, transform_X_and_y,
+    transform_unpriv_tag)
+
+from experiment.preprocessing_bin import (
+    binarized_data_set, transform_X_A_and_y,
     transform_disturb_prime, normalise_disturb_prime,
     normalise_disturb_whole)
-from experiment.ver2.mext_data import (
+from experiment.preprocessing_nonbin import (
     renewed_transform_disturb, renewed_normalise_disturb,
     renewed_normalise_separate)
 
-from experiment.ver1.manf_hpm import (
+from experiment.df_bin.manf_hpm import (
     PartE1_ParaSenAnalysis, PartE2_ParaSenAnalysis, PartE3_ParamsSen,
     PartF1_ParaSenAnalysis, PartF2_ParaSenAnalysis)
-from experiment.ver1.manf_exp import (
+from experiment.df_bin.manf_exp import (
     ComparisonB1_withDirectComput, ComparisonB2_withDirectComput,
     ComparisonC2_withDirectComput,
     ComparisonC4_withDirectComput, ComparisonC5_withDirectComput)

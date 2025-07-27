@@ -1,8 +1,7 @@
 # coding: utf-8
-#
 # Usage: to measure the bias level within one classifier
 #
-# Author: Yijun Bian
+# Author: Yj
 # 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
 #    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
 # 2. Approximating Discrimination Within Models When Faced With Several

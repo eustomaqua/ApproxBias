@@ -1,8 +1,7 @@
 # coding: utf-8
-#
 # Usage: to calculate the distance directly
 #
-# Author: Yijun Bian
+# Author: Yj
 # 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
 #    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
 # 2. Approximating Discrimination Within Models When Faced With Several
@@ -13,7 +12,7 @@
 import numpy as np
 import numba
 
-from utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer
 # from utils.verifiers import check_zero
 
 

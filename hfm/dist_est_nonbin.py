@@ -1,8 +1,7 @@
 # coding: utf-8
-#
 # Usage: to approximate the distance quickly
 #
-# Author: Yijun Bian
+# Author: Yj
 # 2. Approximating Discrimination Within Models When Faced With Several
 #    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
 #
@@ -11,7 +10,7 @@
 import numpy as np
 import numba
 
-from utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean
 from hfm.dist_est_bin import projector
 

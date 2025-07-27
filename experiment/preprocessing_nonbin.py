@@ -8,18 +8,10 @@ import numpy as np
 import pandas as pd
 # from copy import deepcopy
 
-# from experiment.datasets import (Ricci, German, Adult,
-#                                  PropublicaRecidivism,
-#                                  PropublicaViolentRecidivism)
-# from experiment.datasets import preprocess, adversarial
-# from experiment.datasets import (AVAILABLE_FAIR_DATASET,
-#                                  DATASETS, DATASET_NAMES)
-
 import time
 from experiment.datasets import (
     process_above, adverse_perturb,
     make_sensitive_attrs_binary, make_class_attr_num)
-from hfm.utils.verifiers import DTY_BOL
 
 
 # ===============================
@@ -45,7 +37,7 @@ def make_bool_feat_numerical(dataframe, boolean_feats=None):
     # dataframe should be `processed_numerical`
     newframe = dataframe.copy()
     for attr in boolean_feats:
-        if newframe[attr].dtype == DTY_BOL:  # 'bool':
+        if newframe[attr].dtype == 'bool':
             newframe[attr] = newframe[attr].replace({True: 1})
             newframe[attr] = newframe[attr].replace({False: 0})
     return newframe
@@ -231,10 +223,8 @@ def renewed_prep_and_adversarial(dataset, data_frame, ratio=.7,
     belongs_priv = dataset.find_where_belongs(processed_data)
     if len(belongs_priv) > 1:
         belongs_priv_with_joint = [
-            np.logical_and(belongs_priv[0],
-                           belongs_priv[1]).astype(DTY_BOL),
-            np.logical_or(belongs_priv[0],
-                          belongs_priv[1]).astype(DTY_BOL),
+            np.logical_and(belongs_priv[0], belongs_priv[1]),
+            np.logical_or(belongs_priv[0], belongs_priv[1]),
         ]
         belongs_priv.extend(belongs_priv_with_joint)
     marginalised_groups = preproc_mu['marginalised_groups']

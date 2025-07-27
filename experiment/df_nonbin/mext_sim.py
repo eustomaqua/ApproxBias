@@ -11,7 +11,6 @@ import os
 import sys
 import time
 
-# import pdb
 import numpy as np
 # import pandas as pd
 from pathos import multiprocessing as pp
@@ -20,20 +19,20 @@ from pathos import multiprocessing as pp
 from hfm.utils.recorders import get_elogger, elegant_print
 from hfm.utils.decorators import (
     elegant_dated, fantasy_durat, fantasy_durat_major)
-from experiment.utils.data_split import (
+from pyfair.facil.data_split import (
     sklearn_k_fold_cv, sklearn_stratify, manual_cross_valid,
     manual_repetitive, scale_normalize_helper)
+
 from experiment.datasets import (
-    transform_X_and_y, DATASET_NAMES, DATASETS)  # process_above,
-from experiment.ver1.manf_data import (
-    transform_unpriv_tag, normalise_disturb_prime)
-from experiment.ver2.mext_data import (
-    # process_addtl, process_addtl_multivalue,
+    transform_X_and_y, DATASET_NAMES, DATASETS,
+    transform_unpriv_tag)
+from experiment.preprocessing_bin import normalise_disturb_prime
+from experiment.preprocessing_nonbin import (
     renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
     check_marginalised_indices, renewed_transform_disturb,
     renewed_normalise_disturb, renewed_normalise_separate)
 
-from experiment.ver2.mext_exp_mp import (
+from experiment.df_nonbin.mext_exp_mp import (
     ComparisonC2_withDirectComput, ComparisonB2_withDirectComput,
     ComparisonC4_withDirectComput,
     ComparisonD2_withDirectComput, ComparisonD3_withDirectComput,

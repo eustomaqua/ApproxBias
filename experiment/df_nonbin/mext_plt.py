@@ -11,25 +11,22 @@ import csv
 import numpy as np
 import pandas as pd
 # import matplotlib.pyplot as plt
-import pdb
+# import pdb
 
-from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
-# from hfm.utils.recorders import get_elogger, rm_ehandler
-
-from experiment.facil.draw_addtl import (
-    # boxplot_k_cv_with_real, multiple_scatter_comparison,
-    # scatter_id_chart, scatter_and_corr
+from pyfair.granite.draw_addtl import (
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
     line_reg_with_marginal_distr, single_line_reg_with_distr,
     multi_lin_reg_with_distr, multi_lin_reg_without_distr,
     scatter_parl_chart_renew, hyper_params_lin_reg,
     _uncertainty_plotting)
 
-from experiment.utils.draw_hypos import _avg_and_stdev, _encode_sign
-from experiment.facil.draw_chart import (
+from pyfair.marble.draw_hypos import _avg_and_stdev, _encode_sign
+from pyfair.granite.draw_chart import (
     analogous_confusion_extended)  # analogous_confusion,
-# from experiment.facil.draw_graph import scatter_parl_chart
-from experiment.generic import GraphSetupVer2 as GraphSetup
+# from pyfair.granite.draw_graph import scatter_parl_chart
+
+from experiment.utils_empirical import GraphSetupVer2 as GraphSetup
+from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
 
 
 # ===============================
@@ -42,16 +39,19 @@ from experiment.generic import GraphSetupVer2 as GraphSetup
 
 
 def _sub_depict_scat(df_raw, tYs, suff, diff=False):
-    scat_X = np.concatenate([df_raw[tYs[0]].values.astype(DTY_FLT),
-                             df_raw[tYs[2]].values.astype(DTY_FLT)], axis=0)
-    scat_Y = np.concatenate([df_raw[tYs[1]].values.astype(DTY_FLT),
-                             df_raw[tYs[3]].values.astype(DTY_FLT)], axis=0)
+    scat_X = np.concatenate([
+        df_raw[tYs[0]].values.astype(DTY_FLT),
+        df_raw[tYs[2]].values.astype(DTY_FLT)], axis=0)
+    scat_Y = np.concatenate([
+        df_raw[tYs[1]].values.astype(DTY_FLT),
+        df_raw[tYs[3]].values.astype(DTY_FLT)], axis=0)
     # annots = ['Distance via direct computation', 'Distance via approximation']
     annotX, annotY = r'\mathbf{D}_\cdot', r'\hat{\mathbf{D}}_\cdot'
     annots = ['${}$'.format(annotX), '${}$'.format(annotY),
               '${}={}$'.format(annotY, annotX)]
-    single_line_reg_with_distr(scat_X, scat_Y, annots, suff + '_sty3',
-                               linreg=True, snspec='sty3b')
+    single_line_reg_with_distr(
+        scat_X, scat_Y, annots, suff + '_sty3',
+        linreg=True, snspec='sty3b')
     if not diff:
         return
     scat_Z = np.zeros_like(scat_Y) - 1.
@@ -61,8 +61,9 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
     annotZ = r'\frac{abs(\hat{\mathbf{D}}_\cdot-\mathbf{D}_\cdot)}{\mathbf{D}_\cdot}'
     annots = ['${}$'.format(annotX), '${}$'.format(annotZ),
               '${}={}$'.format(annotY, annotX)]
-    single_line_reg_with_distr(scat_X, scat_Z, annots, suff + '_sty6',
-                               linreg=True, snspec='sty6')
+    single_line_reg_with_distr(
+        scat_X, scat_Z, annots, suff + '_sty6',
+        linreg=True, snspec='sty6')
     return
 
 
@@ -81,8 +82,9 @@ def _sub_depict_tim(df_raw, tYs, suff, diff=False, log_taken=False):
     scat_Z = scat_Y / scat_X - 1.
     # annotZ = r'\frac{T_{\hat{\mathbf{D}}_\cdot}}{T_{\mathbf{D}_\cdot}}-1'
     annotZ = r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1'
-    annots = ['${}$  (sec)'.format(annotX), '${}$'.format(annotZ),
-              '${}={}$'.format(annotY, annotX)]
+    annots = [
+        '${}$  (sec)'.format(annotX), '${}$'.format(annotZ),
+        '${}={}$'.format(annotY, annotX)]
     kws['snspec'] = 'sty6'
     single_line_reg_with_distr(scat_X, scat_Z, annots, suff + '_sty6a', **kws)
     if not log_taken:
@@ -2446,7 +2448,7 @@ class Table4_comparison(Plot4_comparison):
         U_cp_part1 = U_cp_part1.transpose((1, 0, 2)).reshape(nb_col, -1)
         U_cp_part2 = U_cp_part2.transpose((1, 0, 2)).reshape(nb_col, -1)
         tmp_b = self._picked_keys[: -2] + [
-            r'$\mathbf{df}_{prev}$' + '\n bin-val',
+            r'$\mathbf{df}_{prev}$' + '\n bin-val  ',
             r'  $\mathbf{df}_{prev}$' + '\n \t multival',
             r'$\mathbf{df}$', r'$\mathbf{df}^{avg}$']  # 4+4=8
         U_cp_tmp = U_cp_raw.transpose((1, 0, 2)).reshape(nb_col + nb_ind, -1)
@@ -2632,6 +2634,7 @@ class Table4_comparison(Plot4_comparison):
                 # if i >= 3 and j >= 7:
                 #   pdb.set_trace()
                 cm[i, j] = ct
+        # pdb.set_trace()
         analogous_confusion_extended(
             Mat_A.reshape(nb_ind, -1), Mat_B.reshape(nb_col - nb_ind, -1),
             tmp_a, tmp_d, figname, cm, cmap_name=cmap_name, rotate=rotate)

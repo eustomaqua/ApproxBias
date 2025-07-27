@@ -11,7 +11,7 @@ from hfm.dist_est_bin import ApproxDist_bin as ApproxDist
 from hfm.hfm_df import bias_degree as fair_degree
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
-from experiment.classifiers import IndividualClsf, RelativeFairClsf
+from experiment.utils_learner import IndividualClsf, RelativeFairClsf
 
 
 # -------------------------------

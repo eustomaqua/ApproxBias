@@ -7,9 +7,9 @@
 from hfm.dist_drt import (
     DistDirect_Euclidean, DistDirect_halfway_min, DistDirect_mediator,
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
+
 import numpy as np
-# import pdb
-from utils.verifiers import check_equal, check_belong
+from hfm.utils.verifiers import check_equal, check_belong
 
 
 def generate_dat(n, nd, na, nai, nc=2):

@@ -14,6 +14,8 @@ from experiment.facil.draw_graph import (
     _setup_locater, _style_set_fig, _style_set_axis,
     _barh_fcolor, _sns_line_err_bars)
 
+import pdb
+
 
 import itertools
 # import seaborn as sns

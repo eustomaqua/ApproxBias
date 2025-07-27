@@ -1,8 +1,7 @@
 # coding: utf-8
-#
 # Usage: to approximate the distance quickly
 #
-# Author: Yijun Bian
+# Author: Yj
 # 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
 #    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
 #
@@ -11,7 +10,7 @@
 import numpy as np
 import numba
 
-from utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean
 
 
@@ -49,7 +48,7 @@ def set_belonging(idx_S0, idx_S1, i_anchor, idx_j):
     return False
 
 
-# @numba.jit(nopython=True)
+@numba.jit(nopython=True)
 def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
                            i, m2):
     i_anchor = idx_y_fx[i]  # anchor's location after projection
@@ -76,7 +75,7 @@ def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
         num_j += 1
         j -= 1
     # Find the minimum among them, recorded as d_min^s
-    del A_anchor
+    # del A_anchor
     return min_js
 
 
@@ -160,61 +159,32 @@ def weight_generator(n_d):
     return vec_w
 
 
-"""
 @fantasy_timer
-def ApproxDist_bin(X_and_yddot, A, idx_S1, m1, m2):
-    idx_S0 = ~idx_S1
-    n_d = X_and_yddot.shape[1]  # n,n_d= X_and_yddot.shape
-    d_max = []
-    for _ in range(m1):  # for k in
-        vec_w = weight_generator(n_d - 1)
-        tmp, _ = AcceleDist_bin(
-            X_and_yddot, A, idx_S0, idx_S1, m2, vec_w)
-        d_max.append(tmp[0])
-    return min(d_max)  # float
-
-
-@fantasy_timer
-def ApproxDist_bin_revised(X_and_yddot, A, idx_S1, m1, m2):
-    idx_S0 = ~idx_S1
-    n, n_d = X_and_yddot.shape
-    d_max, d_avg = [], []
-    for _ in range(m1):  # for k in
-        vec_w = weight_generator(n_d - 1)
-        tmp, _ = AcceleDist_bin(
-            X_and_yddot, A, idx_S0, idx_S1, m2, vec_w)
-        d_max.append(tmp[0])
-        d_avg.append(tmp[1])
-    # return min(d_max)  # float
-    return min(d_max), min(d_avg) / float(n)
-"""
-
-
-@fantasy_timer
-def ApproxDist_bin(X_nA_y, A_j, non_sa, m1, m2):
-    idx_sa = ~non_sa  # idx_S0 = ~idx_S1
+def ApproxDist_bin(X_nA_y, A_j, idx_S1, m1, m2):
+    idx_S0 = ~idx_S1       # idx_sa = ~non_sa
     n_d = X_nA_y.shape[1]  # n,n_d= X_nA_y.shape
     d_max = []
-    for _ in range(m1):  # for k in
+    for _ in range(m1):    # for k in
         vec_w = weight_generator(n_d - 1)
         tmp, _ = AcceleDist_bin(
-            X_nA_y, A_j, idx_sa, non_sa, m2, vec_w)
+            X_nA_y, A_j, idx_S0, idx_S1, m2, vec_w)
         d_max.append(tmp[0])
-    return min(d_max)  # float
+    return min(d_max)      # float
 
 
 @fantasy_timer
-def ApproxDist_bin_revised(X_nA_y, A_j, non_sa, m1, m2):
-    idx_sa = ~non_sa  # idx_S0 = ~idx_S1
+def ApproxDist_bin_revised(X_nA_y, idx_S1, m1, m2):
+    A_j = idx_S1.astype('int')
+    idx_S0 = ~idx_S1       # idx_sa = ~non_sa
     n, n_d = X_nA_y.shape
     d_max, d_avg = [], []
-    for _ in range(m1):  # for k in
+    for _ in range(m1):    # for k in
         vec_w = weight_generator(n_d - 1)
         tmp, _ = AcceleDist_bin(
-            X_nA_y, A_j, idx_sa, non_sa, m2, vec_w)
+            X_nA_y, A_j, idx_S0, idx_S1, m2, vec_w)
         d_max.append(tmp[0])
         d_avg.append(tmp[1])
-    # return min(d_max)  # float
+    # return min(d_max)    # float
     return min(d_max), min(d_avg) / float(n)
 
 

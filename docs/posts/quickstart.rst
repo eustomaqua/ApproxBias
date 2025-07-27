@@ -27,19 +27,24 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
 .. code-block:: console
   :linenos:
 
-  $ # Install Anaconda/miniconda if you didn't
+  $ # Install anaconda/miniconda if you didn't
   $
-  $ # Create a virtual environment
+  $ # To create a virtual environment
   $ conda create -n test python=3.11 # or 3.8
   $ source activate test
   $
-  $ # Install packages
+  $ # To install packages
   $ pip install --upgrade pip
   $ pip install -r requirements.txt  # Python 3.11
   $ # pip install -r reqs_dev.txt    # Python 3.8
   $ # python -m pytest
   $
-  $ # Delete the virtual environment
+  $ # To install PyFairness
+  $ # git clone git@github.com:eustomaqua/PyFairness.git
+  $ # pip install -r PyFairness/reqs_py311.txt
+  $ pip install -e ./PyFairness
+  $
+  $ # To delete the virtual environment
   $ source deactivate
   $ conda remove -n test --all
 

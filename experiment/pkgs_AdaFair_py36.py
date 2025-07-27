@@ -1,5 +1,3 @@
-# cf. https://github.com/iosifidisvasileios/AdaFair
-
 """Weight Boosting
 
 This module contains weight boosting estimators for both classification and
@@ -35,23 +33,24 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
-import sklearn
+# import sklearn
 from sklearn.base import is_classifier, ClassifierMixin, is_regressor
 from sklearn.ensemble import BaseEnsemble
 ## from sklearn.ensemble.forest import BaseForest
-from sklearn.ensemble._forest import BaseEnsemble
+from sklearn.ensemble._forest import BaseForest  # BaseEnsemble
 # from sklearn.externals import six
 
 from hfm.utils.verifiers import check_zero
 import six
 import sys
-# import pdb
+# import pdb  # Modification to make it suit for multi-class classification
 sys.modules['sklearn.externals.six'] = six
 
 __all__ = [
     'AdaFair'
 ]
 # DTYPE = np.float32
+# AdaFair_mod3.py
 
 
 class BaseWeightBoosting(six.with_metaclass(ABCMeta, BaseEnsemble)):
@@ -358,7 +357,10 @@ class BaseWeightBoosting(six.with_metaclass(ABCMeta, BaseEnsemble)):
 
         for idx, val in enumerate(data):
             # protrcted population
-            if val[self.saIndex] == self.saValue:
+            # if val[self.saIndex] == self.saValue:
+            # sa_tmp = (val[self.saIndex] == self.saValue) if isinstance(
+            #     self.saValue, int) else (val[self.saIndex] in self.saValue)
+            if self._member_found(val[self.saIndex]):  # if sa_tmp:
                 # protected group
                 if labels[idx] == 1:
                     protected_positive += sample_weight[idx]  # /len(sample_weight)
@@ -377,6 +379,11 @@ class BaseWeightBoosting(six.with_metaclass(ABCMeta, BaseEnsemble)):
                 non_protected_positive,
                 protected_negative,
                 non_protected_negative]
+
+    def _member_found(self, val):
+        if isinstance(self.saValue, (list, tuple)):
+            return val in self.saValue
+        return val == self.saValue
 
 
 def _samme_proba(estimator, n_classes, X):
@@ -484,8 +491,8 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
                  random_state=None,
                  saIndex=None, saValue=None,
                  debug=False, CSB="CSB2",
-                 X_test=None, y_test=None, c = 1, use_validation=False, proba=False
-                 ):
+                 X_test=None, y_test=None, c = 1,
+                 use_validation=False, proba=False):
 
         super(AdaFair, self).__init__(
             base_estimator=base_estimator,
@@ -573,10 +580,12 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
         tn_non_protected = 0.
         fp_non_protected = 0.
         fn_non_protected = 0.
-        # pdb.set_trace()
         for idx, val in enumerate(data):
             # protrcted population
-            if val[self.saIndex] == self.saValue:
+            # if val[self.saIndex] == self.saValue:
+            # sa_tmp = (val[self.saIndex] == self.saValue) if isinstance(
+            #     self.saValue, int) else (val[self.saIndex] in self.saValue)
+            if self._member_found(val[self.saIndex]):  # if sa_tmp:
                 # correctly classified
                 if labels[idx] == predictions[idx]:
                     if labels[idx] == 1:
@@ -604,20 +613,20 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
                     else:
                         fp_non_protected += 1
 
-        # pdb.set_trace()
+        '''
+        pdb.set_trace()
         tpr_protected = tp_protected / (tp_protected + fn_protected)
         tnr_protected = tn_protected / (tn_protected + fp_protected)
 
         tpr_non_protected = tp_non_protected / (tp_non_protected + fn_non_protected)
         tnr_non_protected = tn_non_protected / (tn_non_protected + fp_non_protected)
         '''
-    tpr_protected = tp_protected / check_zero(tp_protected + fn_protected)
-    tnr_protected = tn_protected / check_zero(tn_protected + fp_protected)
-    tpr_non_protected = tp_non_protected / check_zero(
-        tp_non_protected + fn_non_protected)
-    tnr_non_protected = tn_non_protected / check_zero(
-        tn_non_protected + fp_non_protected)
-    '''
+        tpr_protected = tp_protected / check_zero(tp_protected + fn_protected)
+        tnr_protected = tn_protected / check_zero(tn_protected + fp_protected)
+        tpr_non_protected = tp_non_protected / check_zero(
+            tp_non_protected + fn_non_protected)
+        tnr_non_protected = tn_non_protected / check_zero(
+            tn_non_protected + fp_non_protected)
 
         diff_tpr = tpr_non_protected - tpr_protected
         diff_tnr = tnr_non_protected - tnr_protected
@@ -655,7 +664,10 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
         fn_non_protected = 0.
         for idx, val in enumerate(data):
             # protrcted population
-            if val[self.saIndex] == self.saValue:
+            # if val[self.saIndex] == self.saValue:
+            # sa_tmp = (val[self.saIndex] == self.saValue) if isinstance(
+            #     self.saValue, int) else (val[self.saIndex] in self.saValue)
+            if self._member_found(val[self.saIndex]):  # if sa_tmp:
                 # correctly classified
                 if labels[idx] == predictions[idx]:
                     if labels[idx] == 1:
@@ -728,6 +740,10 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
             np.log(n_classes - 1.))
         if estimator_error <= 0.:
             alpha = 1.
+        # BUG!! I need to redo all AdaFair results if I have more time
+        #
+        # I have checked, there is no problem here, and alpha is supposed to
+        # be 1 if estimator_error is zero.
 
         self.estimator_alphas_[iboost] = alpha
         self.predictions_array += (y_predict == self.classes_[:, np.newaxis]).T * alpha
@@ -774,9 +790,11 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
 
         if not iboost == self.n_estimators - 1:
             for idx, row in enumerate(sample_weight):
-                # pdb.set_trace()
                 if y[idx] == 1 and y_predict[idx] != 1:
-                    if X[idx][self.saIndex] == self.saValue:
+                    # if X[idx][self.saIndex] == self.saValue:
+                    # sa_tmp = (X[idx][self.saIndex] == self.saValue) if isinstance(
+                    #     self.saValue, int) else (X[idx][self.saIndex] in self.saValue)
+                    if self._member_found(X[idx][self.saIndex]):  # if sa_tmp:
                         if self.csb == "CSB2":
                             sample_weight[idx] *= self.cost_protected_positive * np.exp(alpha * max(proba[idx][0], proba[idx][1]))
                         elif self.csb == "CSB1":
@@ -788,7 +806,10 @@ class AdaFair(BaseWeightBoosting, ClassifierMixin):
                             sample_weight[idx] *= self.cost_non_protected_positive * np.exp(alpha)
 
                 elif y[idx] == -1 and y_predict[idx] != -1:
-                    if X[idx][self.saIndex] == self.saValue:
+                    # if X[idx][self.saIndex] == self.saValue:
+                    # sa_tmp = (X[idx][self.saIndex] == self.saValue) if isinstance(
+                    #     self.saValue, int) else (X[idx][self.saIndex] in self.saValue)
+                    if self._member_found(X[idx][self.saIndex]):  # if sa_tmp:
                         if self.csb == "CSB2":
                             sample_weight[idx] *= self.cost_protected_negative * np.exp(alpha * max(proba[idx][0], proba[idx][1]))
                         elif self.csb == "CSB1":
