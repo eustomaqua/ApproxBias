@@ -451,12 +451,12 @@ del parser, args, trial_type, kwargs
 # -------------------------------
 # Empirical plotting
 """
-python hfm_ver2_draw.py -exp rept_expt7a -pre min_max -m1 20 -m2 8
-python hfm_ver2_draw.py -exp rept_expt5a -pre min_max -m1 20
-python hfm_ver2_draw.py -exp rept_expt5b -pre min_max -m2 8
-python hfm_ver2_draw.py -exp mCV_expt4b -pre min_max
+python hfm_nonbin_draw.py -exp rept_expt7a -pre min_max -m1 20 -m2 8
+python hfm_nonbin_draw.py -exp rept_expt5a -pre min_max -m1 20
+python hfm_nonbin_draw.py -exp rept_expt5b -pre min_max -m2 8
+python hfm_nonbin_draw.py -exp mCV_expt4b -pre min_max
 
-python hfm_ver2_draw.py -rev -ratio .97 -exp mCV_rexp1b -pre min_max
-python hfm_ver2_draw.py -rev -ratio .97 -exp mCV_rexp2c -pre min_max
-python hfm_ver2_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp1b -pre min_max
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp2c -pre min_max
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
 """

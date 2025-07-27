@@ -182,13 +182,13 @@ del parser, args, case, mode
 
 # Experiments
 """
-python hfm_ver2_exec.py -exp mCV_expt4* -dat * --nb-cls 3 -nk 2
-python hfm_ver2_exec.py -exp rept_expt5a -dat * -nk 5 -m1 20
-python hfm_ver2_exec.py -exp rept_expt5b -dat * -nk 5 -m2 8
-python hfm_ver2_exec.py -exp rept_expt7a -dat * -nk 5 -m1 20 -m2 8 --fix
+python hfm_nonbin_exec.py -exp mCV_expt4* -dat * --nb-cls 3 -nk 2
+python hfm_nonbin_exec.py -exp rept_expt5a -dat * -nk 5 -m1 20
+python hfm_nonbin_exec.py -exp rept_expt5b -dat * -nk 5 -m2 8
+python hfm_nonbin_exec.py -exp rept_expt7a -dat * -nk 5 -m1 20 -m2 8 --fix
 
-python hfm_ver2_exec.py -rev -exp mCV_rexp1b -dat german -nk 1
-python hfm_ver2_exec.py -rev -exp mCV_rexp2c -dat ricci -nk 2 -rep
-python hfm_ver2_exec.py -rev -exp mCV_rexp3e -dat ricci -nk 2 -rep
-python hfm_ver2_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp1b -dat german -nk 1
+python hfm_nonbin_exec.py -rev -exp mCV_rexp2c -dat ricci -nk 2 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat ricci -nk 2 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
 """

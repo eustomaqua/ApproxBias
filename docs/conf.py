@@ -26,8 +26,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # html_theme = 'piccolo_theme'
 # html_theme = 'furo'
-# html_theme = 'renku'
-html_theme = "sphinx_rtd_theme"
-extensions = ['recommonmark', 'sphinx_markdown_tables']
+html_theme = 'renku'
+# html_theme = "sphinx_rtd_theme"
+# extensions = ['recommonmark', 'sphinx_markdown_tables']
 # html_theme = 'alabaster'
 html_static_path = ['_static']

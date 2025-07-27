@@ -117,12 +117,12 @@ del parser, args, case
 
 # Experiments
 """
-python hfm_ver1_exec.py -exp rept_expt5a -dat tmp|ricci -nk 0|2 -m1 5
-python hfm_ver1_exec.py -exp rept_expt5b -dat tmp|ricci -nk 0|2 -m2 5
-python hfm_ver1_exec.py -exp rept_expt5c -dat tmp|ricci -nk 1
+python hfm_bin_exec.py -exp rept_expt5a -dat tmp|ricci -nk 0|2 -m1 5
+python hfm_bin_exec.py -exp rept_expt5b -dat tmp|ricci -nk 0|2 -m2 5
+python hfm_bin_exec.py -exp rept_expt5c -dat tmp|ricci -nk 1
 
-python hfm_ver1_exec.py -exp mCV_expt6a -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
-python hfm_ver1_exec.py -exp mCV_expt6b -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
+python hfm_bin_exec.py -exp mCV_expt6a -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
+python hfm_bin_exec.py -exp mCV_expt6b -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
 
-python hfm_ver1_exec.py -exp mCV_expt2a|2b|2c|2d|2e -dat ricci --nb-cls 3 -m1 25 -m2 11
+python hfm_bin_exec.py -exp mCV_expt2a|2b|2c|2d|2e -dat ricci --nb-cls 3 -m1 25 -m2 11
 """

@@ -39,14 +39,26 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
   $ # pip install -r reqs_dev.txt    # Python 3.8
   $ # python -m pytest
   $
-  $ # To install PyFairness
-  $ # git clone git@github.com:eustomaqua/PyFairness.git
-  $ # pip install -r PyFairness/reqs_py311.txt
-  $ pip install -e ./PyFairness
-  $
   $ # To delete the virtual environment
   $ source deactivate
   $ conda remove -n test --all
+
+
+We borrow some auxiliary functions from `PyFairness <https://github.com/eustomaqua/PyFairness>`_, and to use it, please do the following.
+
+.. code-block:: console
+  :linenos:
+
+  $ # To install PyFairness
+  $ git clone git@github.com:eustomaqua/PyFairness.git
+  $ # pip install -r PyFairness/reqs_py311.txt
+  $ # pip install -e ./PyFairness
+  $ cp -r ./PyFairness/pyfair ./
+  $ yes | rm -r PyFairness
+  $
+  $ # To uninstall PyFairness
+  $ rm -r pyfair
+  $ # pip uninstall pyfair
 
 
 Examples
