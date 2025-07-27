@@ -8,8 +8,8 @@ Getting started
 
 We provide the evaluation of extra discrimination introduced in the learning procedure for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from [P1]_, and two others come from [P2]_.
 
-.. [P1] Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly https://arxiv.org/abs/2405.09251
-.. [P2] Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes https://arxiv.org/abs/2408.06099
+.. [P1] Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly https://arxiv.org/pdf/2405.09251
+.. [P2] Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes https://arxiv.org/pdf/2408.06099
 
 
 .. This is a short tutorial covering all the aforementioned cases and methods; Note to check your configuration please before running the example. 
@@ -49,16 +49,16 @@ We borrow some auxiliary functions from `PyFairness <https://github.com/eustomaq
 .. code-block:: console
   :linenos:
 
-  $ # To install PyFairness
+  $ # Two ways to install (& uninstall) PyFairness
   $ git clone git@github.com:eustomaqua/PyFairness.git
-  $ # pip install -r PyFairness/reqs_py311.txt
-  $ # pip install -e ./PyFairness
-  $ cp -r ./PyFairness/pyfair ./
-  $ yes | rm -r PyFairness
   $
-  $ # To uninstall PyFairness
-  $ rm -r pyfair
+  $ pip install -r PyFairness/reqs_py311.txt
+  $ pip install -e ./PyFairness
   $ # pip uninstall pyfair
+  $
+  $ cp -r ./PyFairness/pyfair ./
+  $ # rm -r pyfair
+  $ yes | rm -r PyFairness
 
 
 Examples

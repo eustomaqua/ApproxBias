@@ -28,7 +28,10 @@ We release the code of proposed methods from our following papers here, to help 
 We release the code of the proposed methods from our following papers here, to help people who are interested in our work reproduce those results.
 - \[**P1**\] Does machine bring in extra bias in learning? Approximating fairness in models promptly. [[arXiv]](https://arxiv.org/abs/2405.09251)
 - \[**P2**\] Approximating discrimination within models when faced with several non-binary sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
-- Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival). [[OpenReview]](https://openreview.net/pdf?id=ywqVkVQZDj)
+- Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival poster, [OpenReview](https://openreview.net/pdf?id=ywqVkVQZDj)).
+
+
+To reproduce our empirical results, please refer to the [instructions](https://approxbias.readthedocs.io/en/latest/posts/reproduction.html) and use the released experimental data.
 
 
 ## Getting started
