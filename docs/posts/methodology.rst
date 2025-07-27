@@ -159,8 +159,8 @@ For multi-valued sen-att-s [#P2]_, we remark that :math:`\mathbf{D}_{\mathbf{a}}
 
 Up to now, we got a *harmonic fairness measure via manifolds (HFM)*, with three optional versions (that is, previous, maximal, and average HFM).
 
-.. [#P1] Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly https://arxiv.org/pdf/2405.09251
-.. [#P2] Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes https://arxiv.org/pdf/2408.06099
+.. [#P1] Does machine bring in extra bias in learning? Approximating fairness in models promptly https://arxiv.org/pdf/2405.09251
+.. [#P2] Approximating discrimination within models when faced with several non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
 .. [#P3] Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning (M3L)*, Vancouver, Dec 2024. (Non-archival `poster <https://eustomadew.github.io/posters/2024_m3l_fairmanf.pdf>`_, `OpenReview <https://openreview.net/pdf?id=ywqVkVQZDj>`_)
 
 
@@ -237,7 +237,7 @@ For one bi-valued sen-att [#P1]_,
 .. - *Algorithm 4. Simplified ApproxDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 .. - *Algorithm 1. AcceleDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 
-- *Algorithm 4. Simplified ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
+- *Algorithm 4. Simplified* [#P3]_ *ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
 - *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
 
 .. In this way, we reduce the high computational complexity :math:`\mathcal{O}(n^2)` of direct computation to :math:`\mathcal{O}(n\log n)`.

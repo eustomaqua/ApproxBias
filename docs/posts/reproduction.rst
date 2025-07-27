@@ -8,7 +8,7 @@ Reproduction
    :maxdepth: 1
 
 
-The experimental data are released with `ApproxBias <https://github.com/eustomaqua/ApproxBias/tree/master/findings>`_.
+The `experimental data <https://github.com/eustomaqua/ApproxBias/tree/master/findings>`_ are released with ApproxBias.
 
 To reproduce our empirical results for **non-binary cases** [#P2]_, you may do as follows.
 
@@ -28,6 +28,6 @@ To reproduce our empirical results for **non-binary cases** [#P2]_, you may do a
 
 
 
-.. [#P2] Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes https://arxiv.org/pdf/2408.06099
-.. [#P1] Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly https://arxiv.org/pdf/2405.09251
+.. [#P2] Approximating discrimination within models when faced with several non-binary sensitive attributes (arXiv preprint https://arxiv.org/pdf/2408.06099)
+.. [#P1] Does machine bring in extra bias in learning? Approximating fairness in models promptly (arXiv preprint https://arxiv.org/pdf/2405.09251)
 
