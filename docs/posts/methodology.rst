@@ -72,7 +72,7 @@ Distance between sets
 ..      \mathbf{D}(S_1,\bar{S}_1)= \max\Big\{ 
 ..      & \max_{(\mathbf{x,a},y)\in S_1} \min_{(\mathbf{x}',\mathbf{a}',y')\in\bar{S}_1} \mathbf{d}\big( (\mathbf{x},y),(\mathbf{x}',y') \big) ,\\
 ..      & \max_{(\mathbf{x}',\mathbf{a}',y')\in\bar{S}_1} \min_{(\mathbf{x,a},y)\in S_1} \mathbf{d}\big( (\mathbf{x},y),(\mathbf{x}',y') \big) 
-..      \Big\}
+..      \Big\} \,.
 ..      \end{align}
 ..
 ..   - For a trained classifier :math:`f(\cdot)` where :math:`\hat{y}=f(\mathbf{x,a})`,

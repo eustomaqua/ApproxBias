@@ -10,7 +10,8 @@
 project = 'ApproxBias'
 copyright = '2025, Yj'
 author = 'Yijun Bian'
-release = '0.1.0'
+# version = '0.2.1'
+release = '0.2.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

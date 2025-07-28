@@ -282,4 +282,6 @@ python hfm_bin_draw.py -nk 5 -exp rept_expt5a -m1 20
 python hfm_bin_draw.py -nk 5 -exp rept_expt5b -m2 8
 python hfm_bin_draw.py -exp mCV_expt2c -pre min_max
 python hfm_bin_draw.py -exp mCV_expt2a -pre min_max -re
+
+# python hfm_bin_draw.py -exp mCV_expt2b -pre min_max
 """

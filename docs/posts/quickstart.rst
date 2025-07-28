@@ -80,7 +80,7 @@ You may need to adjust the forms of the data you use as follows.
   #   Note that it may vary for different sen-att-s; in that case, modify
   #   `sa_val` accordingly.
   X_nA_y = np.concatenate([y.reshape(-1, 1).astype('float'), X], axis=1)
-  sa_val = [set(A[:, i]) for i in range(A.shape[1])]
+  sa_val = [set(A[:, i].tolist()) for i in range(A.shape[1])]
   sa_val = [[priv_val]+list(i - set({priv_val})) for i in sa_val]
   sa_idx = [[A[:, i] == k for k in j]  for i, j in enumerate(sa_val)]
   X_nA_fx = np.concatenate([fx.reshape(-1, 1).astype('float'), X], axis=1)
@@ -88,7 +88,7 @@ You may need to adjust the forms of the data you use as follows.
   # How to modify `sa_val`, for example, if we have a list of privileged
   # values to indicate their members, that is,
   # param priv_val: a list of priv_vals, shape=(#sen-att,)
-  sa_val = [set(A[:, i]) for i in range(A.shape[1])]
+  sa_val = [set(A[:, i].tolist()) for i in range(A.shape[1])]
   sa_val = [[j]+list(i - set({j})) for i,j in zip(sa_val, priv_val)]
   sa_idx = [[A[:, i] == k for k in j]  for i, j in enumerate(sa_val)]
 

@@ -182,7 +182,7 @@ del parser, args, case, mode
 
 # Experiments
 """
-python hfm_nonbin_exec.py -exp mCV_expt4* -dat * --nb-cls 3 -nk 2
+python hfm_nonbin_exec.py -exp mCV_expt4b|c|d -dat * --nb-cls 3 -nk 2
 python hfm_nonbin_exec.py -exp rept_expt5a -dat * -nk 5 -m1 20
 python hfm_nonbin_exec.py -exp rept_expt5b -dat * -nk 5 -m2 8
 python hfm_nonbin_exec.py -exp rept_expt7a -dat * -nk 5 -m1 20 -m2 8 --fix

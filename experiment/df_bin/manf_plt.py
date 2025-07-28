@@ -1209,13 +1209,11 @@ class Plot2C_comparison(Plot2B_comparison):
             each_att = self.recap_sub_data(raw_dframe, nb_row=4)
         tag_pm, tag_trn, tag_tst = self.prepare_graph()
 
-        '''
         # for ind in [None, 0, 3, 1, 2, 7]:
         for ind in [0, 3, 1, 2, 7]:
             self.drawing_fig2_alt(
                 raw_dframe, tag_tst, nb_set, id_set, each_gen, each_att,
                 joint='none', fig='tst', ind=ind)
-        '''
         self.drawing_fig2_alt(
             raw_dframe, tag_tst, nb_set, id_set, each_gen, each_att,
             joint='none', fig='tst', ind=None)
