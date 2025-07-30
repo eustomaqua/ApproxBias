@@ -65,33 +65,33 @@ class DataSetup:
             'numerical-binsensitive')
         self.saValue = [0 for sa in self.saValue if sa == 1]
 
-        # @property
-        # def data_type(self):
-        #     return self._data_type
+    # @property
+    # def data_type(self):
+    #     return self._data_type
 
-        @property
-        def log_document(self):
-            return self._log_document
+    @property
+    def log_document(self):
+        return self._log_document
 
-        # # ----------- mu -----------
-        # def prepare_mu_datasets(self, ratio=.5, logger=None):
-        #   pass
-        # # ----------- tr -----------
-        # # ----------- bi -----------
-        # def prepare_bi_datasets(self, ratio=.5, logger=None):
-        #   pass
+    # # ----------- mu -----------
+    # def prepare_mu_datasets(self, ratio=.5, logger=None):
+    #   pass
+    # # ----------- tr -----------
+    # # ----------- bi -----------
+    # def prepare_bi_datasets(self, ratio=.5, logger=None):
+    #   pass
 
-        @property
-        def dataset(self):
-            return self._dataset
+    @property
+    def dataset(self):
+        return self._dataset
 
-        @property
-        def data_frame(self):
-            return self._data_frame
+    @property
+    def data_frame(self):
+        return self._data_frame
 
-        @property
-        def trial_type(self):
-            return self._trial_type
+    @property
+    def trial_type(self):
+        return self._trial_type
 
 
 class GraphSetupVer1:

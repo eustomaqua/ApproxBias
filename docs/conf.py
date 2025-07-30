@@ -9,7 +9,8 @@
 
 project = 'ApproxBias'
 copyright = '2025, Yj'
-author = 'Yijun Bian'
+author = 'Yj'
+# author = 'Yijun Bian'
 # version = '0.2.1'
 release = '0.2.1'
 
@@ -20,6 +21,18 @@ extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+
+# extensions = [
+#     'recommonmark',
+#     'sphinx.ext.todo',
+#     'sphinx.ext.githubpages',
+# ]
+# source_suffix = {
+#     '.rst': 'restructuredtext',
+#     '.txt': 'markdown',
+#     '.md': 'markdown',
+# }
 
 
 # -- Options for HTML output -------------------------------------------------

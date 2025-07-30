@@ -24,7 +24,7 @@ jobs:
           command: |
             pip install --upgrade setuptools pip
             pip install -r requirements.txt
-            pip install carbontracker pytest
+            # pip install carbontracker pytest
             pip install coverage coveralls pytest-xdist
             coverage run -m pytest --ignore-glob="*/excl_test_*"
             coverage report

@@ -35,8 +35,8 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
   $
   $ # To install packages
   $ pip install --upgrade pip
-  $ pip install -r requirements.txt  # Python 3.11
-  $ # pip install -r reqs_dev.txt    # Python 3.8
+  $ pip install -r requirements.txt  # Python 3.8
+  $ # pip install -r reqs_dev.txt    # Python 3.11
   $ # python -m pytest
   $
   $ # To delete the virtual environment
@@ -52,7 +52,7 @@ We borrow some auxiliary functions from `PyFairness <https://github.com/eustomaq
   $ # Two ways to install (& uninstall) PyFairness
   $ git clone git@github.com:eustomaqua/PyFairness.git
   $
-  $ pip install -r PyFairness/reqs_py311.txt
+  $ # pip install -r PyFairness/reqs_py311.txt
   $ pip install -e ./PyFairness
   $ # pip uninstall pyfair
   $
