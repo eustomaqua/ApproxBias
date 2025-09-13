@@ -30,7 +30,7 @@ We developed `ApproxBias <https://github.com/eustomaqua/ApproxBias>`_ with ``Pyt
   $ # Install anaconda/miniconda if you didn't
   $
   $ # To create a virtual environment
-  $ conda create -n test python=3.11 # or 3.8
+  $ conda create -n test python=3.8  # or 3.11
   $ source activate test
   $
   $ # To install packages
