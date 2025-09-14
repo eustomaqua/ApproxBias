@@ -7,6 +7,7 @@
 
 import numpy as np
 import pandas as pd
+# import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
 from experiment.utils_empirical import GraphSetupVer1 as GraphSetup
@@ -1424,6 +1425,7 @@ class RePlot2_comparison(GraphSetup):
         gen, rep = None, True
         super().__init__(gen, rep, m1, m2, figname)
         self._cmap_name = 'coolwarm_r'
+        # self._cmap_name = 'muted'  # ver2
         self._nb_iter = 1 if nb_iter <= 0 else nb_iter
         self._nb_cls = nb_cls
         self._picked_keys = ['DP', 'EO', 'PQP'] + [
@@ -1625,7 +1627,9 @@ class Replot2A_comparison(RePlot2_comparison):
         kwargs = {'alpha_loc': 'b4', 'alpha_rev': True, 'annotY': annotZ}
         lineplot_with_uncertainty(
             df_raw, col_X, col_Y_alt, col_Ys, self._picked_keys,
-            figname=suff_2, cmap_name=self._cmap_name, **kwargs)
+            figname=suff_2, cmap_name=self._cmap_name, **kwargs,
+            alpha_clarity=.35, whether_beta=True)
+        # pdb.set_trace()  # cm = self._cmap_name
 
         if ind != 0:
             return

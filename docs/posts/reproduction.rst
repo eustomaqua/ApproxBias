@@ -32,10 +32,11 @@ To reproduce our empirical results for **non-binary cases** [#P2]_, you may do a
 .. .. code-block: : console
 ..   :linenos:
 ..
-..   $ python hfm_bin_draw.py -nk 5 -exp rept_expt5a -m1 20     # Fig. 4
-..   $ python hfm_bin_draw.py -nk 5 -exp rept_expt5b -m2 8      # Fig. 4
-..   $ python hfm_bin_draw.py -exp mCV_expt2c -pre min_max      # Fig. 2, 3, 5; Tables 2-3
+..   $ python hfm_bin_draw.py -nk 5 -exp rept_expt5a -m1 20     # Fig. 5
+..   $ python hfm_bin_draw.py -nk 5 -exp rept_expt5b -m2 8      # Fig. 5
+..   $ python hfm_bin_draw.py -exp mCV_expt2c -pre min_max      # Fig. 2, 4, 6; Tables 2-3
 ..   $ python hfm_bin_draw.py -exp mCV_expt2a -pre min_max -re  # Fig. 1
+..   $ python hfm_bin_draw.py -v ver2 -exp mCV_exp1b  # Fig. 3
 
 
 

@@ -6,7 +6,7 @@ from pyfair.utils_empirical import DAT_EXPT_NMS, DAT_EXPT_ORG
 # from pyfair.utils_empirical import GraphSetup
 from pyfair.facil.utils_const import unique_column, DTY_FLT
 
-from pyfair.granite.draw_fancy import radar_chart
+from pyfair.granite.draw_fancy import radar_chart, grped_radar_cht
 from pyfair.facil.draw_prelim import DTY_PLT
 
 # import numpy as np
@@ -14,7 +14,7 @@ import pandas as pd
 import os
 
 import pdb
-GRP_FAIR_COMMON = ['DP', 'EO', 'PP']
+GRP_FAIR_COMMON = ['DP', 'EO', 'PQP']
 
 
 class GraphSetup(GraphSetupVer1):
@@ -204,7 +204,7 @@ class PlotA_drawing(PlotA_initial):
             pick_set, pick_clf, tag_acc, tag_sa1, tag_sa2, df, id_set)
         if pick_set > 0 and pick_clf > 2:
             df_as_1, df_as_2 = self.obtain_sing_dat_cls(
-                pick_set, pick_clf,
+                pick_set, pick_clf + 4,
                 tag_acc, tag_sa1, tag_sa2, df, id_set)
 
         sub_my = tag_acc[16:][5 + 3:]
@@ -215,7 +215,7 @@ class PlotA_drawing(PlotA_initial):
         del sub_my
         sub_my = [tag_sa1[4 + 2], tag_sa1[4 + 4 + 2]]  # hfm
 
-        labels = GRP_FAIR_COMMON + ['DR', r'GEI ($\alpha$=0.5)'] + [
+        labels = GRP_FAIR_COMMON + ['DR', r'GEI ($\gamma$=0.5)'] + [
             # 0, 0.2, 0.5, 0.8, 1]] + [
             # 0.5]] + [  # 0.2, 0.5, 0.8]] + [
             # 'Theil', 'DR', '0/1 loss'][:-1] + [
@@ -224,9 +224,9 @@ class PlotA_drawing(PlotA_initial):
             # labels = labels[:4] + [r'GEI ($\alpha$={:.1f})'.format(
             #     i) for i in [.2, .5, .8]] + labels[-3:]
             labels = labels[:4] + [
-                r'{:7s}GEI ($\alpha$=0.2)'.format(''),
-                r'GEI ($\alpha$=0.5)',
-                r'GEI ($\alpha$=0.8){:7s}'.format('')] + labels[-3:]
+                r'{:7s}GEI ($\gamma$=0.2)'.format(''),
+                r'GEI ($\gamma$=0.5)',
+                r'GEI ($\gamma$=0.8){:7s}'.format('')] + labels[-3:]
             sub_idv = tag_acc[16:][: 5 + 1]
             sub_idv = [sub_idv[i] for i in [1, 2, 3, 5]]
         currX = sub_grp + sub_idv + sub_my
@@ -251,6 +251,7 @@ class PlotA_drawing(PlotA_initial):
                     clockwise=True)
         if pick_clf <= 2:
             return
+        # dtt = df_tmp
 
         df_tmp = df_as_1[currX].reset_index(drop=True)
         for i in currX:
@@ -263,6 +264,51 @@ class PlotA_drawing(PlotA_initial):
                     # figname=f'{fgn}_s{pick_set}c{pick_clf+4}_sa2',
                     figname=f'{fgn}_s{pick_set}c{pick_clf}p_sa2',
                     clockwise=True)
+        # pdb.set_trace()
+        return
+
+    def depict_grouped(self, pick_set_pl, pick_clf, df, id_set,
+                       mk='tst', fgn='', verbose=True):
+        tag_acc, tag_sa1, tag_sa2 = self.obtain_tag_col(mk)
+        sub_my = tag_acc[16:][5 + 3:][2]  # dr
+        sub_grp = tag_sa1[:3] + [sub_my]
+        sub_idv = tag_acc[16:][:5 + 1]
+        sub_idv = [sub_idv[2], sub_idv[5]]
+        sub_my = [tag_sa1[4 + 2], tag_sa1[4 + 4 + 2]]  # hfm
+        labels = GRP_FAIR_COMMON + [
+            'DR', r'GEI ($\gamma$=0.5)', 'Theil',
+            r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
+        if verbose:
+            labels = labels[:4] + [
+                r'{:7s}GEI ($\gamma$=0.2)'.format(''),
+                r'GEI ($\gamma$=0.5)',
+                r'GEI ($\gamma$=0.8){:7s}'.format('')] + labels[-3:]
+            sub_idv = tag_acc[16:][:5 + 1]
+            sub_idv = [sub_idv[i] for i in [1, 2, 3, 5]]
+        currX = sub_grp + sub_idv + sub_my
+
+        df_tmp_pl = []
+        for pick_set in pick_set_pl:
+            df_at_1, df_at_2 = self.obtain_sing_dat_cls(
+                pick_set, pick_clf, tag_acc, tag_sa1, tag_sa2,
+                df, id_set)
+
+            df_tmp = df_at_1[currX].reset_index(drop=True)
+            for i in currX:
+                df_tmp.loc[:, i] = float(df_tmp[i].mean())
+            if pick_set == 0:
+                df_tmp_pl.append(df_tmp.iloc[:1])
+                continue
+            df_tmp = df_tmp.iloc[:2]
+            df_alt = df_at_2[currX]
+            for i in currX:
+                df_tmp.iloc[1][i] = float(df_alt[i].mean())
+            df_tmp_pl.append(df_tmp)
+
+        anotY = ['$Att_{sen}$ #1', '$Att_{sen}$ #2']
+        fgn = f'{fgn}_sc{pick_clf}_sa'  # len(pick_set_pl)
+        grped_radar_cht(df_tmp_pl, currX, labels, anotY,
+                        clockwise=True, figname=fgn)
         return
 
 
@@ -277,11 +323,17 @@ class Ver2_PlotA_fair_ens(PlotA_drawing):
 
         # pdb.set_trace()
         fgn = f'{figname}_radar'
-        for pkc in [0, 1, 2, 5, 6]:  # [3,4,]
-            for pks in [1, 2, 3, 4]:  # [0,]
-                self.depict_separately(
-                    pks, pkc, raw_dframe, id_set, mk, fgn)
-        # self.depict_separately(2, 2, raw_dframe, id_set, mk, fgn)
+        # for pkc in [0, 1, 2, 5, 6]:  # [3,4,]
+        #     for pks in [1, 2, 3, 4]:  # [0,]
+        #         self.depict_separately(
+        #             pks, pkc, raw_dframe, id_set, mk, fgn)
+        # # self.depict_separately(2, 2, raw_dframe, id_set, mk, fgn)
+
+        for pkc in [0, 1, 2, 5, 6, 5 + 4, 6 + 4]:
+            self.depict_grouped([
+                1, 2, 3, 4], pkc, raw_dframe, id_set, mk, fgn)
+        # self.depict_grouped([
+        #     0, 1, 2, 3, 4], 2, raw_dframe, id_set, mk, fgn)
         return
 
 

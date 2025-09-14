@@ -347,6 +347,6 @@ python hfm_bin_draw.py -exp mCV_expt2c -pre min_max
 python hfm_bin_draw.py -exp mCV_expt2a -pre min_max -re
 
 # python hfm_bin_draw.py -exp mCV_expt2b -pre min_max
+# python hfm_bin_draw.py -v ver2 -exp mCV_exp1c -pre min_max
 python hfm_bin_draw.py -v ver2 -exp mCV_exp1b -pre min_max
-python hfm_bin_draw.py -v ver2 -exp mCV_exp1c -pre min_max
 """
