@@ -102,6 +102,9 @@ if args.revision:
         if trial_type.endswith('rexp3e'):
             kwargs['nb_cls'] = args.nb_cls
 
+    elif trial_type[-6:] in ('rexp4b', 'rexp4c', 'rexp4e',):
+        kwargs['nb_cls'] = args.nb_cls
+
     case = Rev_ManfExtPrime_Empir(trial_type, data_type, **kwargs)
     # mode = 'a' if data_type == 'adult' else 'w'
     case.trial_one_process(mode='w')
@@ -191,4 +194,7 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp1b -dat german -nk 1
 python hfm_nonbin_exec.py -rev -exp mCV_rexp2c -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
+
+python hfm_nonbin_exec.py -rev -exp mCV_rexp4b -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp4c|d|e -dat * -nk 2 --nb-cls 3
 """

@@ -27,6 +27,7 @@ from pyfair.granite.draw_chart import (
 
 from experiment.utils_empirical import GraphSetupVer2 as GraphSetup
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
+from hfm.utils.recorders import BLFAIR
 
 
 # ===============================
@@ -639,8 +640,10 @@ class Plot3_comparison(GraphSetup):
         super().__init__(gen, rep, m1, m2, n_e, figname)
         self._nb_iter = 1 if nb_iter <= 0 else nb_iter
 
-        self._picked_keys = ['DP', 'EO', 'PQP'] + [
-            'DR', r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
+        # self._picked_keys = ['DP', 'EO', 'PQP'] + [
+        #     'DR', r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
+        self._picked_keys = BLFAIR + [
+            r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
         self._pick_metric = [
             'Accuracy', 'Precision', 'Recall', r'$f_1$ score',
             # 'FPR rate', 'FNR rate', 'Sensitivity', 'Specificity']

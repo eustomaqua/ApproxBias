@@ -14,6 +14,7 @@ from experiment.utils_empirical import GraphSetupVer2
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.hfm_df import bias_degree_bin as fair_degree_v3
 from hfm.hfm_df import bias_degree_nonbin as fair_degree_v4
+from hfm.utils.recorders import BLFAIR
 
 
 # ==============================
@@ -553,16 +554,16 @@ class RevPlotY_comparison(GraphSetup):
         # mat_A = ans_acc[:, :5]  # :7]
         key_A = ['Accuracy', 'Precision', 'Recall', 'Specificity',
                  r'$f_1$ score', r'g\_mean', r'DiscP'][:5]  # r'$g_mean$'
-        key_B_1 = [r'DP', r'EO', r'PQP', r'DR',
-                   r'$\mathbf{df}_{prev}$', r'$\mathbf{df}_{prev,emb}$',
-                   r'$\mathbf{df}$', r'$\mathbf{df}_{emb}$']
+        key_B_1 = BLFAIR + [  # [r'DP', r'EO', r'PQP', r'DR',
+            r'$\mathbf{df}_{prev}$', r'$\mathbf{df}_{prev,emb}$',
+            r'$\mathbf{df}$', r'$\mathbf{df}_{emb}$']
         # analogous_confusion_extended(
         #     mat_A.T, mat_B_1.T, key_A, key_B_1, 'test_3', **pm)
         mat_B_2 = np.concatenate([ans_far[:, 2:], ans_far[
             :, 1:2], ans_hfm[:, -4:]], axis=1)
-        key_B_2 = [r'DP', r'EO', r'PQP', r'DR',
-                   r'$\mathbf{df}_{prev}^{avg}$', r'$\mathbf{df}_{prev,emb}^{avg}$',
-                   r'$\mathbf{df}^{avg}$', r'$\mathbf{df}_{emb}^{avg}$']
+        key_B_2 = BLFAIR + [  # [r'DP', r'EO', r'PQP', r'DR',
+            r'$\mathbf{df}_{prev}^{avg}$', r'$\mathbf{df}_{prev,emb}^{avg}$',
+            r'$\mathbf{df}^{avg}$', r'$\mathbf{df}_{emb}^{avg}$']
         if not omitted:
             analogous_confusion_extended(
                 mat_A.T, mat_B_1.T, key_A, key_B_1,
@@ -598,7 +599,7 @@ class RevPlotY_comparison(GraphSetup):
                  r'$\Delta$Precision', r'$\Delta$Recall',
                  r'$\Delta$Specificity', r'$\Delta\,f_1$ score',
                  r'$\Delta$g_mean', r'$\Delta$DiscP'][:5]
-        key_B = [r'DP', r'EO', r'PQP', r'DR', ]
+        key_B = BLFAIR  # [r'DP', r'EO', r'PQP', r'DR', ]
         mat_B = np.concatenate([
             ans_far[:, 2:], ans_far[:, 1:2],
             ans_hfm[:, [-8, -6, -2, -7, -5, -1]]], axis=1)
@@ -765,7 +766,7 @@ class RevP_YC_embedding(RevPlotY_comparison):
         mat_A = ans_acc[:, 7:7 + 5]
         key_A = [r'$\Delta$Accuracy', r'$\Delta$Precision', r'$\Delta$Recall',
                  r'$\Delta$Specificity', r'$\Delta\,f_1$ score', ]
-        key_B = [r'DP', r'EO', r'PQP', r'DR']
+        key_B = BLFAIR  # [r'DP', r'EO', r'PQP', r'DR']
         mat_B_1 = np.concatenate([ans_far[:, 2:], ans_far[:, 1:2],
                                   res_alt_hfm_max[:, [-8, -6]],
                                   res_alt_hfm_avg[:, [-6, ]],
@@ -807,7 +808,7 @@ class RevP_YC_embedding(RevPlotY_comparison):
         mat_A = ans_acc[:, 7:7 + 5]
         key_A = [r'$\Delta$Accuracy', r'$\Delta$Precision', r'$\Delta$Recall',
                  r'$\Delta$Specificity', r'$\Delta\,f_1$ score', ]
-        key_B = [r'DP', r'EO', r'PQP', r'DR']
+        key_B = BLFAIR  # [r'DP', r'EO', r'PQP', r'DR']
         mat_B_1 = np.concatenate([ans_far[:, 2:], ans_far[:, 1:2],
                                   ans_hfm[:, -6:-3],
                                   ans_hfm_emb[:, -6:-3]], axis=1)
@@ -1236,7 +1237,7 @@ class RevPlotX_extendSP(GraphSetup):
         key_A = [r'$\Delta$Accuracy', r'$\Delta\,f_1$ score',
                  r'$\Delta$Precision',
                  r'$\Delta$Recall', r'$\Delta$Specificity']
-        key_B = [r'DP', r'EO', r'PQP', r'DR']
+        key_B = BLFAIR  # [r'DP', r'EO', r'PQP', r'DR']
 
         mat_B_1 = np.concatenate([ans_far[:, :4],
                                   ans_hfm[:, [0, 12, 17, 1, 13, 18]],

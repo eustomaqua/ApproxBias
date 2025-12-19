@@ -16,6 +16,9 @@ from hfm.dist_cvg_nonbin import (AcceleDist_nonbin,
                                  ApproxDist_nonbin,
                                  ApproxDist_nonbin_mpver)
 
+from hfm.dist_cvg_nonbin import (
+    StratVacant, StratRearrange, StratEarlyStop, EffExact)
+
 import numpy as np
 from pathos import multiprocessing as pp
 from hfm.dist_drt import (DirectDist_bin, DirectDist_nonbin,
@@ -28,7 +31,7 @@ from hfm.utils.verifiers import check_equal
 import pdb
 
 
-def test_ompare_subproc():
+def test_compare_subproc():
     X_nA_y, A, indices, vec_w = generate_dat(40, 5, 2, 3)
     k, m2, i = 0, 6, 11
     idx_S1, Ap = indices[k][1], A[:, k]
@@ -171,4 +174,38 @@ def test_approx_dist():
     compare_approx(3, m1, m2)
     compare_multiver(2, m1, m2)
     compare_multiver(3, m1, m2)
+    return
+
+
+# ------------------------------------------
+# strategies
+
+
+def test_strategy():
+    m1, m2, n_e, k = 3, 5, 2, 0
+    n, nd, na, nai = 30, 4, 2, 3
+    X_nA_y, A, indices, vec_w = generate_dat(n, nd, na, nai)
+    idx_S1, Ap = indices[k][1], A[:, k]
+    S0 = [indices[k][1], indices[k][0], indices[k][2]]
+    i_alt = [~idx_S1, idx_S1]  # idx_S0=~idx_S1
+
+    res_1 = DirectDist_bin(X_nA_y, idx_S1)
+    res_2 = DirectDist_nonbin(X_nA_y, i_alt)
+    res_3 = DirectDist_nonbin(X_nA_y, S0)
+    res_4 = DirectDist_nonbin(X_nA_y, indices[k])
+    assert check_equal(res_1[0], res_2[0])
+    assert check_equal(res_3[0], res_4[0])
+
+    ans_1 = StratVacant(X_nA_y, Ap, m1, m2, n_e)
+    ans_2 = StratRearrange(X_nA_y, Ap, m1, m2, n_e)
+    ans_3 = StratEarlyStop(X_nA_y, Ap, n_e)
+    assert check_equal(ans_3[0], res_3[0])
+
+    cmp_1 = StratVacant(X_nA_y, idx_S1, m1, m2, n_e)
+    cmp_2 = StratRearrange(X_nA_y, idx_S1, m1, m2, n_e)
+    cmp_3 = StratEarlyStop(X_nA_y, idx_S1, n_e)
+    assert check_equal(cmp_3[0], res_2[0])
+    assert check_equal(cmp_3[0], res_1[0])
+
+    # pdb.set_trace()
     return

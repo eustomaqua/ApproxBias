@@ -120,6 +120,29 @@ def AcceleDist_nonbin(X_nA_y, A_j, m2, vec_w):
     return max(d_min), sum(d_min)
 
 
+# @numba.jit(nopython=True)
+def AcceleCore(X_nA_y, A_j, m2, vec_w):
+    proj = [projector(ele, vec_w) for ele in X_nA_y]
+    idx_y_fx = np.argsort(proj)
+
+    n = X_nA_y.shape[0]  # number of instances
+    d_min = []
+    for i in range(n):
+        # Set the anchor data point (xi,yi) in this round
+        min_js = sub_accelerator_smaler(
+            X_nA_y, A_j, idx_y_fx, i, m2)
+        min_jr = sub_accelerator_larger(
+            X_nA_y, A_j, idx_y_fx, i, m2)
+        # finally,
+        tmp = min(min_js, min_jr)
+        d_min.append(tmp)
+
+    # dist_est_nonbin.py
+    # def AcceleDist_nonbin():
+    # return max(d_min), sum(d_min)
+    return d_min  # 4convergence
+
+
 # ------------------------------------------
 # Algorithm 2. ApproxDist
 
@@ -162,6 +185,7 @@ def ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e=2):
         tmp = [AcceleDist_nonbin(
             X_nA_y, A_j, m2, W[k]) for k in range(n_e)]
         tmp, _ = zip(*tmp)
+        # tmp = [[max(k), sum(k)] for k in tmp]  # convergence
         t_max, t_avg = zip(*tmp)
 
         d_max.append(min(t_max))

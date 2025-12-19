@@ -4,6 +4,9 @@
 import logging
 import pandas as pd
 
+BLFAIR = ['DP', 'EO', 'PQP', 'DR']
+BLFAIR = ['DP', 'EOpp', 'PP', 'DR']
+
 
 def _get_tmp_name_ens(name_ens):
     tmp = name_ens[: 3]

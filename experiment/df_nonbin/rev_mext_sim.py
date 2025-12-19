@@ -30,6 +30,9 @@ from experiment.df_nonbin.rev_mext_exp_mp import (
     RevCompZA_efficient, RevCompZB_efficient, RevCompZC_efficient,
     RevCompYA_NN, RevCompYB_NN, RevCompYC_NN, RevCompXB_NN, RevCompXD_NN,
     RevCompXE_ensemble, RevCompXF_learner)
+from experiment.df_nonbin.rev_mext_exp_mp import (
+    ConvergeE2_with, ConvergeE3_with, ConvergeE4_with, ConvergeE5_with)
+import pdb
 
 
 # =====================================
@@ -178,11 +181,16 @@ class Rev_ManfExtEmpir(DataSetup):
             cr4c = [''] * 9 + [self._prep] + cr4c
             # csv_w.writerows([csv_row_1, cr2c, cr3c, cr4c])
             # del csv_row_1, cr2c, cr3c, cr4c
-        elif self._trial_type[-6: -1] in ('rexp3'):
+        elif self._trial_type[-6: -1] in ('rexp3', 'rexp4b'):
             cr2c = csv_row_2a + ['abbr_cls'] + cr2c
             # cr2c = csv_row_2a[:-1] + ['abbr_cls', 'k?']
             cr3c = [''] * 11 + cr3c
             cr4c = [''] * 9 + [self._prep, ''] + cr4c
+
+        elif self._trial_type[-6: -1] in ('rexp4',):
+            cr2c = csv_row_2a + cr2c
+            cr3c = [''] * 10 + cr3c
+            cr4c = [''] * 9 + [self._prep] + cr4c
         csv_w.writerows([csv_row_1, cr2c, cr3c, cr4c])
         del csv_row_1, cr2c, cr3c, cr4c
 
@@ -233,6 +241,16 @@ class Rev_ManfExtEmpir(DataSetup):
                     for k in range(1, nk):
                         csv_w.writerow([''] * 9 + [k, ''] + res_data[k][i * 4 + j + 3])
             # pass
+
+        elif self._trial_type[-6:] in ('rexp4c', 'rexp4d', 'rexp4e'):
+            for k in range(nk):
+                csv_w.writerow([''] * 9 + [k] + res_data[k])
+        elif self._trial_type[-6:] in ('rexp4b',):
+            for j, jk in enumerate(self._iterator.learners_inside):
+                csv_w.writerow([''] * 9 + [0, jk] + res_data[0][j])
+                for k in range(1, nk):
+                    csv_w.writerow([''] * 9 + [k, ''] + res_data[k][j])
+        # pdb.set_trace()
 
         del nk, sens_att, priv_val, mrg_grp
         del res_data, res_aux, csv_row_2a
@@ -398,10 +416,29 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
         elif trial_type.endswith('rexp3f'):
             self._iterator = RevCompXF_learner(abbr_cls='')
 
+        elif trial_type.endswith('rexp4b'):
+            self._iterator = ConvergeE2_with(  # nb_cls=7,
+                nb_cls, self.saIndex, self.saValue, n_e
+            )  # , omitted=self._omit)
+        elif trial_type.endswith('rexp4c'):
+            self._iterator = ConvergeE3_with(
+                nb_cls, self.saIndex, self.saValue, n_e)
+        elif trial_type.endswith('rexp4d'):
+            self._iterator = ConvergeE4_with(
+                nb_cls, self.saIndex, self.saValue, n_e)
+        elif trial_type.endswith('rexp4e'):
+            self._iterator = ConvergeE5_with(
+                nb_cls, self.saIndex, self.saValue, n_e)
+        # rexp4b: refer to expt4b
+
         nk = f'nk{self._nb_iter}' if self._nb_iter > 0 else 'sing'
         formatted = '_'.join([
             trial_type, nk, prep.replace('_', ''), self._log_document,
             'r{}'.format(int(self._ratio * 100)), 'pms', ])
+        if trial_type.endswith('rexp4b'):
+            # formatted = formatted[:-3] + '_'.join([
+            #     '', f'cls{nb_cls}', 'pms', ])
+            formatted += f'_cls{nb_cls}'
         self._log_document = formatted + ('_gen' * gen + '_rep' * rep)
         del nk
         if trial_type.endswith('rexp3d'):
@@ -549,10 +586,13 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                     X_A_trn, [], X_A_tst, self.saIndex)
             # i-th K-Fold
             elegant_print("Iteration {}-th".format(k + 1), logger)
+            kw = {} if not self._trial_type.endswith(
+                'rexp4b') else {'jt_trn': jt_trn, 'jt_tst': jt_tst}
             res_iter = self.coding_per_iteration_cv_split(
                 logger, pool, k,
                 X_trn, A_trn, y_trn, X_A_trn, X_Aq_trn, g1m_trn,
-                X_tst, A_tst, y_tst, X_A_tst, X_Aq_tst, g1m_tst)
+                X_tst, A_tst, y_tst, X_A_tst, X_Aq_tst, g1m_tst,
+                **kw)
             res_ans.append(res_iter)
             del X_trn, A_trn, y_trn, g1m_trn, jt_trn, X_A_trn, X_Aq_trn
             del X_tst, A_tst, y_tst, g1m_tst, jt_tst, X_A_tst, X_Aq_tst
@@ -563,7 +603,8 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
     def coding_per_iteration_cv_split(
             self, logger, pool, k,
             X_trn, A_trn, y_trn, X_wA_trn, X_wAq_trn, g1m_trn,
-            X_tst, A_tst, y_tst, X_wA_tst, X_wAq_tst, g1m_tst):
+            X_tst, A_tst, y_tst, X_wA_tst, X_wAq_tst, g1m_tst,
+            jt_trn=None, jt_tst=None):
         since = time.time()
         res_iter = []
         positive_label = self._dataset.get_positive_class_val(
@@ -590,6 +631,14 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                 # self._m1, self._m2, self._n_e, positive_label)
                 self._m1, self._m2, self._n_e, pool, positive_label, **pms)
 
+        elif ('rexp4b' in self._trial_type):
+            # pms = {}  # pdb.set_trace()
+            res_iter = self._iterator.schedule_content(
+                X_trn, A_trn, y_trn, X_wA_trn, X_wAq_trn, g1m_trn,
+                X_tst, A_tst, y_tst, X_wA_tst, X_wAq_tst, g1m_tst,
+                self._m1, self._m2, self._n_e, positive_label, pool,
+                jt_trn=jt_trn, jt_tst=jt_tst)
+
         del positive_label
         tim_elapsed = time.time() - since
         elegant_print("CV iteration {}-th, consumed {}".format(
@@ -605,11 +654,22 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
 
         if 'rexp1' in self._trial_type:
             res_iter = self._iterator.schedule_content(
-                X, A, y, g1m_indices, self._m1, self._m2, self._n_e, pool)
+                X, A, y,
+                g1m_indices, self._m1, self._m2, self._n_e, pool)
         elif 'rexp2' in self._trial_type:
             res_iter = self._iterator.schedule_content(
                 X, A, y, X_wA, X_wAq,
                 g1m_indices, self._m1, self._m2, self._n_e, pool)
+
+        elif self._trial_type[-6:] in ('rexp4c', 'rexp4d', 'rexp4e'):
+            res_iter = self._iterator.schedule_content(
+                X, A, y, g1m_indices,           # X_wA,
+                self._m1, self._m2, self._n_e)  # , pool)
+        elif self._trial_type[-6:] in ('rexp4e',):
+            # kw = {'pool': pool} / {}  # ,**kw)
+            res_iter = self._iterator.schedule_content(
+                X, A, y, g1m_indices,
+                self._m1, self._m2, self._n_e, pool)
         return res_iter
 
 
