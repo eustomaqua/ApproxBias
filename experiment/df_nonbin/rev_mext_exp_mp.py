@@ -2081,7 +2081,7 @@ class ConvergeE_setup:
         if n_a > 1:
             A_0 = np.logical_and(A_i[0], A_i[1]).astype(DTY_FLT)
             A_1 = np.logical_or(A_i[0], A_i[1]).astype(DTY_FLT)
-            # pdb.set_trace()
+            # pdb.set_trace()  # SOMETHING WRONG??
         else:
             A_0, A_1 = None, None
         for i in range(n_a):
@@ -2757,7 +2757,7 @@ class ConvergeF_setup(ConvergeE_setup):
         if n_a > 1:
             A_0 = np.logical_and(A_i[0], A_i[1]).astype(DTY_FLT)
             A_1 = np.logical_or(A_i[0], A_i[1]).astype(DTY_FLT)
-            # pdb.set_trace()
+            # pdb.set_trace()  # SOMETHING WRONG?
         else:
             A_0, A_1 = None, None
         for i in range(n_a):
@@ -2992,6 +2992,23 @@ class ConvergeF2_with(ConvergeE2_with, ConvergeF_setup):
     def prepare_trial(self):
         csv_row_1 = unique_column(11 + 1 + 374 * 2)
 
+        sub_pt1, sub_pt2, sub_pt3, sub_pt4 = self.trial_prep_pt4()
+        csv_row_4c = ['classifier', 'T(learning)'] + (
+            sub_pt1 + sub_pt2 + sub_pt3 * 4 + sub_pt4) * 2
+        del sub_pt1, sub_pt2, sub_pt3, sub_pt4
+
+        sub_r3c_c, sub_r3c_d, sub_r3c_ab = self.trial_prep_pt3()
+        csv_row_3c = ['', ''] + (sub_r3c_ab + sub_r3c_c + sub_r3c_d) * 2
+        del sub_r3c_c, sub_r3c_d, sub_r3c_ab  # 65+196+113 =374
+        sub_r2c_ab, sub_r2c_c, sub_r2c_d = self.trial_prep_pt2()
+        csv_row_2c = ['Ensem', ''] + ['Training set: performance'] + (
+            sub_r2c_ab + sub_r2c_c + sub_r2c_d) + [
+            'Test set: performance'] + (sub_r2c_ab + sub_r2c_c + sub_r2c_d)
+        del sub_r2c_ab, sub_r2c_c, sub_r2c_d
+
+        return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
+
+    def trial_prep_pt4(self):
         sub_pt1 = self._metric_part1 * 3
         sub_pt2 = (['g1', 'g0'] * 3 + self._metric_part2) * 4  # +11*4
         sub_pt3_a = ['Ds', 'Ds_avg', 'Df', 'Df_avg',
@@ -3007,11 +3024,10 @@ class ConvergeF2_with(ConvergeE2_with, ConvergeF_setup):
             'T(Extend_multivar_mp /EffExact-StratVacant)',
             'T(EffExact-StratES)', 'T(EffExact-StratRA)',
             'T(comp.performance)']  # 21+44+49*4+113 =374 in total
-        csv_row_4c = ['classifier', 'T(learning)'] + (
-            sub_pt1 + sub_pt2 + sub_pt3 * 4 + sub_pt4) * 2
         del sub_pt3_a, sub_pt3_b, sub_pt3_c
-        del sub_pt1, sub_pt2, sub_pt3, sub_pt4
+        return sub_pt1, sub_pt2, sub_pt3, sub_pt4
 
+    def trial_prep_pt3(self):
         sub_r3c_ab = (['Normal'] + [''] * 6 + ['Adversarial'] + [
             ''] * 6 + [r'$\Delta$(performance)'] + [''] * 6) * 1 + ([
                 'Grp.intermediate'] + [''] * 5 + [
@@ -3033,9 +3049,9 @@ class ConvergeF2_with(ConvergeE2_with, ConvergeF_setup):
         sub_r3c_d += ['T(Direct_multivar)', 'T(EffExact.StratVacant)',
                       'T(EffExact .StratES)', 'T(EffExact .StratRA)'
                       ] + ['T(computing perf.)']  # +9*3*(3+1)+4 +1=112+1
-        csv_row_3c = ['', ''] + (sub_r3c_ab + sub_r3c_c + sub_r3c_d) * 2
-        del sub_r3c_c, sub_r3c_d, sub_r3c_ab  # 65+196+113 =374
+        return sub_r3c_c, sub_r3c_d, sub_r3c_ab
 
+    def trial_prep_pt2(self):
         sub_r2c_ab = [''] * 20 + ['fairness sa#1'] + [''] * 10 + [
             'fairness sa#2'] + [''] * 10 + ['Grp intersection'] + [
             ''] * 10 + ['Grp union'] + [''] * 10  # joint and|or
@@ -3043,11 +3059,122 @@ class ConvergeF2_with(ConvergeE2_with, ConvergeF_setup):
             'HFM intersection'] + [''] * 48 + ['HFM union'] + [''] * 48
         sub_r2c_d = ['HFM.ext w/converged'] + [''] * (9 * 3 * 4 - 1) + [
             'HFM.ext tim_elapsed', '', '', '', 'T(comp. performance)']
-        # sub_r2c =ab+c+d  # 21+22*2 +49*4+9*12+5 =374
+        # # sub_r2c =ab+c+d  # 21+22*2 +49*4+9*12+5 =374
+        return sub_r2c_ab, sub_r2c_c, sub_r2c_d
+
+
+class ConvergeF7_with(ConvergeF2_with):
+    def count_sing_part5(self, y, y_hat, g1m, pos_label):
+        # _, _, g1_Cm, g0_Cm = marginalised_pd_mat(
+        #     y, y_hat, pos_label, non_sa)
+        cmp_fair, ut_f = [], time.time()
+        tmp_1, ut1 = extGrp1_DP_sing(y, y_hat, g1m, pos_label)
+        tmp_2, ut2 = extGrp2_EO_sing(y, y_hat, g1m, pos_label)
+        tmp_3, ut3 = extGrp3_PQP_sing(y, y_hat, g1m, pos_label)
+        cmp_fair.extend(tmp_1[:2] + tmp_2[:2] + tmp_3[:2])
+        cmp_fair.extend(alterGrps_sing(tmp_1[-1], g1m)[0])
+        cmp_fair.extend(alterGrps_sing(tmp_2[-1], g1m)[0])
+        cmp_fair.extend(alterGrps_sing(tmp_3[-1], g1m)[0])
+        ut_f = time.time() - ut_f
+        cmp_fair.extend([ut1, ut2, ut3, ut_f])
+        return cmp_fair  # 6+6+4=16
+
+    def count_single_member(self, X, A, y, y_hat, y_qtb,
+                            g1m_indices, m1, m2, n_e,
+                            pos_label, jt, pool=None):
+        ut_c = time.time()
+        res_indi = []
+        ta_1 = self.count_sing_part1(y, y_hat, pos_label)
+        ta_2 = self.count_sing_part1(y, y_qtb, pos_label)
+        ta_3 = [abs(t1 - t2) for t1, t2 in zip(ta_1, ta_2)]
+        res_indi.extend(ta_1 + ta_1 + ta_3)  # tuple(ta_3))
+        del ta_1, ta_2, ta_3  # +7*3=21
+
+        far_2, far_3, far_5 = [], [], []
+        n_a = len(g1m_indices)
+        for i in range(n_a):
+            tmp = self.count_sing_part2(
+                y, y_hat, y_qtb, g1m_indices[i][0], pos_label)
+            far_2.extend(tmp)
+        if n_a == 1:
+            far_2.extend([''] * 11 * 3)
+        else:
+            far_2.extend(self.count_sing_part2(
+                y, y_hat, y_qtb, jt[0], pos_label))  # & jt
+            far_2.extend(self.count_sing_part2(
+                y, y_hat, y_qtb, jt[1], pos_label))  # | jt
+        ut_c = time.time() - ut_c
+
+        X_and_y = np.concatenate([
+            y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        X_and_y_hat = np.concatenate([
+            y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        A_i = [A[:, i].copy() == 1 for i in range(n_a)]
+        if n_a > 1:
+            A_0 = np.logical_and(A_i[0], A_i[1]).astype(DTY_FLT)
+            A_1 = np.logical_or(A_i[0], A_i[1].astype(DTY_FLT))
+        else:
+            A_0, A_1 = None, None
+        for i in range(n_a):
+            far_3.extend(self.count_sing_part3(
+                X_and_y, X_and_y_hat, g1m_indices[i][0],
+                A_i[i], m1, m2, n_e))
+        if n_a == 1:
+            far_3.extend([''] * 49 * 3)
+        else:
+            far_3.extend(self.count_sing_part3(
+                X_and_y, X_and_y_hat, jt[0], A_0, m1, m2, n_e))
+            far_3.extend(self.count_sing_part3(
+                X_and_y, X_and_y_hat, jt[1], A_1, m1, m2, n_e))
+        del A_0, A_1, A_i
+
+        for i in range(n_a):
+            far_5.extend(self.count_sing_part5(
+                y, y_hat, g1m_indices[i], pos_label))
+        if n_a == 1:
+            far_5.extend([''] * 16 * 3)
+        else:
+            far_5.extend(self.count_sing_part5(
+                y, y_hat, [jt[0], ~jt[0]], pos_label))
+            far_5.extend(self.count_sing_part5(
+                y, y_hat, [jt[1], ~jt[1]], pos_label))
+            # NB. this is not precise
+
+        far_4 = self.count_sing_part4(
+            X_and_y, X_and_y_hat, g1m_indices, A, m1, m2,
+            n_e, pool)
+        far_4.append(ut_c)  # total 65+(16*4)+49*4+113 =438
+        # return res_indi + far_2 + far_3 + far_5 + far_4
+        return res_indi + far_2 + far_5 + far_3 + far_4
+
+    def prepare_trial(self):
+        csv_row_1 = unique_column(11 + 1 + 438 * 2)
+
+        sub_pt1, sub_pt2, sub_pt3, sub_pt4 = self.trial_prep_pt4()
+        sub_pt5 = (['max', 'avg', ] * 3 * 2 + [
+            'T(extG1)', 'T(extG2)', 'T(extG3)',
+            'T(extGrp* total)']) * 4  # StatsParity
+        csv_row_4c = ['classifier', 'T(learning)'] + (
+            sub_pt1 + sub_pt2 + sub_pt5 + sub_pt3 * 4 + sub_pt4) * 2
+        del sub_pt1, sub_pt2, sub_pt5, sub_pt3, sub_pt4
+
+        sub_r3c_c, sub_r3c_d, sub_r3c_ab = self.trial_prep_pt3()
+        sub_r3c_f = (['extG1', '', 'extG2', '', 'extG3', '',
+                      'altG1', '', 'altG2', '', 'altG3', '',
+                      'Time cost', '', '', '']) * 4
+        csv_row_3c = ['', ''] + (sub_r3c_ab + sub_r3c_f +
+                                 sub_r3c_c + sub_r3c_d) * 2
+        del sub_r3c_c, sub_r3c_d, sub_r3c_ab, sub_r3c_f
+
+        sub_r2c_ab, sub_r2c_c, sub_r2c_d = self.trial_prep_pt2()
+        sub_r2c_f = ['StatsParity sa#1'] + [''] * 15 + [
+            'StatsParity sa#2'] + [''] * 15 + ['SP.ext joint&'] + [
+            ''] * 15 + ['SP.ext joint|'] + [''] * 15
         csv_row_2c = ['Ensem', ''] + ['Training set: performance'] + (
-            sub_r2c_ab + sub_r2c_c + sub_r2c_d) + [
-            'Test set: performance'] + (sub_r2c_ab + sub_r2c_c + sub_r2c_d)
-        del sub_r2c_ab, sub_r2c_c, sub_r2c_d
+            sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d) + [
+            'Test set: performance'] + (
+                sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d)
+        del sub_r2c_ab, sub_r2c_c, sub_r2c_d, sub_r2c_f
 
         return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
 
@@ -3055,5 +3182,6 @@ class ConvergeF2_with(ConvergeE2_with, ConvergeF_setup):
 # -------------------------------------
 
 # -------------------------------------
+# --------
 # --------
 # --------

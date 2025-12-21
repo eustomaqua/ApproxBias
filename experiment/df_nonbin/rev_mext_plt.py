@@ -67,7 +67,7 @@ class GraphSetup(GraphSetupVer2):  # REVISION S
 #   rexp1a: multivar (incl. nonbin x n_a) 对比结果
 #   rexp1b: nonbin ~singularly~ 单独计算
 #   rexp1c: bin 单独计算，把 multi-val 当成 bi-val 计算
-# rexp2: 齐琪，考虑 embedding +y_hat 计算 df
+# rexp2: qiqi，考虑 embedding +y_hat 计算 df
 #   rexp2a: 不是交叉验证
 #   rexp2b: 交叉验证，用BaseNet,
 #   rexp2c: 交叉验证，用BaseNet, 比 rexp2b 信息更多
@@ -1538,6 +1538,226 @@ class RevP_XF_statsParity(RevP_XE_statsParity):
 
 
 # ------------------------------
+# ------------------------------
+
+
+# ------------------------------
+# convergence
+# rexp4|5: two strategies
+#   rexp4 only includes the early-stopping strategy
+#   rexp5 also includes the rearrangment strategy
+# rexp*b: cross-validation, several learning algorithms
+
+
+class ConvPlotE_init(GraphSetup):
+    # refer to RevPlotZ
+
+    def sub_plt_tim(self, df_tmp, tag_col, suff, rmk='multivar',
+                    omitted=True):
+        tag_tim = tag_col[: 5]
+        scat_X = df_tmp[tag_tim[2]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag_tim[1]].values.astype(DTY_FLT),
+                  df_tmp[tag_tim[3]].values.astype(DTY_FLT),
+                  df_tmp[tag_tim[4]].values.astype(DTY_FLT)]
+
+        if rmk == 'multivar':
+            ant_X = r'T_{\mathbf{D}_{\mathbf{a}}(S)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{\mathbf{a}}(S)}'
+            ant_app = r'T_{ExtendDist}'
+            ant_cvg = r'T_{ExactDist (StratES)}'  # .(StratES)
+            ant_arr = r'T_{ExactDist (StratRA)}'  # .(StratRA)
+        elif rmk == 'sen-att':
+            ant_X = r'T_{\mathbf{D}_a(S,a_i)}'        # {\mathbf{a}}
+            ant_Y = r'T_{\hat{\mathbf{D}}_a(S,a_i)}'  # {\mathbf{a}}
+            ant_app = r'T_{ApproxDist}'
+            ant_cvg = r'T_{StratES}'
+            ant_arr = r'T_{StratRA}'
+        ant_eff = r'T_{EarlyBreak}'
+        annotY = ['${}$'.format(ant_eff), '${}$'.format(ant_app),
+                  '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(ant_Y),
+                 '${} = {}$'.format(ant_Y, ant_X)]
+
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, suff, snspec='sty4')
+        if not omitted:
+            multi_lin_reg_without_distr(
+                df_tmp[tag_tim[0]].values.astype(DTY_FLT),
+                scat_Y, annotY, annot, suff + '_alt', snspec='sty4')
+        return
+
+    def sub_plt_val(self, df_tmp, tag_col, suff, rmk='multivar',
+                    omitted=True):
+        tag_max = tag_col[5: 5 + 5]
+        tag_avg = tag_col[5 + 5: 5 + 5 + 3]
+        scat_X = df_tmp[tag_max[2]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag_max[1]].values.astype(DTY_FLT),
+                  df_tmp[tag_max[3]].values.astype(DTY_FLT),
+                  df_tmp[tag_max[4]].values.astype(DTY_FLT)]
+
+        if rmk == 'multivar':
+            ant_X = r'\mathbf{D}_{\mathbf{a}}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}(S)'
+            ant_app = 'ExtendDist'
+            ant_cvg = 'ExactDist (StratES)'
+            ant_arr = 'ExactDist (StratRA)'
+        elif rmk == 'sen-att':
+            ant_X = r'\mathbf{D}_a(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_a(S,a_i)'
+            ant_app = 'ApproxDist'
+            ant_cvg = 'StratES'
+            ant_arr = 'StratRA'
+        ant_eff = 'EarlyBreak'
+        annotY = ['${}$'.format(ant_eff), '${}$'.format(ant_app),
+                  '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$'.format(ant_X), '${}$'.format(ant_Y),
+                 '${} = {}$'.format(ant_Y, ant_X)]
+
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, suff, snspec='sty3b')
+        if not omitted:
+            multi_lin_reg_without_distr(
+                df_tmp[tag_max[0]].values.astype(DTY_FLT),
+                scat_Y, annotY, annot, suff + '_alt',
+                snspec='sty3a')  # 'sty6'?
+        return
+
+    def obtain_binval_senatt(self, dframe, id_set,
+                             tag, tag_s1, tag_s2, dr_ptb=''):
+        columns = {t2: t1 for t1, t2 in zip(tag_s1, tag_s2)}
+        df_raw = dframe.iloc[id_set[1] + 1: id_set[2]][tag + tag_s1]
+        if dr_ptb:
+            df_raw[dr_ptb] = dframe.iloc[id_set[1]][dr_ptb]
+        for k in [1, 2]:
+            df_tmp = dframe.iloc[id_set[
+                k] + 1: id_set[k + 1]][tag + tag_s2]
+            df_tmp = df_tmp.rename(columns=columns)
+            if dr_ptb:
+                df_tmp[dr_ptb] = dframe.iloc[id_set[k]][dr_ptb]
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        for k in [3, 4]:
+            df_tmp = dframe.iloc[id_set[
+                k] + 1: id_set[k + 1]][tag + tag_s1]
+            if dr_ptb:
+                df_tmp[dr_ptb] = dframe.iloc[id_set[k]][dr_ptb]
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        return df_raw
+
+    def obtain_multival_senatt(self, dframe, id_set,
+                               tag, tag_s1, tag_s2, dr_ptb='',
+                               first_incl=False):
+        columns = {t2: t1 for t1, t2 in zip(tag_s1, tag_s2)}
+        df_raw = dframe.iloc[id_set[2] + 1: id_set[3]][tag + tag_s1]
+        if dr_ptb:
+            df_raw[dr_ptb] = dframe.iloc[id_set[2]][dr_ptb]
+        for k in [3, 4]:
+            df_tmp = dframe.iloc[id_set[k] + 1: id_set[
+                k + 1]][tag + tag_s2]
+            df_tmp = df_tmp.rename(columns=columns)
+            if dr_ptb:
+                df_tmp[dr_ptb] = dframe.iloc[id_set[k]][dr_ptb]
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        if not first_incl:
+            return df_raw
+        df_tmp = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_s1]
+        if dr_ptb:
+            df_tmp[dr_ptb] = dframe.iloc[id_set[0]][dr_ptb]
+        df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        return df_raw
+
+
+class ConvFig_4E_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
+        csv_row_1 = unique_column(10 + 39)
+        df_raw = self.sub_dat_multivar(
+            raw_dframe, nb_set, id_set, csv_row_1[10:])
+
+        tag_multivar = csv_row_1[10: 10 + 13]
+        df_tmp = df_raw[tag_multivar]
+        tag_sa1 = csv_row_1[23: 23 + 13]
+        tag_sa2 = csv_row_1[23 + 13: 23 + 13 * 2]
+        df_tmp = self.sub_dat_sen_att(df_raw, tag_sa1, tag_sa2)
+        suff, rmk = f'rexp8e_{pre}_whole_tim', 'sen-att'
+        self.sub_plt_tim(df_tmp, tag_sa1, suff, rmk)
+        self.sub_plt_val(df_tmp, tag_sa1, suff.replace('tim', 'val'), rmk)
+
+        # suff = 'rexp8e_{}_adult_tim'.format(pre)
+        # df_tmp = self.sub_dat_sing_set(
+        #     raw_dframe, id_set, 3, tag_multivar, tag_sa1, tag_sa2)
+        # self.sub_plt_tim(df_tmp[1], tag_sa1, suff, 'sen-att')
+        # self.sub_plt_val(df_tmp[1], tag_sa1, suff.replace(
+        #     'tim', 'val'), 'sen-att')
+
+        suff = suff.replace('whole', 'multivar')
+        self.sub_plt_tim(df_raw, tag_multivar, suff)
+        self.sub_plt_val(df_raw, tag_multivar, suff.replace('tim', 'val'))
+        '''
+        df_tmp = self.obtain_binval_senatt(
+            raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2)
+        self.sub_plt_tim(df_tmp, tag_sa1, suff, 'sen-att')
+        self.sub_plt_val(df_tmp, tag_sa1, suff.replace(
+            'tim', 'val'), 'sen-att')
+        df_tmp = self.obtain_multival_senatt(
+            raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2,
+            first_incl=True)
+        self.sub_plt_tim(df_tmp, tag_sa1, suff)
+        self.sub_plt_val(df_tmp, tag_sa1, suff.replace('tim', 'val'))
+        # df_tmp = self.obtain_multival_senatt(raw_dframe, )
+        '''
+        # pdb.set_trace()
+        return
+
+
+# class ConvFig_4C_exact(ConvPlotE_init):
+#     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+#         nb_set, id_set, _, _, _ = self.recap_sub_data(
+#             raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
+#         csv_row_1 = unique_column(10 + 28 * 2)  # 34*2)
+#         df_raw = self.sub_dat_multivar(raw_dframe, nb_set, id_set, csv_row_1[10:])
+#         pdb.set_trace()
+#         return
+
+
+# class ConvFig_4D_exact(ConvPlotE_init):
+#     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+#         pass
+
+
+class ConvFig_4B_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pass
+
+
+# class ConvP_5C_exact(ConvPlotE_init):
+#     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+#         pass
+
+
+class ConvFig_5C_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
+        csv_row_1 = unique_column(10 + 34 * 2)  # 28*2)
+        df_raw = self.sub_dat_multivar(raw_dframe, nb_set, id_set, csv_row_1[10:])
+        pdb.set_trace()
+        return
+
+
+class ConvFig_5D_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pass
+
+
+class ConvFig_5E_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pass
+
+
+class ConvFig_5B_exact(ConvPlotE_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pass
 
 
 # ------------------------------

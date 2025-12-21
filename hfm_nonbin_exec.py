@@ -197,8 +197,10 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp2c -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
 
-python hfm_nonbin_exec.py -rev -exp mCV_rexp4b -dat * -nk 2 --nb-cls 3 -rep
-python hfm_nonbin_exec.py -rev -exp mCV_rexp4c|d|e -dat * -nk 2 --nb-cls 3
-python hfm_nonbin_exec.py -rev -exp mCV_rexp5b -dat * -nk 2 --nb-cls 3 -rep
-python hfm_nonbin_exec.py -rev -exp mCV_rexp5c|d|e -dat * -nk 2 --nb-cls 3
+python hfm_nonbin_exec.py -rev -exp mCV_rexp8b -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp8c|d|e -dat * -nk 2 --nb-cls 3
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9b -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9c|d|e -dat * -nk 2 --nb-cls 3
+# rexp4,rexp5 --> rexp8,rexp9
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9f -dat * -nk 2 --nb-cls 3 -rep
 """

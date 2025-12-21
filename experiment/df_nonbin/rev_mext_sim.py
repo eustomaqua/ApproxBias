@@ -32,7 +32,8 @@ from experiment.df_nonbin.rev_mext_exp_mp import (
     RevCompXE_ensemble, RevCompXF_learner)
 from experiment.df_nonbin.rev_mext_exp_mp import (
     ConvergeE2_with, ConvergeE3_with, ConvergeE4_with, ConvergeE5_with,
-    ConvergeF2_with, ConvergeF3_with, ConvergeF4_with, ConvergeF5_with)
+    ConvergeF2_with, ConvergeF3_with, ConvergeF4_with, ConvergeF5_with,
+    ConvergeF7_with)
 import pdb
 
 
@@ -187,12 +188,14 @@ class Rev_ManfExtEmpir(DataSetup):
             # cr2c = csv_row_2a[:-1] + ['abbr_cls', 'k?']
             cr3c = [''] * 11 + cr3c
             cr4c = [''] * 9 + [self._prep, ''] + cr4c
-        elif self._trial_type[-6: -1] in ('rexp5b', 'rexp4b',):
+        elif self._trial_type[-6: -1] in (
+                'rexp9b', 'rexp8b', 'rexp9f'):  # 'rexp5b', 'rexp4b',
             cr2c = csv_row_2a + ['abbr_cls'] + cr2c
             cr3c = [''] * 11 + cr3c
             cr4c = ['', '', '', self._prep] + [''] * 7 + cr4c
 
-        elif self._trial_type[-6: -1] in ('rexp4', 'rexp5',):
+        elif self._trial_type[-6: -1] in (
+                'rexp8', 'rexp9',):  # 'rexp4', 'rexp5',
             cr2c = csv_row_2a + cr2c
             cr3c = [''] * 10 + cr3c
             # cr4c = [''] * 9 + [self._prep] + cr4c
@@ -248,11 +251,15 @@ class Rev_ManfExtEmpir(DataSetup):
                         csv_w.writerow([''] * 9 + [k, ''] + res_data[k][i * 4 + j + 3])
             # pass
 
-        elif self._trial_type[-6:] in ('rexp4c', 'rexp4d', 'rexp4e',
-                                       'rexp5c', 'rexp5d', 'rexp5e'):
+        elif self._trial_type[-6:] in (
+            # 'rexp4c', 'rexp4d', 'rexp4e',
+            # 'rexp5c', 'rexp5d', 'rexp5e',
+                'rexp8c', 'rexp8d', 'rexp8e',
+                'rexp9c', 'rexp9d', 'rexp9e'):
             for k in range(nk):
                 csv_w.writerow([''] * 9 + [k] + res_data[k])
-        elif self._trial_type[-6:] in ('rexp4b', 'rexp5b',):
+        elif self._trial_type[-6:] in (
+                'rexp8b', 'rexp9b', 'rexp9f'):  # 'rexp4b','rexp5b',
             for j, jk in enumerate(self._iterator.learners_inside):
                 csv_w.writerow([''] * 9 + [0, jk] + res_data[0][j])
                 for k in range(1, nk):
@@ -423,30 +430,33 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
         elif trial_type.endswith('rexp3f'):
             self._iterator = RevCompXF_learner(abbr_cls='')
 
-        elif trial_type.endswith('rexp4b'):
+        elif trial_type.endswith('rexp8b'):  # 'rexp4b'):
             self._iterator = ConvergeE2_with(  # nb_cls=7,
                 nb_cls, self.saIndex, self.saValue, n_e
             )  # , omitted=self._omit)
-        elif trial_type.endswith('rexp4c'):
+        elif trial_type.endswith('rexp8c'):  # 'rexp4c'):
             self._iterator = ConvergeE3_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
-        elif trial_type.endswith('rexp4d'):
+        elif trial_type.endswith('rexp8d'):  # 'rexp4d'):
             self._iterator = ConvergeE4_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
-        elif trial_type.endswith('rexp4e'):
+        elif trial_type.endswith('rexp8e'):  # 'rexp4e'):
             self._iterator = ConvergeE5_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
-        elif trial_type.endswith('rexp5b'):
+        elif trial_type.endswith('rexp9b'):  # 'rexp5b'):
             self._iterator = ConvergeF2_with(  # nb_cls=7,
                 nb_cls, self.saIndex, self.saValue, n_e
             )  # , omitted=self._omit)
-        elif trial_type.endswith('rexp5c'):
+        elif trial_type.endswith('rexp9f'):
+            self._iterator = ConvergeF7_with(
+                nb_cls, self.saIndex, self.saValue, n_e)
+        elif trial_type.endswith('rexp9c'):  # 'rexp5c'):
             self._iterator = ConvergeF3_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
-        elif trial_type.endswith('rexp5d'):
+        elif trial_type.endswith('rexp9d'):  # 'rexp5d'):
             self._iterator = ConvergeF4_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
-        elif trial_type.endswith('rexp5e'):
+        elif trial_type.endswith('rexp9e'):  # 'rexp5e'):
             self._iterator = ConvergeF5_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
         # rexp4b: refer to expt4b
@@ -456,7 +466,8 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
         formatted = '_'.join([
             trial_type, nk, prep.replace('_', ''), self._log_document,
             'r{}'.format(int(self._ratio * 100)), 'pms', ])
-        if trial_type.endswith('rexp4b') or trial_type.endswith('rexp5b'):
+        # if trial_type.endswith('rexp4b') or .endswith('rexp5b'):
+        if trial_type[-6:] in ('rexp8b', 'rexp9b', 'rexp9f'):
             # formatted = formatted[:-3] + '_'.join([
             #     '', f'cls{nb_cls}', 'pms', ])
             formatted += f'_cf{nb_cls}'  # f'_cls{nb_cls}'
@@ -610,7 +621,8 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             # kw = {} if not self._trial_type.endswith(
             #     'rexp4b') else {'jt_trn': jt_trn, 'jt_tst': jt_tst}
             kw = {}
-            if self._trial_type[-6:] in ('rexp4b', 'rexp5b'):
+            if self._trial_type[-6:] in (
+                    'rexp8b', 'rexp9b', 'rexp9f'):  # 'rexp4b','rexp5b',
                 # kw = {'jt_trn': jt_trn, 'jt_tst': jt_tst}
                 kw['jt_trn'] = jt_trn
                 kw['jt_tst'] = jt_tst
@@ -657,8 +669,11 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                 # self._m1, self._m2, self._n_e, positive_label)
                 self._m1, self._m2, self._n_e, pool, positive_label, **pms)
 
-        elif ('rexp4b' in self._trial_type) or (
-                'rexp5b' in self._trial_type):
+        elif self._trial_type[-6:] in ('rexp8b', 'rexp9b', 'rexp9f'):
+            # elif ('rexp4b' in self._trial_type) or (
+            #     'rexp5b' in self._trial_type) or (
+            #     'rexp8b' in self._trial_type) or (
+            #     'rexp9b' in self._trial_type):
             # pms = {}  # pdb.set_trace()
             res_iter = self._iterator.schedule_content(
                 X_trn, A_trn, y_trn, X_wA_trn, X_wAq_trn, g1m_trn,
@@ -688,12 +703,15 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                 X, A, y, X_wA, X_wAq,
                 g1m_indices, self._m1, self._m2, self._n_e, pool)
 
-        elif self._trial_type[-6:] in ('rexp4c', 'rexp4d',  # 'rexp4e',
-                                       'rexp5c', 'rexp5d',):
+        elif self._trial_type[-6:] in ('rexp8c', 'rexp8d',
+                                       'rexp9c', 'rexp9d',):
+            # elif [-6:] in ('rexp4c', 'rexp4d',  # 'rexp4e',
+            #                            'rexp5c', 'rexp5d',):
             res_iter = self._iterator.schedule_content(
                 X, A, y, g1m_indices,           # X_wA,
                 self._m1, self._m2, self._n_e)  # , pool)
-        elif self._trial_type[-6:] in ('rexp4e', 'rexp5e',):
+        elif self._trial_type[-6:] in (
+                'rexp8e', 'rexp9e',):  # 'rexp4e', 'rexp5e',
             # kw = {'pool': pool} / {}  # ,**kw)
             res_iter = self._iterator.schedule_content(
                 X, A, y, g1m_indices,

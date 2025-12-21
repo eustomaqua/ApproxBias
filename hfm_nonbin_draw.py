@@ -24,6 +24,12 @@ from experiment.df_nonbin.rev_mext_plt import (
     RevP_XC_statsParity, RevP_XD_statsParity,
     RevP_XE_statsParity, RevP_XF_statsParity)
 
+from experiment.df_nonbin.rev_mext_plt import (
+    ConvFig_5C_exact, ConvFig_5D_exact, ConvFig_5E_exact,
+    ConvFig_5B_exact, ConvFig_4B_exact,
+    # ConvFig_4C_exact, ConvFig_4D_exact, ConvFig_4E_exact)
+    ConvFig_4E_exact)
+
 
 # ===============================
 # Empirical results
@@ -238,6 +244,48 @@ class Rev_ManfExtDrawing(object):
             self.drawing_whole_rexp2(trial_type, prefix, figname, pms)
         elif trial_type[-6: -1] == 'rexp3':
             self.drawing_whole_rexp3(trial_type, prefix, figname, pms)
+
+        elif trial_type[-6: -1] == 'rexp9':  # 'rexp5':
+            self.drawing_whole_expr5(trial_type, prefix, figname, pms)
+        elif trial_type[-6: -1] == 'rexp8':  # 'rexp4':
+            self.drawing_whole_expr4(trial_type, prefix, figname, pms)
+        return
+
+    def drawing_whole_expr5(self, trial_type, prefix, figname, pms):
+        # trial = if trial_type.endswith('5b') else trial_type[:-1]
+        pre = self._prep.replace('_', '')
+        xlsx_name = '{}_nk{}_r{}_pms'.format(  # '5b'
+            trial_type if trial_type.endswith('9b') else trial_type[
+                :-1], self._nb_iter, int(self._ratio * 100))
+        if trial_type.endswith('9b'):  # '5b'):
+            xlsx_name += '_cf{}_rep'.format(self._nb_cls)
+        sheet_name = '{}_{}'.format(trial_type[-5:], pre)
+        sheet_name = sheet_name.replace('exp9', 'exp5')
+        # sheet_name = sheet_name.replace('exp8', 'exp4')
+
+        if trial_type.endswith('rexp9c'):  # 'rexp5c'):
+            # self._iterator = ConvP_5C_exact(figname, **pms)
+            self._iterator = ConvFig_5C_exact(figname, **pms)
+        df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        self._iterator.schedule_mspaint(df, pre)
+        return
+
+    def drawing_whole_expr4(self, trial_type, prefix, figname, pms):
+        pre = self._prep.replace('_', '')
+        xlsx_name = '{}_nk{}_r{}_pms'.format(  # '4b'
+            trial_type if trial_type.endswith('8b') else trial_type[
+                :-1], self._nb_iter, int(self._ratio * 100))
+        if trial_type.endswith('8b'):  # '4b'):
+            xlsx_name += '_cf{}_rep'.format(self._nb_cls)
+        sheet_name = '{}_{}'.format(trial_type[-5:], pre)
+        sheet_name = sheet_name.replace('exp8', 'exp4')
+
+        if trial_type.endswith('rexp8e'):
+            self._iterator = ConvFig_4E_exact(figname, **pms)
+        # elif trial_type.endswith('rexp8c'):  # 'rexp4c'):
+        #     self._iterator = ConvFig_4C_exact(figname, **pms)
+        df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        self._iterator.schedule_mspaint(df, pre)
         return
 
     def drawing_whole_rexp3(self, trial_type, prefix, figname, pms):
@@ -459,4 +507,6 @@ python hfm_nonbin_draw.py -exp mCV_expt4b -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp1b -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp2c -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
+
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9* -pre min_max
 """
