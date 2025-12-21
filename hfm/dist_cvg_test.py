@@ -207,5 +207,19 @@ def test_strategy():
     assert check_equal(cmp_3[0], res_2[0])
     assert check_equal(cmp_3[0], res_1[0])
 
+    # from hfm.dist_est_nonbin import AcceleCore
+    # from hfm.dist_est_nonbin import orthogonal_weight
+    # from hfm.dist_cvg_nonbin import (
+    #     # StratRearrange_ver1, StratRearrange_ver2,
+    #     StratRearrange_ver3, StratRearrange_ver4)
+    # W, _ = orthogonal_weight(nd + 1, n_e)
+    # T_min = AcceleCore(X_nA_y, Ap, m2, W[0])
+    # T_alt = AcceleCore(X_nA_y, Ap, m2, W[1])
+    # T_v1 = StratRearrange_ver1(X_nA_y, Ap, m1, m2, n_e)
+    # T_v2 = StratRearrange_ver2(X_nA_y, Ap, m1, m2, n_e)
+    # T_v3 = StratRearrange_ver3(X_nA_y, Ap, m1, m2, n_e)
+    # T_v4 = StratRearrange_ver4(X_nA_y, Ap, m1, m2, n_e)
+    assert check_equal(ans_2[0], res_3[0])
+    assert check_equal(cmp_2[0], res_2[0])
     # pdb.set_trace()
     return

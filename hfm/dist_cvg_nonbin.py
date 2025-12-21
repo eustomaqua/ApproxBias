@@ -15,7 +15,8 @@ from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean
 from hfm.dist_est_bin import projector
 from hfm.dist_est_nonbin import (
-    set_belonging, orthogonal_weight, AcceleCore)
+    set_belonging, orthogonal_weight, AcceleCore,
+    AcceleCoreBack)
 
 # https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-reflection-for-list-and-set-types
 from numba.typed import List
@@ -272,14 +273,15 @@ def StratVacant(X_nA_y, A_j, m1, m2, n_e=2):
     return min(d_max), min(d_avg) / float(n)
 
 
+'''
 @fantasy_timer
-def StratRearrange(X_nA_y, A_j, m1, m2, n_e=2):
+def StratRearrange_ver1(X_nA_y, A_j, m1, m2, n_e=2):
     n, n_d = X_nA_y.shape  # n_d-1 #non-sen-att
     d_max, d_avg = [], []
     for _ in range(m1):
         # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
         W, _ = orthogonal_weight(n_d, n_e)
-        tmp = [AcceleCore(
+        tmp = [AcceleCoreBack(
             X_nA_y, A_j, m2, W[k]) for k in range(n_e)]
         dt_min = []
         for i in range(n):
@@ -292,6 +294,67 @@ def StratRearrange(X_nA_y, A_j, m1, m2, n_e=2):
 # INCORRECT!
 
 
+@fantasy_timer
+def StratRearrange_ver2(X_nA_y, A_j, m1, m2, n_e=2):
+    n, n_d = X_nA_y.shape  # n_d-1 #non-sen-att
+
+    # dt_min = []  # d_max, d_avg = [], []
+    # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
+    W, _ = orthogonal_weight(n_d, n_e)
+    tmp = [AcceleCoreBack(X_nA_y, A_j, m2,
+                          W[k]) for k in range(n_e)]
+    tmp = list(zip(*tmp))
+    dt_min = [min(i) for i in tmp]
+
+    for _ in range(1, m1):
+        W, _ = orthogonal_weight(n_d, n_e)
+        tmp = [AcceleCoreBack(X_nA_y, A_j, m2, W[k]
+                              ) for k in range(n_e)]
+        tmp = list(zip(*tmp))
+        for i, tk in enumerate(tmp):
+            dt = min(tk)  # tmp[i])
+            if dt < dt_min[i]:
+                dt_min[i] = dt
+    return max(dt_min), sum(dt_min) / float(n)
+# INCORRECT!
+# StratRearrange = StratRearrange_ver2
+'''
+
+
+@fantasy_timer
+def StratRearrange_ver3(X_nA_y, A_j, m1, m2, n_e=2):
+    n, n_d = X_nA_y.shape  # n_d-1 #non-sen-att
+    dt_min = np.full(n, np.inf).tolist()
+    for _ in range(m1):
+        # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
+        W, _ = orthogonal_weight(n_d, n_e)
+        tmp = [AcceleCoreBack(X_nA_y, A_j, m2,
+                              W[k]) for k in range(n_e)]
+        tmp = list(zip(*tmp))
+        for i, tk in enumerate(tmp):
+            dt = min(tk)
+            if dt < dt_min[i]:
+                dt_min[i] = dt
+    return max(dt_min), sum(dt_min) / float(n)
+
+
+@fantasy_timer
+def StratRearrange_ver4(X_nA_y, A_j, m1, m2, n_e=2):
+    n, n_d = X_nA_y.shape  # n_d-1 #non-sen-att
+    dt_min = []
+    for _ in range(m1):
+        # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
+        W, _ = orthogonal_weight(n_d, n_e)
+        tmp = [AcceleCoreBack(X_nA_y, A_j, m2, W[k]
+                              ) for k in range(n_e)]
+        tmp = list(zip(*tmp))  # (n_e,n) --> (n,n_e)
+        dt_min.append([min(i) for i in tmp])
+    dt_min = list(zip(*dt_min))  # (m1,n) -> (n,m1)
+    dt_min = [min(i) for i in dt_min]
+    return max(dt_min), sum(dt_min) / float(n)
+
+
+StratRearrange = StratRearrange_ver4
 StratEarlyStop = ApproxDist_nonbin
 
 

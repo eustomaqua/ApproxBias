@@ -102,7 +102,9 @@ if args.revision:
         if trial_type.endswith('rexp3e'):
             kwargs['nb_cls'] = args.nb_cls
 
-    elif trial_type[-6:] in ('rexp4b', 'rexp4c', 'rexp4e',):
+    elif trial_type[-6:] in (
+        'rexp4b', 'rexp4c', 'rexp4e',
+            'rexp4d', 'rexp5b', 'rexp5c', 'rexp5d', 'rexp5e',):
         kwargs['nb_cls'] = args.nb_cls
 
     case = Rev_ManfExtPrime_Empir(trial_type, data_type, **kwargs)
@@ -197,4 +199,6 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
 
 python hfm_nonbin_exec.py -rev -exp mCV_rexp4b -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp4c|d|e -dat * -nk 2 --nb-cls 3
+python hfm_nonbin_exec.py -rev -exp mCV_rexp5b -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp5c|d|e -dat * -nk 2 --nb-cls 3
 """

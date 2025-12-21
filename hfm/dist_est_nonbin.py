@@ -143,6 +143,23 @@ def AcceleCore(X_nA_y, A_j, m2, vec_w):
     return d_min  # 4convergence
 
 
+def AcceleCoreBack(X_nA_y, A_j, m2, vec_w):
+    proj = [projector(ele, vec_w) for ele in X_nA_y]
+    idx_y_fx = np.argsort(proj)
+    n = X_nA_y.shape[0]
+    dt_min = np.full(n, np.inf, dtype='float').tolist()
+    for pos in range(n):
+        i = idx_y_fx[pos]  # original/initial sample id
+        # before pos<>i # dt_min[pos] = d_min[i]
+
+        min_js = sub_accelerator_smaler(
+            X_nA_y, A_j, idx_y_fx, pos, m2)
+        min_jr = sub_accelerator_larger(
+            X_nA_y, A_j, idx_y_fx, pos, m2)
+        dt_min[i] = min(min_js, min_jr)  # pos
+    return dt_min   # 4convergence
+
+
 # ------------------------------------------
 # Algorithm 2. ApproxDist
 
