@@ -6,7 +6,8 @@ import pandas as pd
 import numpy as np
 
 from pyfair.granite.draw_addtl import (
-    multi_lin_reg_without_distr, lineplot_with_uncertainty)
+    multi_lin_reg_without_distr, lineplot_with_uncertainty,
+    single_line_reg_with_distr)
 from pyfair.granite.draw_graph import scatter_id_chart
 from pyfair.granite.draw_chart import analogous_confusion_extended
 from experiment.utils_empirical import GraphSetupVer2
@@ -1733,34 +1734,254 @@ class ConvFig_4B_exact(ConvPlotE_init):
 # class ConvP_5C_exact(ConvPlotE_init):
 #     def schedule_mspaint(self, raw_dframe, pre='minmax'):
 #         pass
+class ConvPlotF_init(ConvPlotE_init):
+    def sub_plt_tim(self, df_tmp, tag_col, suff, rmk='multivar',
+                    omitted=True):
+        tag_tim = tag_col[: 6]
+        scat_X = df_tmp[tag_tim[2]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag_tim[1]].values.astype(DTY_FLT),
+                  df_tmp[tag_tim[3]].values.astype(DTY_FLT),
+                  df_tmp[tag_tim[4]].values.astype(DTY_FLT),
+                  df_tmp[tag_tim[5]].values.astype(DTY_FLT),
+                  ]  # df_tmp[tag_tim[1]].values.astype(DTY_FLT)]
+
+        if rmk == 'multivar':
+            ant_X = r'T_{\mathbf{D}_{\mathbf{a}}(S)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{\mathbf{a}}(S)}'
+            ant_app = r'T_{ExtendDist}'
+            ant_cvg = r'T_{ExactDist (StratES)}'
+            ant_arr = r'T_{ExactDist (StratRA)}'
+            # ant_Z1 = r'\frac{ T_{\hat{\mathbf{D}}_{\mathbf{a}}(S)} }{ T_{\mathbf{D}_{\mathbf{a}}(S)} }-1'
+            ant_Z2 = r'\lg(\frac{ T_{\hat{\mathbf{D}}_{\mathbf{a}}(S)} }{ T_{\mathbf{D}_{\mathbf{a}}(S)} })'
+        elif rmk == 'sen-att':
+            ant_X = r'T_{\mathbf{D}_a(S,a_i)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_a(S,a_i)}'
+            ant_app = r'T_{ApproxDist}'
+            ant_cvg = r'T_{StratES}'
+            ant_arr = r'T_{StratRA}'
+            # ant_Z1 = r'\frac{ \hat{\mathbf{D}}_a(S,a_i) }{ \mathbf{D}_a(S,a_i) }-1'
+            ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_a(S,a_i) }{ \mathbf{D}_a(S,a_i) })'
+        ant_eff = r'T_{EarlyBreak}'
+        annotY = [
+            '${}$'.format(ant_eff), '${}$'.format(ant_app),
+            '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$ (sec)'.format(ant_X),
+                 '${}$ (sec)'.format(ant_Y),
+                 '${} = {}$'.format(ant_Y, ant_X)]
+
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, suff, snspec='sty4')
+        if not omitted:
+            multi_lin_reg_without_distr(
+                df_tmp[tag_tim[0]].values.astype(DTY_FLT),
+                scat_Y, annotY, annot, suff + '_alt', snspec='sty4')
+
+        # scat_Z = [k / scat_X - 1 for k in scat_Y]
+        # annot[1] = '${}$'.format(ant_Z1)
+        kws = {'snspec': 'sty6'}  # 'linreg': True,
+        # # single_line_reg_with_distr(
+        # multi_lin_reg_without_distr(
+        #     scat_X, scat_Z, annotY, annot, suff + '_s6a', **kws)
+        scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z2)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, suff + '_s6b', **kws)
+        return
+
+    def sub_plt_val(self, df_tmp, tag_col, suff, rmk='multivar',
+                    omitted=True):
+        tag_max = tag_col[6: 6 + 6]
+        scat_X = df_tmp[tag_max[2]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag_max[1]].values.astype(DTY_FLT),
+                  df_tmp[tag_max[3]].values.astype(DTY_FLT),
+                  df_tmp[tag_max[4]].values.astype(DTY_FLT),
+                  df_tmp[tag_max[5]].values.astype(DTY_FLT)]
+
+        if rmk == 'multivar':
+            ant_X = r'\mathbf{D}_{\mathbf{a}}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}(S)'
+            ant_app = 'ExtendDist'
+            ant_cvg = 'ExactDist (StratES)'
+            ant_arr = 'ExactDist (StratRA)'
+            ant_Z1 = r'\frac{ \hat{\mathbf{D}}_{\mathbf{a}}(S) }{ \mathbf{D}_{\mathbf{a}}(S) }-1'
+            # ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_{\mathbf{a}}(S) }{ \mathbf{D}_{\mathbf{a}}(S) })'
+        elif rmk == 'sen-att':
+            ant_X = r'\mathbf{D}_a(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_a(S,a_i)'
+            ant_app = 'ApproxDist'
+            ant_cvg = 'StratES'
+            ant_arr = 'StratRA'
+            ant_Z1 = r'\frac{ \hat{\mathbf{D}}_a(S,a_i) }{ \mathbf{D}_a(S,a_i) }-1'
+            # ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_a(S,a_i) }{ \mathbf{D}_a(S,a_i) })'
+        ant_eff = 'EarlyBreak'
+        annotY = [
+            '${}$'.format(ant_eff), '${}$'.format(ant_app),
+            '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$'.format(ant_X), '${}$'.format(ant_Y),
+                 '${} = {}$'.format(ant_Y, ant_X)]
+
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, suff, snspec='sty3b')
+        if not omitted:
+            multi_lin_reg_without_distr(
+                df_tmp[tag_max[0]].values.astype(DTY_FLT),
+                scat_Y, annotY, annot, suff + '_alt',
+                snspec='sty3a')  # 'sty6'?
+
+        kws = {'snspec': 'sty6'}
+        scat_Z = [k / scat_X - 1 for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z1)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, suff + '_s6a', **kws)
+        # scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        # annot[1] = '${}$'.format(ant_Z2)
+        # multi_lin_reg_without_distr(
+        #     scat_X, scat_Z, annotY, annot, suff + '_s6b', **kws)
+        return
+
+    def sub_plt_avg(self, df_tmp, tag_col, suff, rmk='multivar'):
+        tag_avg = tag_col[6 + 6: 6 + 6 + 4]
+        scat_X = df_tmp[tag_avg[0]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag_avg[1]].values.astype(DTY_FLT),
+                  df_tmp[tag_avg[2]].values.astype(DTY_FLT),
+                  df_tmp[tag_avg[3]].values.astype(DTY_FLT)]
+
+        if rmk == 'multivar':
+            ant_X = r'\mathbf{D}_{\mathbf{a}}^\text{avg}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S)'
+            ant_app = 'ExtendDist'
+            ant_cvg = 'ExactDist (StratES)'
+            ant_arr = 'ExactDist (StratRA)'
+            ant_Z1 = r'\frac{ \hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S) }{ \mathbf{D}_{\mathbf{a}}^\text{avg}(S) }-1'
+            ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S) }{ \mathbf{D}_{\mathbf{a}}^\text{avg}(S) })'
+        elif rmk == 'sen-att':
+            ant_X = r'\mathbf{D}_a^\text{avg}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_a^\text{avg}(S,a_i)'
+            ant_app = 'ApproxDist'
+            ant_cvg = 'StratES'
+            ant_arr = 'StratRA'
+            ant_Z1 = r'\frac{ \hat{\mathbf{D}}_a^\text{avg}(S,a_i) }{ \mathbf{D}_a^\text{avg}(S,a_i) }-1'
+            ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_a^\text{avg}(S,a_i) }{ \mathbf{D}_a^\text{avg}(S,a_i) })'
+        annotY = ['${}$'.format(ant_app), '${}$'.format(ant_cvg),
+                  '${}$'.format(ant_arr)]
+        annot = ['${}$'.format(ant_X), '${}$'.format(ant_Y),
+                 '${} = {}$'.format(ant_Y, ant_X)]
+
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, suff, snspec='sty3b')
+        kws = {'snspec': 'sty6'}
+        scat_Z = [k / scat_X - 1 for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z1)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, suff + '_s6a', **kws)
+        # scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        # annot[1] = '${}$'.format(ant_Z2)
+        # multi_lin_reg_without_distr(
+        #     scat_X, scat_Z, annotY, annot, suff + '_s6b', **kws)
+        return
 
 
-class ConvFig_5C_exact(ConvPlotE_init):
+class ConvFig_5C_exact(ConvPlotF_init):  # E_init
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
         csv_row_1 = unique_column(10 + 34 * 2)  # 28*2)
         df_raw = self.sub_dat_multivar(raw_dframe, nb_set, id_set, csv_row_1[10:])
+        tag_sa1 = csv_row_1[10: 10 + 34]
+        tag_sa2 = csv_row_1[10 + 34:]
         pdb.set_trace()
         return
 
 
-class ConvFig_5D_exact(ConvPlotE_init):
+class ConvFig_5D_exact(ConvPlotF_init):  # E_init
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        pass
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
+        csv_row_1 = unique_column(10 + 41 * 2)
+        df_raw = self.sub_dat_multivar(raw_dframe, nb_set, id_set, csv_row_1[10:])
+        tag_sa1 = csv_row_1[10: 10 + 41]
+        tag_sa2 = csv_row_1[10 + 41:]
+        pdb.set_trace()
+        return
 
 
-class ConvFig_5E_exact(ConvPlotE_init):
+class ConvFig_5E_exact(ConvPlotF_init):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        pass
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=1, nc_sens=0)
+        csv_row_1 = unique_column(10 + 48)  # 34*2)  # 28*2)
+        df_raw = self.sub_dat_multivar(
+            raw_dframe, nb_set, id_set, csv_row_1[10:])
+
+        tag_multivar = csv_row_1[10: 10 + 16]
+        tag_sa1 = csv_row_1[26: 26 + 16]
+        tag_sa2 = csv_row_1[26 + 16: 26 + 16 * 2]
+        df_tmp = df_raw[tag_multivar]
+        df_tmp = self.sub_dat_sen_att(df_raw, tag_sa1, tag_sa2)
+        suff, rmk = f'rexp9e_{pre}_sing_tim', 'sen-att'
+        self.sub_plt_tim(df_tmp, tag_sa1, suff, rmk)
+        self.sub_plt_val(
+            df_tmp, tag_sa1, suff.replace('tim', 'val'), rmk)
+        self.sub_plt_avg(
+            df_tmp, tag_sa1, suff.replace('tim', 'avg'), rmk)
+        # suff = suff.replace('sing', 'sapl')
+        # self.sub_plt_tim(df_raw, tag_multivar, suff)
+        # self.sub_plt_val(df_raw, tag_multivar,
+        #                  suff.replace('tim', 'val'))
+        # self.sub_plt_avg(df_raw, tag_multivar,
+        #                  suff.replace('tim', 'avg'))
+
+        # df_tmp = self.obtain_binval_senatt(
+        #     raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2)
+        # suff = suff.replace('sapl', 'bin')
+        # self.sub_plt_tim(df_tmp, tag_sa1, suff, rmk)
+        # self.sub_plt_val(df_tmp, tag_sa1, suff.replace(
+        #     'tim', 'val'), rmk)
+        # suff = suff.replace('bin', 'mut')
+        # df_tmp = self.obtain_multival_senatt(
+        #     raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2,
+        #     first_incl=True)
+        # self.sub_plt_tim(df_tmp, tag_sa1, suff)
+        # self.sub_plt_val(df_tmp, tag_sa1, suff.replace('tim', 'val'))
+        # suff = suff.replace('mut', 'muf')
+        # df_tmp = self.obtain_multival_senatt(
+        #     raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2)
+        # self.sub_plt_tim(df_tmp, tag_sa1, suff)
+        # self.sub_plt_val(df_tmp, tag_sa1, suff.replace('tim', 'val'))
+        # pdb.set_trace()
+        return
 
 
-class ConvFig_5B_exact(ConvPlotE_init):
+class ConvFig_5B_exact(ConvPlotF_init):  # E_init
+    def prepare_graph(self):
+        csv_row_1 = unique_column(10 + 2 + 374 * 2)
+        tmp_norm, tmp_gf = 7, 11   # tmp_egf=0,tmp_if
+        tmp_hfm = 12 + 5 + 27 + 5  # hfm
+        tmp_hfm_ext = (9 + 18) * 4 + 5
+
+        pms = csv_row_1[: 11 + 1]  # params last: Ensem/ut
+        tag_trn = csv_row_1[12: 12 + 374]
+        tag_tst = csv_row_1[12 + 374:]
+        return pms, tag_trn, tag_tst
+
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        pass
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            raw_dframe, nb_row=4, nc_norm=3, nc_sens=4)
+
+        pdb.set_trace()
+        return
+
+
+class ConvFig_5F_exact(ConvPlotF_init):
+    def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pdb.set_trace()
+        return
 
 
 # ------------------------------
 
 
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp8e -pre min_max
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9f -pre min_max
 # ------------------------------

@@ -257,15 +257,20 @@ class Rev_ManfExtDrawing(object):
         xlsx_name = '{}_nk{}_r{}_pms'.format(  # '5b'
             trial_type if trial_type.endswith('9b') else trial_type[
                 :-1], self._nb_iter, int(self._ratio * 100))
-        if trial_type.endswith('9b'):  # '5b'):
+        if trial_type[-2:] in ('9b', '9f'):  # .endswith('9b','5b'):
             xlsx_name += '_cf{}_rep'.format(self._nb_cls)
         sheet_name = '{}_{}'.format(trial_type[-5:], pre)
-        sheet_name = sheet_name.replace('exp9', 'exp5')
+        if not trial_type.endswith('9f'):
+            sheet_name = sheet_name.replace('exp9', 'exp5')
         # sheet_name = sheet_name.replace('exp8', 'exp4')
 
         if trial_type.endswith('rexp9c'):  # 'rexp5c'):
             # self._iterator = ConvP_5C_exact(figname, **pms)
             self._iterator = ConvFig_5C_exact(figname, **pms)
+        elif trial_type.endswith('rexp9d'):
+            self._iterator = ConvFig_5D_exact(figname, **pms)
+        elif trial_type.endswith('rexp9e'):
+            self._iterator = ConvFig_5E_exact(figname, **pms)
         df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(df, pre)
         return
