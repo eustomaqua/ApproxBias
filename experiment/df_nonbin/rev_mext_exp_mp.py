@@ -1932,14 +1932,16 @@ class ConvergeE_setup:
         res_indi.append(imba_discriminant_power(sen, spe))
         return res_indi  # shape=(7,)
 
-    def count_sing_part2(self, y, y_hat, y_qtb, non_sa, pos_label):
+    def count_sing_part2(self, y, y_hat, y_qtb, non_sa, pos_label,
+                         verbose=True):
         _, _, g1_Cm, g0_Cm = marginalised_pd_mat(
             y, y_hat, pos_label, non_sa)
         cmp_fair = []
         tmp_1 = unpriv_group_one(g1_Cm, g0_Cm)
         tmp_2 = unpriv_group_two(g1_Cm, g0_Cm)
         tmp_3 = unpriv_group_thr(g1_Cm, g0_Cm)
-        cmp_fair.extend(tmp_1 + tmp_2 + tmp_3)
+        if verbose:
+            cmp_fair.extend(tmp_1 + tmp_2 + tmp_3)
 
         cmp_fair.append(abs(tmp_1[0] - tmp_1[1]))
         cmp_fair.append(abs(tmp_2[0] - tmp_2[1]))
@@ -2354,16 +2356,19 @@ class ConvergeE2_with(ConvergeE_setup):
             X_trn, A_trn, jt_trn, X_tst, A_tst, jt_tst)
         res_iter.extend(tmp)  # (3,1+306*2)
 
-        if len(jt_trn) == 0:
-            tmp = self.subroute_one_sens_att(
-                X_wA_trn, y_trn, X_wAq_trn, g1ms_trn[0][0],
-                X_wA_tst, y_tst, X_wAq_tst, g1ms_tst[0][0],
-                self.saIndex[0], self.saValue[0], pos_label,
-                m1, m2, pool,
-                X_trn, A_trn, g1ms_trn, jt_trn,
-                X_tst, A_tst, g1ms_tst, jt_tst)
-            res_iter.extend(tmp)
-            return res_iter
+        # pdb.set_trace()
+        # NOTICE THAT IT HAS BEEN CHANGED FROM 28 Dec 2025
+        #
+        # if len(jt_trn) == 0:
+        #     tmp = self.subroute_one_sens_att(
+        #         X_wA_trn, y_trn, X_wAq_trn, g1ms_trn[0][0],
+        #         X_wA_tst, y_tst, X_wAq_tst, g1ms_tst[0][0],
+        #         self.saIndex[0], self.saValue[0], pos_label,
+        #         m1, m2, pool,
+        #         X_trn, A_trn, g1ms_trn, jt_trn,
+        #         X_tst, A_tst, g1ms_tst, jt_tst)
+        #     res_iter.extend(tmp)
+        #     return res_iter
 
         sa_len = len(g1ms_trn)
         for i in range(sa_len):
@@ -3154,6 +3159,10 @@ class ConvergeF7_with(ConvergeF2_with):
         sub_pt5 = (['max', 'avg', ] * 3 * 2 + [
             'T(extG1)', 'T(extG2)', 'T(extG3)',
             'T(extGrp* total)']) * 4  # StatsParity
+        # sub_pt5 = (['extG1', 'extG2', 'extG3',
+        #             'altG1', 'altG2', 'algG3',
+        #             'T(extG1)', 'T(extG2)', 'T(extG3)',
+        #             'T(extGrp* total)'])
         csv_row_4c = ['classifier', 'T(learning)'] + (
             sub_pt1 + sub_pt2 + sub_pt5 + sub_pt3 * 4 + sub_pt4) * 2
         del sub_pt1, sub_pt2, sub_pt5, sub_pt3, sub_pt4
@@ -3162,6 +3171,7 @@ class ConvergeF7_with(ConvergeF2_with):
         sub_r3c_f = (['extG1', '', 'extG2', '', 'extG3', '',
                       'altG1', '', 'altG2', '', 'altG3', '',
                       'Time cost', '', '', '']) * 4
+        # sub_r3c_f = (['extGrp:max','',''])
         csv_row_3c = ['', ''] + (sub_r3c_ab + sub_r3c_f +
                                  sub_r3c_c + sub_r3c_d) * 2
         del sub_r3c_c, sub_r3c_d, sub_r3c_ab, sub_r3c_f
@@ -3171,6 +3181,104 @@ class ConvergeF7_with(ConvergeF2_with):
             'StatsParity sa#2'] + [''] * 15 + ['SP.ext joint&'] + [
             ''] * 15 + ['SP.ext joint|'] + [''] * 15
         csv_row_2c = ['Ensem', ''] + ['Training set: performance'] + (
+            sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d) + [
+            'Test set: performance'] + (
+                sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d)
+        del sub_r2c_ab, sub_r2c_c, sub_r2c_d, sub_r2c_f
+
+        return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
+
+
+class ConvergeF8_with(ConvergeF7_with):
+    # def count_sing_part2(self, y, y_hat, y_qtb, non_sa, pos_label):
+    #     _, _, g1_Cm, g0_Cm = marginalised_pd_mat(
+    #         y, y_hat, pos_label, non_sa)
+    #     cmp_far = []
+
+    def count_single_member(self, X, A, y, y_hat, y_qtb,
+                            g1m_indices, m1, m2, n_e,
+                            pos_label, jt, pool=None):
+        ut_c = time.time()
+        res_ind = []
+        ta_1 = self.count_sing_part1(y, y_hat, pos_label)
+        ta_2 = self.count_sing_part1(y, y_qtb, pos_label)
+        ta_3 = [abs(t1 - t2) for t1, t2 in zip(ta_1, ta_2)]
+        res_ind.extend(ta_1 + ta_2 + ta_3)
+        del ta_1, ta_2, ta_3  # .shape=(21,)=(7*3,)
+
+        far_2, far_3, far_5 = [], [], []
+        n_a = len(g1m_indices)
+        for i in range(n_a):
+            tmp = self.count_sing_part2(
+                y, y_hat, y_qtb, g1m_indices[i][0], pos_label,
+                verbose=False)
+            far_2.extend(tmp)
+        if n_a == 1:
+            far_2.extend([''] * 5)  # 11)
+        ut_c = time.time() - ut_c    # .shape +11*2
+
+        X_and_y = np.concatenate([
+            y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        X_and_y_hat = np.concatenate([
+            y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        A_i = [A[:, i].copy() == 1 for i in range(n_a)]
+        for i in range(n_a):
+            far_3.extend(self.count_sing_part3(
+                X_and_y, X_and_y_hat, g1m_indices[i][0],
+                A_i[i], m1, m2, n_e))
+        if n_a == 1:
+            far_3.extend([''] * 49)  # .shape +49*2
+
+        for i in range(n_a):
+            far_5.extend(self.count_sing_part5(
+                y, y_hat, g1m_indices[i], pos_label))
+        if n_a == 1:
+            far_5.extend([''] * 16)
+        far_4 = self.count_sing_part4(
+            X_and_y, X_and_y_hat, g1m_indices, A, m1, m2,
+            n_e, pool)
+        far_4.append(ut_c)  # 21+(11+16+49)*2+(112+1)=286
+        #    verbose=False  # 21+( 5+16+49)*2+(112+1)=274
+        return res_ind + far_2 + far_5 + far_3 + far_4
+
+    def prepare_trial(self):
+        # csv_row_1 = unique_column(11 + 1 + 286*2)
+        csv_row_1 = unique_column(11 + 1 + 274 * 2)
+
+        sub_pt1, _, sub_pt3, sub_pt4 = self.trial_prep_pt4()
+        sub_pt5 = (['max', 'avg'] * 6 + [
+            'T(extG1)', 'T(extG2)', 'T(extG3)',
+            'T(extGrp* total)']) * 2      # *4
+        sub_pt2 = self._metric_part2 * 2  # *4
+        csv_row_4c = ['classifier', 'T(learning)'] + (
+            sub_pt1 + sub_pt2 + sub_pt5 + sub_pt3 * 2
+            + sub_pt4) * 2
+        del sub_pt1, sub_pt2, sub_pt3, sub_pt4, sub_pt5
+
+        sub_r3c_c, sub_r3c_d, _ = self.trial_prep_pt3()
+        # sub_r3c_f = (['extG1', '', 'extG2', '', 'extG3', '',
+        #               'altG1', '', 'altG2', '', 'altG3', '',
+        #               'Time cost', '', '', '']) * 2  # *4
+        sub_r3c_f = (['extG1/2/3', '', '', '', '', '',
+                      'altG1/2/3', '', '', '', '', '',
+                      'Time cost', '', '', '']) * 2
+        sub_r3c_ab = ['Normal'] + [''] * 6 + ['Adversarial'] + [
+            ''] * 6 + [r'$\Delta$(performance)'] + [''] * 6 + [
+            'Grpx3', '', '', 'DR', ''] * 2
+        sub_r3c_c = sub_r3c_c[: 49 * 2]
+        csv_row_3c = ['', ''] + (sub_r3c_ab + sub_r3c_f +
+                                 sub_r3c_c + sub_r3c_d) * 2
+        del sub_r3c_c, sub_r3c_d, sub_r3c_ab, sub_r3c_f
+
+        _, sub_r2c_c, sub_r2c_d = self.trial_prep_pt2()
+        sub_r2c_f = ['StatsParity sa#1'] + [''] * 15 + [
+            'StatsParity sa#2'] + [''] * 15
+        # sub_r2c_ab = sub_r2c_ab[: -22]
+        sub_r2c_c = sub_r2c_c[: 49 * 2]
+        sub_r2c_ab = [''] * 20 + ['fairness sa#1'] + [
+            ''] * 4 + ['fairness sa#2'] + [''] * 4
+        csv_row_2c = ['Ensem', ''] + [
+            'Training set: performance'] + (
             sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d) + [
             'Test set: performance'] + (
                 sub_r2c_ab + sub_r2c_f + sub_r2c_c + sub_r2c_d)

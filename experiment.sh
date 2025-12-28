@@ -6,8 +6,8 @@ EXP=mCV_rexp4*
 PRE=min_max
 for DAT in ricci german ppr ppvr adult
 do
-    python hfm_nonbin_exec.py -rev -exp $EXP -dat $DAT -nk 5 --nb-cls 7  -rep
-    # python hfm_nonbin_exec.py -rev -exp $EXP -dat $DAT -nk 5 --nb-cls 7  # cde
+    python hfm_nonbin_exec.py -rev -exp $EXP -pre $PRE -dat $DAT -nk 5 --nb-cls 7  -rep
+    # python hfm_nonbin_exec.py -rev -exp $EXP -pre $PRE -dat $DAT -nk 5 --nb-cls 7  # cde
 done
 
 

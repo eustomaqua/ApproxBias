@@ -106,6 +106,9 @@ if args.revision:
         'rexp4b', 'rexp4c', 'rexp4e',
             'rexp4d', 'rexp5b', 'rexp5c', 'rexp5d', 'rexp5e',):
         kwargs['nb_cls'] = args.nb_cls
+    elif trial_type[-2:] in ('9b', '8b', '8c', '8d', '8e',
+                             '9f', '9g', '9c', '9d', '9e',):
+        kwargs['nb_cls'] = args.nb_cls
 
     case = Rev_ManfExtPrime_Empir(trial_type, data_type, **kwargs)
     # mode = 'a' if data_type == 'adult' else 'w'
@@ -197,10 +200,10 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp2c -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp3e -dat german -nk 2 -rep
 
-python hfm_nonbin_exec.py -rev -exp mCV_rexp8b -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp8b|9b -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp8c|d|e -dat * -nk 2 --nb-cls 3
-python hfm_nonbin_exec.py -rev -exp mCV_rexp9b -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9c|d|e -dat * -nk 2 --nb-cls 3
 # rexp4,rexp5 --> rexp8,rexp9
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9f -dat * -nk 2 --nb-cls 3 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9g -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
 """

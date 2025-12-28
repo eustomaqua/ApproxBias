@@ -1924,12 +1924,12 @@ class ConvFig_5E_exact(ConvPlotF_init):
             df_tmp, tag_sa1, suff.replace('tim', 'val'), rmk)
         self.sub_plt_avg(
             df_tmp, tag_sa1, suff.replace('tim', 'avg'), rmk)
-        # suff = suff.replace('sing', 'sapl')
-        # self.sub_plt_tim(df_raw, tag_multivar, suff)
-        # self.sub_plt_val(df_raw, tag_multivar,
-        #                  suff.replace('tim', 'val'))
-        # self.sub_plt_avg(df_raw, tag_multivar,
-        #                  suff.replace('tim', 'avg'))
+        suff = suff.replace('sing', 'multivar')  # 'sapl')
+        self.sub_plt_tim(df_raw, tag_multivar, suff)
+        self.sub_plt_val(df_raw, tag_multivar,
+                         suff.replace('tim', 'val'))
+        self.sub_plt_avg(df_raw, tag_multivar,
+                         suff.replace('tim', 'avg'))
 
         # df_tmp = self.obtain_binval_senatt(
         #     raw_dframe, id_set, tag_multivar, tag_sa1, tag_sa2)
@@ -1967,15 +1967,547 @@ class ConvFig_5B_exact(ConvPlotF_init):  # E_init
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             raw_dframe, nb_row=4, nc_norm=3, nc_sens=4)
-
         pdb.set_trace()
         return
 
 
-class ConvFig_5F_exact(ConvPlotF_init):
+class ConvFig_5H_exact(ConvPlotF_init):
+    def prepare_graph(self):
+        csv_row_1 = unique_column(11 + 1 + 274 * 2)
+        pms = csv_row_1[: 11 + 1]
+        tag_trn = csv_row_1[12: 12 + 274]
+        tag_tst = csv_row_1[12 + 274:]
+        return pms, tag_trn, tag_tst
+
+    def incise_graph(self, tag):           # tmp_norm, tmp_gf = 7, 11
+        tag_norm = [tag[: 7], tag[7 + 7: 7 * 3]]  # normal,delta(perf)
+        tag_gf = [tag[21: 21 + 5] + tag[31: 31 + 16],
+                  tag[26: 21 + 10] + tag[47: 47 + 16]]
+        # tag_gf each sa:   DP,EOpp,PP,DR,hat_L(loss),
+        #                   extG*(max|avg *3), altExtG*(max|avg *3),
+        #               T(extG1),T(extG2),T(extG3), T(extGrp* total)
+        tmp = [tag[63: 63 + 12 + 5 + 9 + 9 * 2 + 5],
+               tag[63 + 49: 63 + 49 * 2]]
+        tag_hfm = {
+            'dist': [
+                j[:4] + j[12:12 + 2] + j[17:17 + 4] +
+                j[26:26 + 4] + j[35:35 + 4] for j in tmp],
+            # 'dist' sa:    DistDirect_bin{Ds,Ds_avg,Df,Df_avg},
+            #               ApproxDist_bin{Ds,Df},
+            #               StratVacant{Ds,Ds_avg,Df,Df_avg},
+            #               StratES{Ds,Ds_avg,Df,Df_avg},
+            #               StratRA{Ds,Ds_avg,Df,Df_avg},
+            'df': [j[
+                4:7] + [j[12 + 2], ] + j[17 + 4:17 + 7] + j[
+                26 + 4:26 + 7] + j[35 + 4:35 + 7] for j in tmp],
+            # 'df' sa  :    DistDirect_bin{df_prev,df,df_avg},
+            #               ApproxDist_bin{df_prev},
+            #               StratVacant{df_prev,df,df_avg},
+            #               StratES{df_prev,df,df_avg},
+            #               StratRA{df_prev,df,df_avg},
+            'tim': [j[
+                7:12] + j[12 + 3:12 + 5] + j[17 + 7:17 + 9] + j[
+                26 + 7:26 + 9] + j[35 + 7:35 + 9 + 5] for j in tmp],
+            # 'tim' sa :    DistDirect_bin{t_Ds,t_Df,
+            #                           T(df_prev),T(df),T(df_avg)},
+            #               ApproxDist_bin{t_Ds,t_Df},
+            #               StratVacant{t_Ds,t_Df},
+            #               StratES{t_Ds,t_Df}, StratRA{t_Ds,t_Df},
+            #               T(DistDirect_bin), T(ApproxDist_bin),
+            #               T(StratVacant /DistApprox_nonbin),
+            #               T(StratES), T(StratRA),
+            #
+            # 'dist': 4+2+4*3=18, 'df':3+1+3*3=13, 'tim': 5+2*4+5=18
+        }  # 'dist_avg': [j[] for j in tmp]}  # .siz=(2,18|13|13+5)
+
+        tmp = tag[(21 + 10 + 16 * 2) + 49 * 2: 63 + 98 + (
+            9 + 18 + 9 + 18 + 9 + 18 + 9 + 18 + 5)]
+        tag_df_conv = {
+            'multivar': tmp[:9] + tmp[
+                27:27 + 9] + tmp[54:54 + 9] + tmp[81:81 + 9],
+            # 'multivar':   DistDirect_multivar{Ds,Ds_avg,Df,Df_avg,
+            #                          df_prev,df,df_avg,t_Ds,t_Df},
+            #               EffExact-Vacant{.... ... ..},
+            #               EffExact-StratES{. x9},
+            #               EffExact-StratRA{. x9},
+            'sa1': tmp[9:18] + tmp[
+                9 * 4:9 * 5] + tmp[9 * 7:9 * 8] + tmp[9 * 10:9 * 11],
+            'sa2': tmp[18:27] + tmp[
+                9 * 5:9 * 6] + tmp[9 * 8:9 * 9] + tmp[9 * 11:9 * 12],
+            # 'sa' :    DistDirect_nonbin{.... ... ..},
+            #           StratVacant /DistApprox_nonbin{. x9},
+            #           StratES{. x9}, StratRA{. x9},
+            'tim': tmp[9 * 12: 9 * 12 + 5],
+            # 'tim':  T(DistDirect_multivar), T(DistExtend_multivar),
+            #         T(EffExact-StratES), T(EffExact-StratRA),
+            #         T(computing normal-perf +grp fair dr),
+            #
+            # 'multivar /sa': 9*4=36, 'tim': 4+1=5
+        }  # tag_df_multivar = []
+        del tmp  # pdb.set_trace()
+        return tag_norm, tag_gf, tag_hfm, tag_df_conv
+
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+        pms, _, tag_tst = self.prepare_graph()
+        tg_norm, tag_dr, tag_hfm, tag_conv = self.incise_graph(tag_tst)
+        fgn = f'{self._figname}{pre}'  # _multivar
+        # self.subfig_conv_multivar(raw_dframe, tag_conv, fgn)
+        # self.subfig_conv_singvar(raw_dframe, tag_hfm, tag_conv, fgn)
         pdb.set_trace()
         return
+
+    def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn):
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            dframe, nb_row=4, nc_norm=3, nc_sens=4)
+        tag_sa1 = tag_conv['sa1'][:9]  # [:4] *=tag_sa1[:4]+tag_sa1[-2:]
+        tag_sa2 = tag_conv['sa2'][:9]  # [:4] *=tag_sa2[:4]+tag_sa2[-2:]
+        tag_sa1 = tag_hfm['dist'][0] + tag_sa1[:4] + tag_hfm[
+            'tim'][0][:-5] + tag_sa1[-2:]
+        tag_sa2 = tag_hfm['dist'][1] + tag_sa2[:4] + tag_hfm[
+            'tim'][1][:-5] + tag_sa2[-2:]
+        # tag_sa*:  DistDirect_bin x4, ApproxDist_bin x2,
+        #           StratVacant x4, StratES x4, StratRA x4,
+        #           DistDirect_nonbin x4,   # .siz=18+4=22
+        # tag_tim:  DistDirect_bin x5, ApproxDist_bin x2,
+        #           StratVacant x2, StratES x2, StratRA x2,
+        #           DistDirect_nonbin x2,   # .siz=13+2=15
+        tmp = self.sub_dat_sen_att(
+            dframe, nb_set, id_set, tag_sa1, tag_sa2)
+
+        tag_tim = tag_sa1[18 + 4:]
+        tag_tim = tag_tim[:2] + tag_tim[5:]
+        tag_tim = np.array(tag_tim).reshape(-1, 2).T.tolist()
+        fgn += '_whole'
+        self.sub_plt_tim_prev(tmp, tag_tim, fgn + '_tim', 't_Ds')
+        tag_val = tag_sa1[: 18 + 4]
+        tag_avg = np.array([tag_val[i] for i in [
+            1, 3, 7, 9, 11, 13, 15, 17,
+            19, 21]]).reshape(-1, 2).T.tolist()
+        tag_val = np.array([tag_val[i] for i in [
+            0, 2, 4, 5, 6, 8, 10, 12, 14, 16,
+            18, 20]]).reshape(-1, 2).T.tolist()
+        self.sub_plt_val_prev(tmp, tag_val, fgn + '_val', 'Ds')
+        self.sub_plt_avg_prev(tmp, tag_avg, fgn + '_avg', 'Ds_avg')
+        return
+
+    def sub_plt_tim_prev(self, df_tmp, tag, fgn, sgn='t_D.'):
+        if sgn.startswith('t_Ds') or (sgn == 't_D'):
+            scat_X = df_tmp[tag[0][5]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][3]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][4]].values.astype(DTY_FLT)]
+            ant_X = r'T_{\mathbf{D}_a(S,a_i)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_a(S,a_i)}'
+            ant_Xp = r'T_{\mathbf{D}(S_1,\bar{S}_1)}'
+            ant_Yq = r'T_{\hat{\mathbf{D}}(S_1,\bar{S}_1)}'
+        elif sgn.startswith('t_Df'):
+            scat_X = df_tmp[tag[1][5]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[1][0]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][3]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][4]].values.astype(DTY_FLT)]
+            ant_X = r'T_{\mathbf{D}_{f,a}(S,a_i)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{f,a}(S,a_i)}'
+            ant_Xp = r'T_{\mathbf{D}_f(S_1,\bar{S}_1)}'
+            ant_Yq = r'T_{\hat{\mathbf{D}}_f(S_1,\bar{S}_1)}'
+        else:
+            scat_X = np.concatenate([df_tmp[tag[0][
+                5]].values, df_tmp[tag[1][5]].values]).astype(DTY_FLT)
+            scat_Y = [np.concatenate([
+                df_tmp[tag[0][0]].values, df_tmp[
+                    tag[1][0]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][1]].values, df_tmp[
+                    tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][2]].values, df_tmp[
+                    tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][3]].values, df_tmp[
+                    tag[1][3]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][4]].values, df_tmp[
+                    tag[1][4]].values]).astype(DTY_FLT)]
+            ant_X = r'T_{\mathbf{D}_{\cdot,a}(S,a_i)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{\cdot,a}(S,a_i)}'
+            ant_Xp = r'T_{\mathbf{D}_{\cdot}(S_1,\bar{S}_1)}'
+            ant_Yq = r'T_{\hat{\mathbf{D}}_{\cdot}(S_1,\bar{S}_1)}'
+        annotY = ['${}$'.format(ant_Xp), '${}$'.format(ant_Yq),
+                  r'$T_{ApproxDist}$', r'$T_{StratES}$',
+                  r'$T_{StratRA}$']  # r'$T_{DirectDist_nonbin}$']
+        annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+        return
+
+    def sub_plt_val_prev(self, df_tmp, tag, fgn, sgn='D.'):
+        if sgn.startswith('Ds') or (sgn == 'D'):
+            scat_X = df_tmp[tag[0][5]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][3]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][4]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_a(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_a(S,a_i)'
+            ant_Xp = r'\mathbf{D}(S_1,\bar{S}_1)'
+            ant_Yq = r'\hat{\mathbf{D}}(S_1,\bar{S}_1)'
+        elif sgn.startswith('Df'):
+            scat_X = df_tmp[tag[1][5]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[1][0]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][3]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][4]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{f,a}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_{f,a}(S,a_i)'
+            ant_Xp = r'\mathbf{D}_f(S_1,\bar{S}_1)'
+            ant_Yq = r'\hat{\mathbf{D}}_f(S_1,\bar{S}_1)'
+        else:
+            scat_X = np.concatenate([df_tmp[tag[0][
+                5]].values, df_tmp[tag[1][5]].values]).astype(DTY_FLT)
+            scat_Y = [np.concatenate([
+                df_tmp[tag[0][0]].values, df_tmp[
+                    tag[1][0]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][1]].values, df_tmp[
+                    tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][2]].values, df_tmp[
+                    tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][3]].values, df_tmp[
+                    tag[1][3]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][4]].values, df_tmp[
+                    tag[1][4]].values]).astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{\cdot,a}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_{\cdot,a}(S,a_i)'
+            ant_Xp = r'\mathbf{D}_{\cdot}(S_1,\bar{S}_1)'
+            ant_Yq = r'\hat{\mathbf{D}}_{\cdot}(S_1,\bar{S}_1)'
+        annotY = ['${}$'.format(ant_Xp), '${}$'.format(ant_Yq),
+                  r'ApproxDist', r'StratES',
+                  r'StratRA']  # r'$DirectDist_nonbin$']
+        annot = ['${}$'.format(ant_X), '${}$'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+        return
+
+    def sub_plt_avg_prev(self, df_tmp, tag, fgn, sgn='D._avg'):
+        if sgn.startswith('Ds') or (sgn == 'D_avg'):
+            scat_X = df_tmp[tag[0][4]].values.astype(DTY_FLT)
+            scat_Y = [  # df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                df_tmp[tag[0][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_a^{avg}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_a^{avg}(S,a_i)'
+            # ant_Xp = r'\mathbf{D}^{avg}(S_1,\bar{S}_1)'
+            # ant_Yq = r'\hat{\mathbf{D}}^{avg}(S_1,\bar{S}_1)'
+        elif sgn.startswith('Df'):  # 'Df_avg'
+            scat_X = df_tmp[tag[1][4]].values.astype(DTY_FLT)
+            scat_Y = [  # df_tmp[tag[1][0]].values.astype(DTY_FLT),
+                df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                df_tmp[tag[1][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{f,a}^{avg}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_{f,a}^{avg}(S,a_i)'
+            # ant_Xp = r'\mathbf{D}_f^{avg}(S_1,\bar{S}_1)'
+            # ant_Yq = r'\hat{\mathbf{D}}_f^{avg}(S_1,\bar{S}_1)'
+        else:
+            scat_X = np.concatenate([df_tmp[tag[0][
+                4]].values, df_tmp[tag[1][4]].values]).astype(DTY_FLT)
+            scat_Y = [  # np.concatenate([
+                # df_tmp[tag[0][0]].values, df_tmp[
+                #     tag[1][0]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][1]].values, df_tmp[
+                    tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][2]].values, df_tmp[
+                    tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([df_tmp[tag[0][3]].values, df_tmp[
+                    tag[1][3]].values]).astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{\cdot,a}^{avg}(S,a_i)'
+            ant_Y = r'\hat{\mathbf{D}}_{\cdot,a}^{avg}(S,a_i)'
+            # ant_Xp = r'\mathbf{D}_{\cdot}^{avg}(S_1,\bar{S}_1)'
+            # ant_Yq = r'\hat{\mathbf{D}}_{\cdot}^{avg}(S_1,\bar{S}_1)'
+        annotY = [  # '${}$'.format(ant_Xp), # '${}$'.format(ant_Yq),
+            r'ApproxDist', r'StratES',
+            r'StratRA']  # r'$DirectDist_nonbin$']
+        annot = ['${}$'.format(ant_X), '${}$'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+        return
+
+    def subfig_conv_multivar(self, dframe, tag_conv, fgn
+                             ):  # tag_hfm, obtn_fig_conv_multivar
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            dframe, nb_row=4, nc_norm=3, nc_sens=4)
+
+        tag_multivar = tag_conv['multivar'] + tag_conv['tim'][
+            :-1]  # + tag_conv['sa1'] + tag_conv['sa2']
+        df_alt = self.sub_dat_multivar(
+            dframe, nb_set, id_set, tag_multivar)
+        tag_tim = [tag_multivar[7:9], tag_multivar[9 + 7:18],
+                   tag_multivar[18 + 7:27], tag_multivar[27 + 7:36]]
+        tag_tim = np.array(tag_tim).T.tolist()
+        fgn += '_multivar'  # _mvc
+        self.sub_plt_tim(df_alt, tag_tim, fgn + '_tim', 't_Ds')
+        # self.sub_plt_tim(df_alt, tag_tim, fgn + '_timDf', 't_Df')
+        # self.sub_plt_tim(df_alt, tag_tim, fgn + '_timdot')
+        tag_val = np.array([tag_multivar[i] for i in [
+            0, 2, 9, 11, 18, 20, 27, 29, ]]).reshape(4, 2).T.tolist()
+        tag_avg = np.array([tag_multivar[i] for i in [
+            1, 3, 10, 12, 19, 21, 28, 30, ]]).reshape(4, 2).T.tolist()
+        self.sub_plt_val(df_alt, tag_val, fgn + '_val', 'Ds')
+        self.sub_plt_avg(df_alt, tag_avg, fgn + '_avg', 'Ds_avg')
+
+        tag_sa1 = tag_conv['sa1']
+        tmp = self.sub_dat_sen_att(
+            dframe,  # or df_alt,
+            nb_set, id_set, tag_sa1, tag_conv['sa2'])
+        tag_tim = np.array([tag_sa1[7:9], tag_sa1[9 + 7:18], tag_sa1[
+            18 + 7:27], tag_sa1[27 + 7:36]]).T.tolist()
+        fgn = fgn.replace('multivar', 'whole')
+        self.sub_plt_tim(tmp, tag_tim, fgn + '_tim', 't_Ds')
+        # self.sub_plt_tim(tmp, tag_tim, fgn + '_timDf', 't_Df')
+        # self.sub_plt_tim(tmp, tag_tim, fgn + '_timdot', 't_D')  # _D,Dd
+        tag_val = np.array([tag_sa1[i] for i in [
+            0, 2, 9, 11, 18, 20, 27, 29, ]]).reshape(4, 2).T.tolist()
+        tag_avg = np.array([tag_sa1[i] for i in [
+            1, 3, 10, 12, 19, 21, 28, 30, ]]).reshape(4, 2).T.tolist()
+        self.sub_plt_val(tmp, tag_val, fgn + '_val', 'Ds')
+        self.sub_plt_avg(tmp, tag_avg, fgn + '_avg', 'Ds_avg')
+        del tag_tim, tag_val, tag_avg, fgn, tag_sa1, tmp
+        del df_alt, tag_multivar, nb_set, id_set
+        return
+
+    def sub_dat_sen_att(self, dframe, nb_set, id_set, tag_sa1, tag_sa2):
+        df_raw = dframe[tag_sa1].iloc[id_set[0] + 1: id_set[0 + 1]]
+        columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+        for i in range(1, nb_set):
+            df_tmp = dframe[tag_sa1].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_alt = dframe[tag_sa2].iloc[id_set[i] + 1: id_set[i + 1]]
+            df_alt = df_alt.rename(columns=columns)
+            df_raw = pd.concat([df_raw, df_tmp, df_alt], axis=0)
+            del df_tmp, df_alt
+        return df_raw.reset_index(drop=True)
+
+    def sub_plt_tim(self, df_tmp, tag, fgn, sgn='t_D.'):
+        # tag_tim = tag_col[-4:]  # rmk='multivar',
+        # scat_X = df_tmp[tag_tim[0]].values.astype(DTY_FLT)
+        # scat_Y = [df_tmp[tag_tim[1]].values.astype(DTY_FLT),
+        #           df_tmp[tag_tim[2]].values.astype(DTY_FLT),
+        #           df_tmp[tag_tim[3]].values.astype(DTY_FLT)]
+
+        if sgn == 't_Ds' or (sgn == 't_D'):
+            scat_X = df_tmp[tag[0][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][3]].values.astype(DTY_FLT)]
+            ant_X = r'T_{\mathbf{D}_{\mathbf{a}}(S)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{\mathbf{a}}(S)}'
+            if 'multivar' not in fgn:
+                ant_X = r'T_{\mathbf{D}_a(S,a_i)}'
+                ant_Y = r'T_{\hat{\mathbf{D}}_a(S,a_i)}'
+        elif sgn == 't_Df':
+            scat_X = df_tmp[tag[1][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][3]].values.astype(DTY_FLT)]
+            ant_X = r'T_{\mathbf{D}_{f,\mathbf{a}}(S)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{f,\mathbf{a}}(S)}'
+            if 'multivar' not in fgn:
+                ant_X = r'T_{\mathbf{D}_{f,a}(S,a_i)}'
+                ant_Y = r'T_{\hat{\mathbf{D}}_{f,a}(S,a_i)}'
+        else:
+            scat_X = np.concatenate([
+                df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                df_tmp[tag[1][0]].values.astype(DTY_FLT)], axis=0)
+            scat_Y = [np.concatenate([
+                df_tmp[tag[0][1]].values,
+                df_tmp[tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][2]].values,
+                    df_tmp[tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][3]].values,
+                    df_tmp[tag[1][3]].values]).astype(DTY_FLT), ]
+            ant_X = r'T_{\mathbf{D}_{\cdot,\mathbf{a}}(S)}'
+            ant_Y = r'T_{\hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S)}'
+            if 'multivar' not in fgn:
+                ant_X = r'T_{\mathbf{D}_{\cdot,a}(S,a_i)}'
+                ant_Y = r'T_{\hat{\mathbf{D}}_{\cdot,a}(S,a_i)}'
+
+        if 'multivar' in fgn:  # if rmk == 'multivar':
+            ant_app = r'T_{ExtendDist}'
+            ant_cvg = r'T_{ExactDist (StratES)}'
+            ant_arr = r'T_{ExactDist (StratRA)}'
+        else:  # rmk=='sen-att'
+            ant_app = r'T_{ApproxDist}'
+            ant_cvg = r'T_{StratES}'
+            ant_arr = r'T_{StratRA}'
+        annotY = ['${}$'.format(ant_app), '${}$'.format(
+            ant_cvg), '${}$'.format(ant_arr)]  # '${}$ (sec)'
+        annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+        return
+
+    def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.'):
+        if sgn.startswith('Ds') or (sgn == 'D'):  # sgn=='Ds'
+            scat_X = df_tmp[tag[0][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{\mathbf{a}}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_a(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_a(S,a_i)'
+        elif sgn.startswith('Df'):             # sgn == 'Df':
+            scat_X = df_tmp[tag[1][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{f,\mathbf{a}}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{f,\mathbf{a}}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_{f,a}(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_{f,a}(S,a_i)'
+        else:
+            scat_X = np.concatenate([
+                df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                df_tmp[tag[1][0]].values.astype(DTY_FLT)], axis=0)
+            scat_Y = [np.concatenate([
+                df_tmp[tag[0][1]].values,
+                df_tmp[tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][2]].values,
+                    df_tmp[tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][3]].values,
+                    df_tmp[tag[1][3]].values]).astype(DTY_FLT), ]
+            ant_X = r'\mathbf{D}_{\cdot,\mathbf{a}}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_{\cdot,a}(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_{\cdot,a}(S,a_i)'
+        if 'multivar' in fgn:  # if rmk == 'multivar':
+            ant_app = r'ExtendDist'
+            ant_cvg = r'ExactDist (StratES)'
+            ant_arr = r'ExactDist (StratRA)'
+        else:  # rmk=='sen-att'
+            ant_app = r'ApproxDist'
+            ant_cvg = r'StratES'
+            ant_arr = r'StratRA'
+        annotY = ['${}$'.format(ant_app), '${}$'.format(
+            ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$'.format(ant_X), '${}$'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+        return
+
+    def sub_plt_avg(self, df_tmp, tag, fgn, sgn='D._avg'):
+        if sgn.startswith('Ds') or (sgn == 'D_avg'):  # =='Ds_avg'
+            scat_X = df_tmp[tag[0][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[0][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[0][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{\mathbf{a}}^{avg}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}^{avg}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_a^{avg}(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_a^{avg}(S,a_i)'
+        elif sgn.startswith('Df'):              # sgn == 'Df_avg':
+            scat_X = df_tmp[tag[1][0]].values.astype(DTY_FLT)
+            scat_Y = [df_tmp[tag[1][1]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][2]].values.astype(DTY_FLT),
+                      df_tmp[tag[1][3]].values.astype(DTY_FLT)]
+            ant_X = r'\mathbf{D}_{f,\mathbf{a}}^{avg}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{f,\mathbf{a}}^{avg}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_{f,a}^{avg}(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_{f,a}^{avg}(S,a_i)'
+        else:
+            scat_X = np.concatenate([
+                df_tmp[tag[0][0]].values.astype(DTY_FLT),
+                df_tmp[tag[1][0]].values.astype(DTY_FLT)], axis=0)
+            scat_Y = [np.concatenate([
+                df_tmp[tag[0][1]].values,
+                df_tmp[tag[1][1]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][2]].values,
+                    df_tmp[tag[1][2]].values]).astype(DTY_FLT),
+                np.concatenate([
+                    df_tmp[tag[0][3]].values,
+                    df_tmp[tag[1][3]].values]).astype(DTY_FLT), ]
+            ant_X = r'\mathbf{D}_{\cdot,\mathbf{a}}^{avg}(S)'
+            ant_Y = r'\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^{avg}(S)'
+            if 'multivar' not in fgn:
+                ant_X = r'\mathbf{D}_{\cdot,a}^{avg}(S,a_i)'
+                ant_Y = r'\hat{\mathbf{D}}_{\cdot,a}^{avg}(S,a_i)'
+        if 'multivar' in fgn:  # if rmk == 'multivar':
+            ant_app = r'ExtendDist'
+            ant_cvg = r'ExactDist (StratES)'
+            ant_arr = r'ExactDist (StratRA)'
+        else:  # rmk=='sen-att'
+            ant_app = r'ApproxDist'
+            ant_cvg = r'StratES'
+            ant_arr = r'StratRA'
+        annotY = ['${}$'.format(ant_app), '${}$'.format(
+            ant_cvg), '${}$'.format(ant_arr)]
+        annot = ['${}$'.format(ant_X), '${}$'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+        return
+
+
+class ConvFig_5F_exact(ConvFig_5H_exact):  # ConvPlotF_init):
+    # def schedule_mspaint(self, raw_dframe, pre='minmax'):
+    #     csv_row_1 = unique_column(11 + 1 + 438 * 2)
+    #     pdb.set_trace()
+    #     return
+
+    def prepare_graph(self):
+        csv_row_1 = unique_column(11 + 1 + 438 * 2)
+        pms = csv_row_1[: 11 + 1]
+        tag_trn = csv_row_1[12: 12 + 438]
+        tag_tst = csv_row_1[12 + 438:]
+        return pms, tag_trn, tag_tst
+
+    def incise_graph(self, tag):
+        tag_norm = [tag[: 7], tag[7 + 7: 7 * 3]]
+        tag_gf = [
+            tag[21 + 6:21 + 6 + 5] + tag[(21 + 11 * 4): 65 + 16],
+            tag[21 + 11 + 6:21 + 11 * 2] + tag[
+                (21 + 44) + 16: 65 + 16 * 2]]
+        tmp = [tag[21 + 11 * 4 + 16 * 4: (
+            21 + 44 + 64) + 12 + 5 + 9 + 9 * 2 + 5],
+            tag[129 + 49: 129 + 49 * 2]]
+        tag_hfm = {
+            'dist': [j[:4] + j[12:12 + 2] + j[17:17 + 4] +
+                     j[26:26 + 4] + j[35:35 + 4] for j in tmp],
+            'df': [j[
+                4:7] + [j[12 + 2], ] + j[17 + 4:17 + 7] + j[
+                26 + 4:26 + 7] + j[35 + 4:35 + 7] for j in tmp],
+            'tim': [j[
+                7:12] + j[12 + 3:12 + 5] + j[17 + 7:17 + 9] + j[
+                26 + 7:26 + 9] + j[35 + 7:35 + 9 + 5] for j in tmp],
+        }
+
+        tmp = tag[(21 + 11 * 4 + 16 * 4) + 49 * 4: 129 + 196 + (
+            (9 + 18) * 4 + 5)]  # 12+5+9+9*2+5=49
+        tag_df_conv = {
+            'multivar': tmp[:9] + tmp[
+                27:27 + 9] + tmp[54:54 + 9] + tmp[81:81 + 9],
+            'sa1': tmp[9:18] + tmp[
+                9 * 4:9 * 5] + tmp[9 * 7:9 * 8] + tmp[9 * 10:9 * 11],
+            'sa2': tmp[18:27] + tmp[
+                9 * 5:9 * 6] + tmp[9 * 8:9 * 9] + tmp[9 * 11:9 * 12],
+            'tim': tmp[9 * 12: 9 * 12 + 5], }
+        del tmp  # pdb.set_trace()
+        return tag_norm, tag_gf, tag_hfm, tag_df_conv
 
 
 # ------------------------------
@@ -1983,5 +2515,5 @@ class ConvFig_5F_exact(ConvPlotF_init):
 
 # python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp8e -pre min_max
 # python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max
-# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9f -pre min_max
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9f -pre min_max --nb-cls 7
 # ------------------------------
