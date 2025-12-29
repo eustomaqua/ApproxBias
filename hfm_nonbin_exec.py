@@ -109,6 +109,17 @@ if args.revision:
     elif trial_type[-2:] in ('9b', '8b', '8c', '8d', '8e',
                              '9f', '9g', '9c', '9d', '9e',):
         kwargs['nb_cls'] = args.nb_cls
+    elif 'exhp5' in trial_type:
+        if trial_type[-6:] in ['exhp5a', ]:
+            kwargs['m1'] = args.m1_chosen
+        elif trial_type[-6:] in ['exhp5b', ]:
+            kwargs['m2'] = args.m2_chosen
+        # kwargs['n_e'] = args.n_e_chosen
+        # kwargs['gen'] = args.gen
+        # kwargs['rep'] = args.rep
+        kwargs['alternative'] = True
+        kwargs['omitted'] = args.omit
+        # kwargs['mp_cores'] = args.mp_cores
 
     case = Rev_ManfExtPrime_Empir(trial_type, data_type, **kwargs)
     # mode = 'a' if data_type == 'adult' else 'w'
@@ -206,4 +217,6 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9c|d|e -dat * -nk 2 --nb-cls 3
 # rexp4,rexp5 --> rexp8,rexp9
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9f -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9g -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
+python hfm_nonbin_exec.py -rev -exp rept_exhp5a -dat * -nk 2 -m1 20
+python hfm_nonbin_exec.py -rev -exp rept_exhp5b -dat * -nk 2 -m2 8
 """

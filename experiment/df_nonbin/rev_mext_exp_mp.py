@@ -3287,6 +3287,170 @@ class ConvergeF8_with(ConvergeF7_with):
         return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
 
 
+# Hyper-parameters
+
+class ConvHyperE_init:
+    def __init__(self, omitted=True):
+        self._omit = omitted
+
+
+class ConvHP_EA_anal(ConvHyperE_init):
+    def __init__(self, omitted=True):
+        super().__init__(omitted=omitted)
+        self._m2_set = list(range(2, 23, 1))      # len=21
+        if omitted:
+            self._m2_set = list(range(2, 14, 1))  # len=12
+
+    def schedule_content(self, X, A, y_fx, g1m_indices, m1,
+                         n_e, pool=None, alternative=False):
+        X_yfx = np.concatenate([y_fx.reshape(
+            -1, 1), X], axis=1, dtype=DTY_FLT).copy()
+        n_l, n_a = len(self._m2_set), len(g1m_indices)
+        # if not alternative:
+        curr_res = [self.subproc_core_alt(
+            X_yfx, A[:, i], g1m_indices[i][0], m1, n_e,
+            n_l, pool) for i in range(n_a)]  # siz=(n_a,3* 66|39)
+
+        ans_bin = []
+        for i in range(n_a):
+            ans_bin.extend(curr_res[i])
+        if n_a == 1:
+            # ans_bin.extend([[''] * (3 + n_l * 3), ] * 3)
+            # ans_bin.append([''] * (3 + n_l * 3))
+            ans_bin.extend(['', ] * (3 + n_l * 3) * 3)
+        # ans_bin .shape= (n_a *3* (3+n_l+3),) =(39*3*2,)
+
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = DistDirect_multivar(
+            X_yfx, g1m_indices)
+        if n_a > 1:
+            drt_1, drt_2 = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(drt_1), list(drt_2)]
+            del drt_2
+        elif n_a == 1:
+            drt_1, = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(drt_1), [''] * 3]
+        del drt_1, Ds, Ds_avg, Ds_midtmp, t_Ds
+
+        ans_approx = [DistExtend(
+            X_yfx, A, m1, m2, n_e, pool) for m2 in self._m2_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
+        del ans_approx
+        hat_Ds_midtmp = np.array(hat_Ds_midtmp)
+        ans_approx = [list(hat_Ds) + list(hat_Ds_avg) + list(ans_ut)]
+        for i in range(n_a):
+            tmp = hat_Ds_midtmp[:, 0, i].tolist() + hat_Ds_midtmp[
+                :, 1, i].tolist() + hat_Ds_midtmp[:, 2, i].tolist()
+            ans_approx.append(tmp)
+        if n_a == 1:
+            ans_approx.append([''] * n_l * 3)
+        ans_multival = [
+            t_dir + t_ap for t_dir, t_ap in zip(ans_direct, ans_approx)]
+        del ans_direct, ans_approx
+        del hat_Ds, hat_Ds_avg, ans_ut, hat_Ds_midtmp
+
+        # ans_multivar = [Ds, Ds_avg, t_Ds] + list(
+        #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut)
+        # ans_nonbin = []
+        # ans_nonbin.extend(['', ] * (3 + n_l * 3))
+        # for i in range(n_a):
+        #     tmp = hat_Ds_midtmp[:, :, i]
+        #     tmp = np.concatenate([tmp[:, 0], tmp[:, 1], tmp[:2]]).tolist()
+
+        pdb.set_trace()
+        ans_bin.extend(ans_multival)
+        del curr_res, ans_multival
+        return ans_bin
+
+    def subproc_core_alt(self, X_yfx, A_j, non_sa, m1, n_e,
+                         n_l, pool=None):
+        # non_sa = g1m_ind[0]
+        (Ds, Ds_avg), t_Ds = DistDirect_bin(X_yfx, non_sa)
+        # curr_res = [Ds, Ds_avg, t_Ds] + ['']*n_l * 3
+        ans_approx = [ApproxDist_bin(
+            X_yfx, A_j, non_sa, m1, m2) for m2 in self._m2_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        curr_res = [Ds, Ds_avg, t_Ds] + list(
+            ans_approx) + [''] * n_l + list(ans_ut)
+        # curr_res = [curr_res]
+
+        (Ds, Ds_avg), t_Ds = DistDirect_nonbin(X_yfx, [
+            non_sa, ~non_sa])
+        B_j = non_sa.astype(DTY_INT)
+        ans_approx = [DistApprox(
+            X_yfx, B_j, m1, m2, n_e, pool) for m2 in self._m2_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        # curr_res.append([Ds, Ds_avg, t_Ds] + list(
+        #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+        curr_res.extend([Ds, Ds_avg, t_Ds] + list(
+            hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+
+        (Ds, Ds_avg), t_Ds = StratEarlyStop(X_yfx, B_j, n_e=n_e)
+        ans_approx = [StratRearrange(
+            X_yfx, B_j, m1, m2, n_e=n_e) for m2 in self._m2_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        # curr_res.append([Ds, Ds_avg, t_Ds] + list(
+        #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+        curr_res.extend([Ds, Ds_avg, t_Ds] + list(
+            hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+
+        # # multi-valued sen-att
+        # (Ds, Ds_avg), t_Ds = DistDirect_nonbin(
+        #     X_yfx, g1m_ind)   # [non_sa, ~non_sa])
+        # ans_approx = [DistApprox(
+        #     X_yfx, A_j, m1, m2, n_e, pool) for m2 in self._m2_set]
+        # ans_approx, ans_ut = zip(*ans_approx)
+        # hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        # curr_res.append([Ds, Ds_avg, t_Ds] + list(
+        #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+        #
+        # (Ds, Ds_avg), t_Ds = StratEarlyStop(X_yfx, A_j, n_e=n_e)
+        # ans_approx = [StratRearrange(
+        #     X_yfx, A_j, m1, m2, n_e=n_e) for m2 in self._m2_set]
+        # ans_approx, ans_ut = zip(*ans_approx)
+        # hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        # curr_res.append([Ds, Ds_avg, t_Ds] + list(
+        #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+        # return curr_res  # .siz=(5|3, 3+n_l*3)
+        return curr_res    # .siz=((3+n_l*3) *3,)
+
+    # def sub_process_core(self, X_yfx, A_j, non_sa, m1, n_e,
+    #                      n_l=21, pool=None):
+    #     (Ds, Ds_avg), t_Ds = DistDirect_bin(X_yfx, non_sa)
+    #     ans_approx = [ApproxDist_bin(
+    #         X_yfx, A_j, non_sa, m1, m2) for m2 in self._m2_set]
+    #     ans_approx, ans_ut = zip(*ans_approx)
+    #     curr_res = [Ds, Ds_avg, t_Ds] + list(
+    #         ans_approx) + [''] * n_l + list(ans_ut)
+    #
+    #     B_j = non_sa.astype(DTY_INT)
+    #     ans_approx = [DistApprox(
+    #         X_yfx, B_j, m1, m2, n_e, pool) for m2 in self._m2_set]
+    #     ans_approx, ans_ut = zip(*ans_approx)
+    #     Ds, Ds_avg = zip(*ans_approx)
+    #     curr_res = [curr_res]
+    #     curr_res.append(['']*3+list(Ds)+list(Ds_avg)+list(ans_ut))
+
+    def prepare_trial(self):
+        csv_row_1 = unique_column(11 + 66)    # =3+63
+        if self._omit:
+            csv_row_1 = unique_column(11 + 39)  # =3+12*3
+
+        n_l = len(self._m2_set) - 1  # =20
+        csv_row_2c = ['direct_01', '(^avg)', ''] + ['approx_01'] + [
+            ''] * n_l + ['approx_01^{avg}'] + [''] * n_l + [
+            'approx time_cost'] + [''] * n_l
+        csv_row_3c = ['', '', 'ut'] + [
+            "m2= {}".format(i) for i in self._m2_set] * 3
+        return csv_row_1, csv_row_2c, csv_row_3c, []
+
+
+class ConvHP_EB_anal(ConvHyperE_init):
+    pass
+
+
 # -------------------------------------
 
 # -------------------------------------

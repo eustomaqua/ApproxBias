@@ -33,7 +33,7 @@ from experiment.df_nonbin.rev_mext_exp_mp import (
 from experiment.df_nonbin.rev_mext_exp_mp import (
     ConvergeE2_with, ConvergeE3_with, ConvergeE4_with, ConvergeE5_with,
     ConvergeF2_with, ConvergeF3_with, ConvergeF4_with, ConvergeF5_with,
-    ConvergeF7_with, ConvergeF8_with)
+    ConvergeF7_with, ConvergeF8_with, ConvHP_EA_anal, ConvHP_EB_anal)
 import pdb
 
 
@@ -474,6 +474,10 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
         elif trial_type.endswith('rexp9e'):  # 'rexp5e'):
             self._iterator = ConvergeF5_with(
                 nb_cls, self.saIndex, self.saValue, n_e)
+        elif trial_type[-6:] in ('exhp5a', 'exph5a'):
+            self._iterator = ConvHP_EA_anal(self._omit)
+        elif trial_type[-6:] in ('exhp5b', 'exph5b'):
+            self._iterator = ConvHP_EB_anal(self._omit)
         # rexp4b: refer to expt4b
         # rexp5b: refer to rexp4b (add another converged algo)
 
@@ -486,6 +490,10 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             # formatted = formatted[:-3] + '_'.join([
             #     '', f'cls{nb_cls}', 'pms', ])
             formatted += f'_cf{nb_cls}'  # f'_cls{nb_cls}'
+        elif trial_type[-6:] in ('exhp5a', 'exph5a',):
+            formatted += f'_ma{self._m1}' + '_alt' * self._alternative
+        elif trial_type[-6:] in ('exhp5b', 'exph5b',):
+            formatted += f'_mb{self._m2}' + '_alt' * self._alternative
         self._log_document = formatted + ('_gen' * gen + '_rep' * rep)
         del nk
         if trial_type.endswith('rexp3d'):
@@ -543,6 +551,10 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
                     self._gen_iter, self._rep_iter,
                     self._m1, self._m2, self._n_e, ''],
                    sens_att, priv_val, marginalised_group]  # = ''
+        if self._trial_type[-6:] in ('exhp5a', 'exph5a',):
+            res_aux.append(self._iterator._m2_set)
+        elif self._trial_type[-6:] in ('exhp5b', 'exph5b',):
+            res_aux.append(self._iterator._m1_set)
         # del tmp_cls, tmp_ens
         return (X_A.values, y.values, X_Aq.values,
                 marginalised_group, margin_indices, new_attr, res_aux,
@@ -732,6 +744,18 @@ class Rev_ManfExtPrime_Empir(Rev_ManfExtEmpir):
             res_iter = self._iterator.schedule_content(
                 X, A, y, g1m_indices,
                 self._m1, self._m2, self._n_e, pool)
+        elif self._trial_type[-6:] in ('exhp5a', 'exhp5b',
+                                       'exph5a', 'exph5b'):
+            pm_m = {'n_e': self._n_e,
+                    'alternative': self._alternative,
+                    'pool': pool}
+            if self._trial_type.endswith('5a'):
+                pm_m['m1'] = self._m1
+            elif self._trial_type.endswith('5b'):
+                pm_m['m2'] = self._m2
+            res_iter = self._iterator.schedule_content(
+                X, A, y, g1m_indices, **pm_m)
+            del pm_m
         return res_iter
 
 
