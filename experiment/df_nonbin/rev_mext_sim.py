@@ -200,6 +200,17 @@ class Rev_ManfExtEmpir(DataSetup):
             cr3c = [''] * 10 + cr3c
             # cr4c = [''] * 9 + [self._prep] + cr4c
             cr4c = ['', '', '', self._prep] + [''] * 6 + cr4c
+        elif self._trial_type[-6:] in ('exhp5a', 'exhp5b',
+                                       'exph5a', 'exph5b'):
+            cr2c = csv_row_2a + cr2c
+            # cr3c = [''] * 6 + [f'n_e= {self._n_e}', '', '', (
+            #     'omitted' if self._omit else 'verbose'), ''] + cr3c
+            # cr4c = ['', '', '', self._prep] + [''] * 7 + cr4c
+            cr3c = ['', '', '', (
+                'omitted' if self._omit else 'verbose'),
+                f"alt= {self._alternative}",
+                '', f'n_e= {self._n_e}', '', '', ''] + cr3c
+            cr4c = ['', '', '', self._prep] + [''] * 6 + cr4c
         csv_w.writerows([csv_row_1, cr2c, cr3c, cr4c])
         del csv_row_1, cr2c, cr3c, cr4c
 
@@ -276,6 +287,26 @@ class Rev_ManfExtEmpir(DataSetup):
                     for k in range(1, nk):
                         csv_w.writerow([''] * 9 + [
                             k, ''] + res_data[k][3 + 4 * t + j])
+        elif self._trial_type[-6:] in (  # exp(t)-hyper-params
+                'exhp5a', 'exhp5b', 'exph5a', 'exph5b'):
+            # tmp = res_aux[0].copy()
+            # tmp[2] = ''
+            # tmp[-1] = len(res_aux[1])
+            # tmp.append(res_aux[1])
+            # csv_w.writerow(tmp)
+            # csv_w.writerow(res_aux[0] + [res_aux[1]])
+            # tmp[-1] = res_aux[1]
+            # csv_w.writerow(tmp)
+            for ei, eve in enumerate([
+                    'ans_bin', 'res_nonbin', 'res_multivar']):
+                k = 0
+                csv_w.writerow([  # [''] * 6 + [
+                    '', '', (res_aux[1] if ei == 0 else ''), '', '',
+                    '', eve, '', '', k] + res_data[k][ei])
+                # csv_w.writerow([''] * 9 + [eve, k] + res_data[k][ei])
+                for k in range(1, self._nb_iter):
+                    csv_w.writerow([''] * 9 + [k] + res_data[k][ei])
+            # del tmp, k
         # pdb.set_trace()
 
         del nk, sens_att, priv_val, mrg_grp

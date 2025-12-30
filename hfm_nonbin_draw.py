@@ -278,6 +278,7 @@ class Rev_ManfExtDrawing(object):
         elif trial_type.endswith('rexp9d'):
             self._iterator = ConvFig_5D_exact(figname, **pms)
         elif trial_type.endswith('rexp9e'):
+            # xlsx_name = xlsx_name.replace('exp9', 'exp8')
             self._iterator = ConvFig_5E_exact(figname, **pms)
         elif trial_type.endswith('rexp9b'):
             self._iterator = ConvFig_5B_exact(figname, **pms)
@@ -528,5 +529,6 @@ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp1b -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp2c -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
 
-python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp* -pre min_max  # 8e|9e, 9g|f, 9c|d|b
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max  # 8e|9e,
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9g -pre min_max  # 9f|c|d|b
 """

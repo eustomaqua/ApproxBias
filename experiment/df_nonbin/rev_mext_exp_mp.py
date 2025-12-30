@@ -1942,10 +1942,17 @@ class ConvergeE_setup:
         tmp_3 = unpriv_group_thr(g1_Cm, g0_Cm)
         if verbose:
             cmp_fair.extend(tmp_1 + tmp_2 + tmp_3)
+        #
+        # alternative:
+        # g1,g0 = marginalised_np_mat(y,y_hat,pos_label,non_sa)
+        # afterwards unpriv_group_one(g1,g0)
+        # afterwards unpriv_group_two(g1,g0)
+        # afterwards unpriv_group_thr(g1,g0)
 
         cmp_fair.append(abs(tmp_1[0] - tmp_1[1]))
         cmp_fair.append(abs(tmp_2[0] - tmp_2[1]))
-        cmp_fair.append(abs(tmp_3[0] - tmp_3[0]))
+        cmp_fair.append(abs(tmp_3[0] - tmp_3[1]))
+        # cmp_fair.append(abs(tmp_3[0] - tmp_3[0]))  # BUG!
         cmp_fair.append(hat_L_fair(y_hat, y_qtb))
         cmp_fair.append(hat_L_loss(y_hat, y))
         return cmp_fair  # shape=(11,) =(6+3+2,)
@@ -3287,6 +3294,186 @@ class ConvergeF8_with(ConvergeF7_with):
         return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
 
 
+class ConvergeF9_with(ConvergeF8_with):
+    def count_sing_part3(self, X_y, X_y_hat, non_sa, A_j,
+                         m1=20, m2=8, n_e=2):
+        cmp_fair = []
+        ut_a = time.time()
+        (Ds, Ds_avg), t_Ds = DistDirect_bin(X_y, non_sa)
+        (Df, Df_avg), t_Df = DistDirect_bin(X_y_hat, non_sa)
+        df_prev, _ = fair_degree_v3(Ds, Df)
+        ut_a = time.time() - ut_a
+        ddf, _ = fair_degree_v4(Ds, Df)
+        cmp_fair.extend([Ds, Df, df_prev, ddf, t_Ds, t_Df])
+        ut_b = time.time()
+        Ds, t_Ds = ApproxDist_bin(X_y, A_j, non_sa, m1, m2)
+        Df, t_Df = ApproxDist_bin(X_y_hat, A_j, non_sa, m1, m2)
+        df_prev, _ = fair_degree_v3(Ds, Df)
+        ut_b = time.time() - ut_b
+        # df, _ = fair_degree_v4(Ds, Df)
+        cmp_fair.extend([Ds, Df, df_prev, t_Ds, t_Df])
+
+        B_j = non_sa.astype(DTY_INT)
+        ut_c = time.time()
+        (Ds, Ds_avg), t_Ds = StratVacant(X_y, B_j, m1, m2, n_e)
+        (Df, Df_avg), t_Df = StratVacant(X_y_hat, B_j, m1, m2, n_e)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_c = time.time() - ut_c
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, ddf, ddf_avg,
+                         t_Ds, t_Df])
+        ut_d = time.time()
+        (Ds, Ds_avg), t_Ds = StratEarlyStop(X_y, B_j, n_e)
+        (Df, Df_avg), t_Df = StratEarlyStop(X_y_hat, B_j, n_e)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_d = time.time() - ut_d
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, ddf, ddf_avg,
+                         t_Ds, t_Df])
+        ut_e = time.time()
+        (Ds, Ds_avg), t_Ds = StratRearrange(X_y, B_j, m1, m2, n_e)
+        (Df, Df_avg), t_Df = StratRearrange(X_y_hat, B_j, m1, m2, n_e)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_e = time.time() - ut_e
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, ddf, ddf_avg,
+                         t_Ds, t_Df])
+
+        ut_f = time.time()
+        Ds, t_Ds = EffHDD_bin(X_y, B_j)
+        Df, t_Df = EffHDD_bin(X_y_hat, B_j)
+        df_prev, _ = fair_degree_v3(Ds, Df)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ut_f = time.time() - ut_f
+        cmp_fair.extend([Ds, Df, df_prev, ddf, t_Ds, t_Df])
+        cmp_fair.extend([ut_a, ut_b, ut_c, ut_d, ut_e, ut_f])
+        del Ds, Df, Ds_avg, Df_avg, t_Ds, t_Df, ddf, ddf_avg
+        del ut_a, ut_b, ut_c, ut_d, ut_e, ut_f, df_prev
+        return cmp_fair  # shape=(41,) =(6+5+ 8+8*2+ 6,)=(11+24+6,)
+
+    def count_single_member(self, X, A, y, y_hat, y_qtb,
+                            g1m_indices, m1, m2, n_e,
+                            pos_label, jt, pool=None):
+        pass
+
+    def count_sing_part4(self, X_y, X_y_hat, g1m_indices, A,
+                         m1=20, m2=8, n_e=2, pool=None):
+        cmp_fair = []
+        ut_a = time.time()
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = DistDirect_multivar(
+            X_y, g1m_indices)
+        (Df, Df_avg, Df_midtmp), t_Df = DistDirect_multivar(
+            X_y_hat, g1m_indices)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_a = time.time() - ut_a
+        df_prev, _ = fair_degree_v3(Ds, Df)
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, df_prev,
+                         ddf, ddf_avg, t_Ds, t_Df])
+        n_a = len(g1m_indices)
+        Ds, Ds_avg, t_Ds = Ds_midtmp
+        Df, Df_avg, t_Df = Df_midtmp
+        for i in range(n_a):
+            ddf, _ = fair_degree_v4(Ds[i], Df[i])
+            ddf_avg, _ = fair_degree_v4(Ds_avg[i], Df_avg[i])
+            df_prev, _ = fair_degree_v3(Ds[i], Df[i])
+            cmp_fair.extend([
+                Ds[i], Ds_avg[i], Df[i], Df_avg[i], df_prev,
+                ddf, ddf_avg, t_Ds[i], t_Df[i]])
+        if n_a == 1:
+            cmp_fair.extend([''] * 9)
+
+        ut_b = time.time()
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffExact(
+            X_y, A, StratVacant, m1, m2, n_e, pool)
+        (Df, Df_avg, Df_midtmp), t_Df = EffExact(
+            X_y_hat, A, StratVacant, m1, m2, n_e, pool)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_b = time.time() - ut_b
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg,
+                         ddf, ddf_avg, t_Ds, t_Df])
+        Ds, Ds_avg, t_Ds = Ds_midtmp
+        Df, Df_avg, t_Df = Df_midtmp
+        for i in range(n_a):
+            ddf, _ = fair_degree_v4(Ds[i], Df[i])
+            ddf_avg, _ = fair_degree_v4(Ds_avg[i], Df_avg[i])
+            cmp_fair.extend([Ds[i], Ds_avg[i], Df[i], Df_avg[i],
+                             ddf, ddf_avg, t_Ds[i], t_Df[i]])
+        if n_a == 1:
+            cmp_fair.extend([''] * 8)
+
+        ut_d = time.time()
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffExact(
+            X_y, A, StratEarlyStop, None, None, n_e, pool)
+        (Df, Df_avg, Df_midtmp), t_Df = EffExact(
+            X_y_hat, A, StratEarlyStop, None, None, n_e, pool)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_d = time.time() - ut_d
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, ddf,
+                         ddf_avg, t_Ds, t_Df])
+        Ds, Ds_avg, t_Ds = Ds_midtmp
+        Df, Df_avg, t_Df = Df_midtmp
+        for i in range(n_a):
+            ddf, _ = fair_degree_v4(Ds[i], Df[i])
+            ddf_avg, _ = fair_degree_v4(Ds_avg[i], Df_avg[i])
+            cmp_fair.extend([Ds[i], Ds_avg[i], Df[i], Df_avg[i],
+                             ddf, ddf_avg, t_Ds[i], t_Df[i]])
+        if n_a == 1:
+            cmp_fair.extend([''] * 8)
+
+        ut_e = time.time()
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffExact(
+            X_y, A, StratRearrange, m1, m2, n_e, pool)
+        (Df, Df_avg, Df_midtmp), t_Df = EffExact(
+            X_y_hat, A, StratRearrange, m1, m2, n_e, pool)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_e = time.time() - ut_e
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, ddf,
+                         ddf_avg, t_Ds, t_Df])
+        Ds, Ds_avg, t_Ds = Ds_midtmp
+        Df, Df_avg, t_Df = Df_midtmp
+        for i in range(n_a):
+            ddf, _ = fair_degree_v4(Ds[i], Df[i])
+            ddf_avg, _ = fair_degree_v4(Ds_avg[i], Df_avg[i])
+            cmp_fair.extend([Ds[i], Ds_avg[i], Df[i], Df_avg[i],
+                             ddf, ddf_avg, t_Ds[i], t_Df[i]])
+        if n_a == 1:
+            cmp_fair.extend([''] * 8)
+
+        ut_f = time.time()
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffHDD_multivar(
+            X_y, g1m_indices)
+        (Df, Df_avg, Df_midtmp), t_Df = EffHDD_multivar(
+            X_y_hat, g1m_indices)
+        df_prev, _ = fair_degree_v3(Ds, Df)
+        ddf, _ = fair_degree_v4(Ds, Df)
+        ddf_avg, _ = fair_degree_v4(Ds_avg, Df_avg)
+        ut_f = time.time() - ut_f
+        cmp_fair.extend([Ds, Ds_avg, Df, Df_avg, df_prev,
+                         ddf, ddf_avg, t_Ds, t_Df])
+        Ds, Ds_avg, t_Ds = Ds_midtmp
+        Df, Df_avg, t_Df = Df_midtmp
+        for i in range(n_a):
+            df_prev, _ = fair_degree_v3(Ds[i], Df[i])
+            ddf, _ = fair_degree_v4(Ds[i], Df[i])
+            ddf_avg, _ = fair_degree_v4(Ds_avg[i], Df_avg[i])
+            cmp_fair.extend([
+                Ds[i], Ds_avg[i], Df[i], Df_avg[i],
+                df_prev, ddf, ddf_avg, t_Ds[i], t_Df[i]])
+        if n_a == 1:
+            cmp_fair.extend([''] * 9)
+        cmp_fair.extend([ut_a, ut_b, ut_d, ut_e, ut_f])
+        del Ds, Ds_avg, Df, Df_avg, df_prev, ddf, ddf_avg, ut_a
+        del t_Ds, t_Df, Ds_midtmp, Df_midtmp, ut_b, ut_d, ut_e
+        return cmp_fair  # .shape=(131,) =(9*3+8*3+8*3*2+9*3 +5,)=(42*3+5,)
+
+    def prepare_trial(self):
+        return
+
+
 # Hyper-parameters
 
 class ConvHyperE_init:
@@ -3303,8 +3490,10 @@ class ConvHP_EA_anal(ConvHyperE_init):
 
     def schedule_content(self, X, A, y_fx, g1m_indices, m1,
                          n_e, pool=None, alternative=False):
-        X_yfx = np.concatenate([y_fx.reshape(
-            -1, 1), X], axis=1, dtype=DTY_FLT).copy()
+        # X_yfx = np.concatenate([y_fx.reshape(
+        #     -1, 1), X], axis=1, dtype=DTY_FLT).copy()
+        X_yfx = np.concatenate([
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         n_l, n_a = len(self._m2_set), len(g1m_indices)
         # if not alternative:
         curr_res = [self.subproc_core_alt(
@@ -3319,6 +3508,7 @@ class ConvHP_EA_anal(ConvHyperE_init):
             # ans_bin.append([''] * (3 + n_l * 3))
             ans_bin.extend(['', ] * (3 + n_l * 3) * 3)
         # ans_bin .shape= (n_a *3* (3+n_l+3),) =(39*3*2,)
+        del curr_res
 
         (Ds, Ds_avg, Ds_midtmp), t_Ds = DistDirect_multivar(
             X_yfx, g1m_indices)
@@ -3348,7 +3538,14 @@ class ConvHP_EA_anal(ConvHyperE_init):
             t_dir + t_ap for t_dir, t_ap in zip(ans_direct, ans_approx)]
         del ans_direct, ans_approx
         del hat_Ds, hat_Ds_avg, ans_ut, hat_Ds_midtmp
+        # ans_multival .shape= (1+n_a, 3+n_l*3) =(3,39|66)
 
+        # ans_bin.extend(ans_multival)
+        # del curr_res, ans_multival
+        # return ans_bin
+
+        #
+        # pdb.set_trace()
         # ans_multivar = [Ds, Ds_avg, t_Ds] + list(
         #     hat_Ds) + list(hat_Ds_avg) + list(ans_ut)
         # ans_nonbin = []
@@ -3357,10 +3554,45 @@ class ConvHP_EA_anal(ConvHyperE_init):
         #     tmp = hat_Ds_midtmp[:, :, i]
         #     tmp = np.concatenate([tmp[:, 0], tmp[:, 1], tmp[:2]]).tolist()
 
-        pdb.set_trace()
-        ans_bin.extend(ans_multival)
-        del curr_res, ans_multival
-        return ans_bin
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffExact(
+            X_yfx, A, StratEarlyStop, n_e=n_e, pool=pool)
+        if n_a > 1:
+            cvg_1, cvg_2 = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(cvg_1), list(cvg_2)]
+            del cvg_2
+        elif n_a == 1:
+            cvg_1, = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(cvg_1), [''] * 3]
+        del cvg_1, Ds, Ds_avg, t_Ds, Ds_midtmp
+        ans_conver = [EffExact(
+            X_yfx, A, StratRearrange, m1, m2, n_e,
+            pool) for m2 in self._m2_set]
+        ans_conver, ans_ut = zip(*ans_conver)
+        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_conver)
+        del ans_conver
+        hat_Ds_midtmp = np.array(hat_Ds_midtmp)
+        ans_conver = [list(hat_Ds) + list(hat_Ds_avg) + list(ans_ut)]
+        for i in range(n_a):
+            tmp = hat_Ds_midtmp[:, :, i]
+            tmp = np.concatenate([
+                tmp[:, 0], tmp[:, 1], tmp[:, 2]]).tolist()
+            ans_conver.append(tmp)
+        if n_a == 1:
+            ans_conver.append([''] * n_l * 3)
+        ans_convergence = [t_dir + t_ap for t_dir, t_ap in zip(
+            ans_direct, ans_conver)]
+        del ans_conver, hat_Ds, hat_Ds_avg, hat_Ds_midtmp, ans_ut
+
+        res_nonbin = []
+        for i in range(1, 3):
+            res_nonbin.extend([''] * (3 + n_l * 3))
+            res_nonbin.extend(ans_multival[i] + ans_convergence[i])
+        # res_nonbin .shape= (2* (3+n_l*3) *3,)
+        res_multivar = [''] * (3 + n_l * 3)
+        res_multivar.extend(ans_multival[0] + ans_convergence[0])
+        res_multivar.extend([''] * (3 + n_l * 3) * 3)
+        del ans_multival, ans_convergence
+        return [ans_bin, res_nonbin, res_multivar]
 
     def subproc_core_alt(self, X_yfx, A_j, non_sa, m1, n_e,
                          n_l, pool=None):
@@ -3434,21 +3666,190 @@ class ConvHP_EA_anal(ConvHyperE_init):
     #     curr_res.append(['']*3+list(Ds)+list(Ds_avg)+list(ans_ut))
 
     def prepare_trial(self):
-        csv_row_1 = unique_column(11 + 66)    # =3+63
-        if self._omit:
-            csv_row_1 = unique_column(11 + 39)  # =3+12*3
+        num = (3 + len(self._m2_set) * 3) * 3   # not 66|39
+        csv_row_1 = unique_column(10 + num * 2)
+        # csv_row_1 = unique_column(11 + 66)    # =3+63
+        # if self._omit:
+        #     csv_row_1 = unique_column(11 + 39)  # =3+12*3
+        #
+        # n_l = len(self._m2_set) - 1  # =20
+        # csv_row_2c = ['direct_01', '(^avg)', ''] + ['approx_01'] + [
+        #     ''] * n_l + ['approx_01^{avg}'] + [''] * n_l + [
+        #     'approx time_cost'] + [''] * n_l
+        # csv_row_3c = ['', '', 'ut'] + [
+        #     "m2= {}".format(i) for i in self._m2_set] * 3
+        # return csv_row_1, csv_row_2c, csv_row_3c, []
 
-        n_l = len(self._m2_set) - 1  # =20
-        csv_row_2c = ['direct_01', '(^avg)', ''] + ['approx_01'] + [
-            ''] * n_l + ['approx_01^{avg}'] + [''] * n_l + [
-            'approx time_cost'] + [''] * n_l
-        csv_row_3c = ['', '', 'ut'] + [
-            "m2= {}".format(i) for i in self._m2_set] * 3
-        return csv_row_1, csv_row_2c, csv_row_3c, []
+        n_l = len(self._m2_set) - 1
+        tmp_r4c = [f"m2= {i}" for i in self._m2_set] * 3
+        csv_row_4c = ['drt', '(^avg)', 'ut'] + tmp_r4c + [
+            'drt', '(^avg)', 'ut'] + tmp_r4c + [
+            'app', '(^avg)', 'ut'] + tmp_r4c
+        # csv_row_3c = ['DirectDist_bin', '', ''] + ['ApproxDist_bin'] + [
+        #     ''] * n_l + ['(^avg)'] + [''] * n_l + ['tim_cost'] + [
+        #     ''] * n_l + ['DistDirect_nonbin', '', '',
+        #                  'DistApprox_nonbin'] + [''] * n_l + ['(^avg)'] + [
+        #     ''] * n_l + ['tim_cost'] + [''] * n_l + [
+        #     'StratES', '', '', 'StratRA'] + [''] * n_l + ['(^avg)'] + [
+        #     ''] * n_l + ['tim_cost'] + [''] * n_l
+        csv_row_3c = ['DirectDist_bin', '', ''] + ['ApproxDist_bin'] + [
+            ''] * n_l + ['ApproxDist_bin (^avg)'] + [''] * n_l + [
+            'tim_cost'] + [''] * n_l + [
+            'DistDirect_nonbin', '', '', 'DistApprox_nonbin'] + [
+            ''] * n_l + ['DistApprox_nonbin (^avg)'] + [
+            ''] * n_l + ['tim_cost'] + [''] * n_l + [
+            'StratES', '', '', 'StratRA'] + [''] * n_l + [
+            'StratRA (^avg)'] + [''] * n_l + ['tim_cost'] + [''] * n_l
+        n_l = (n_l + 1) * 3
+        tmp_r2c = [''] * (2 + n_l) + ['extension'] + [
+            ''] * (2 + n_l) + ['convergence'] + [''] * (2 + n_l)
+        csv_row_2c = ['sen-att #1'] + tmp_r2c + ['sen-att #2'] + tmp_r2c
+        del tmp_r4c, tmp_r2c, n_l
+        csv_row_2c[-1] = '[END]'
+        return csv_row_1, csv_row_2c, csv_row_3c * 2, csv_row_4c * 2
 
 
 class ConvHP_EB_anal(ConvHyperE_init):
-    pass
+    def __init__(self, omitted=True):
+        super().__init__(omitted=omitted)
+        self._m1_set = list(range(3, 50, 2))      # len=24
+        if omitted:
+            self._m1_set = list(range(3, 34, 2))  # len=16
+
+    def schedule_content(self, X, A, y_fx, g1m_indices, m2,
+                         n_e, pool=None, alternative=False):
+        X_yfx = np.concatenate([
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        n_l, n_a = len(self._m1_set), len(g1m_indices)  # n_ell
+        curr_res = [self.subproc_core_alt(
+            X_yfx, A[:, i], g1m_indices[i][0], m2, n_e,
+            n_l, pool) for i in range(n_a)]
+        ans_bin = []
+        for i in range(n_a):
+            ans_bin.extend(curr_res[i])
+        if n_a == 1:
+            ans_bin.extend(['', ] * (3 + n_l * 3) * 3)
+        del curr_res  # ans_bin .shape= (n_a* (3+n_l*3) *3,)
+
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = DistDirect_multivar(
+            X_yfx, g1m_indices)
+        if n_a > 1:
+            drt_1, drt_2 = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(drt_1), list(drt_2)]
+            del drt_2
+        elif n_a == 1:
+            drt_1, = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(drt_1), [''] * 3]
+        del drt_1, Ds, Ds_avg, Ds_midtmp, t_Ds
+
+        ans_approx = [DistExtend(
+            X_yfx, A, m1, m2, n_e, pool) for m1 in self._m1_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
+        del ans_approx
+        hat_Ds_midtmp = np.array(hat_Ds_midtmp)
+        ans_approx = [list(hat_Ds) + list(hat_Ds_avg) + list(ans_ut)]
+        for i in range(n_a):
+            tmp = hat_Ds_midtmp[:, 0, i].tolist() + hat_Ds_midtmp[
+                :, 1, i].tolist() + hat_Ds_midtmp[:, 2, i].tolist()
+            ans_approx.append(tmp)
+        if n_a == 1:
+            ans_approx.append([''] * n_l * 3)
+        ans_multival = [
+            t_dir + t_ap for t_dir, t_ap in zip(ans_direct, ans_approx)]
+        del ans_direct, ans_approx
+        del hat_Ds, hat_Ds_avg, ans_ut, hat_Ds_midtmp
+
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = EffExact(
+            X_yfx, A, StratEarlyStop, n_e=n_e, pool=pool)
+        if n_a > 1:
+            cvg_1, cvg_2 = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(cvg_1), list(cvg_2)]
+            del cvg_2
+        elif n_a == 1:
+            cvg_1, = zip(*Ds_midtmp)
+            ans_direct = [[Ds, Ds_avg, t_Ds], list(cvg_1), [''] * 3]
+        del cvg_1, Ds, Ds_avg, t_Ds, Ds_midtmp
+        ans_conver = [EffExact(
+            X_yfx, A, StratRearrange, m1, m2, n_e,
+            pool) for m1 in self._m1_set]
+        ans_conver, ans_ut = zip(*ans_conver)
+        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_conver)
+        del ans_conver
+        hat_Ds_midtmp = np.array(hat_Ds_midtmp)
+        ans_conver = [list(hat_Ds) + list(hat_Ds_avg) + list(ans_ut)]
+        for i in range(n_a):
+            tmp = hat_Ds_midtmp[:, :, i]
+            tmp = np.concatenate([
+                tmp[:, 0], tmp[:, 1], tmp[:, 2]]).tolist()
+            ans_conver.append(tmp)
+        if n_a == 1:
+            ans_conver.append([''] * n_l * 3)
+        ans_convergence = [t_dir + t_ap for t_dir, t_ap in zip(
+            ans_direct, ans_conver)]
+        del ans_conver, hat_Ds, hat_Ds_avg, hat_Ds_midtmp, ans_ut
+
+        res_nonbin = []
+        for i in range(1, 3):
+            res_nonbin.extend([''] * (3 + n_l * 3))
+            res_nonbin.extend(ans_multival[i] + ans_convergence[i])
+        res_multivar = [''] * (3 + n_l * 3)
+        res_multivar.extend(ans_multival[0] + ans_convergence[0])
+        res_multivar.extend([''] * (3 + n_l * 3) * 3)
+        del ans_multival, ans_convergence
+        return [ans_bin, res_nonbin, res_multivar]
+
+    def subproc_core_alt(self, X_yfx, A_j, non_sa, m2, n_e,
+                         n_l, pool=None):
+        (Ds, Ds_avg), t_Ds = DistDirect_bin(X_yfx, non_sa)
+        ans_approx = [ApproxDist_bin(
+            X_yfx, A_j, non_sa, m1, m2) for m1 in self._m1_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        curr_res = [Ds, Ds_avg, t_Ds] + list(
+            ans_approx) + [''] * n_l + list(ans_ut)
+
+        (Ds, Ds_avg), t_Ds = DistDirect_nonbin(X_yfx, [
+            non_sa, ~non_sa])
+        B_j = non_sa.astype(DTY_INT)
+        ans_approx = [DistApprox(
+            X_yfx, B_j, m1, m2, n_e, pool) for m1 in self._m1_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        curr_res.extend([Ds, Ds_avg, t_Ds] + list(
+            hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+
+        (Ds, Ds_avg), t_Ds = StratEarlyStop(X_yfx, B_j, n_e=n_e)
+        ans_approx = [StratRearrange(
+            X_yfx, B_j, m1, m2, n_e=n_e) for m1 in self._m1_set]
+        ans_approx, ans_ut = zip(*ans_approx)
+        hat_Ds, hat_Ds_avg = zip(*ans_approx)
+        curr_res.extend([Ds, Ds_avg, t_Ds] + list(
+            hat_Ds) + list(hat_Ds_avg) + list(ans_ut))
+        return curr_res    # .siz=((3+n_l*3) *3,)
+
+    def prepare_trial(self):
+        num = (3 + len(self._m1_set) * 3) * 3
+        csv_row_1 = unique_column(10 + num * 2)
+        n_l = len(self._m1_set) - 1
+        tmp_r4c = [f"m1= {i}" for i in self._m1_set] * 3
+        csv_row_4c = ['drt', '(^avg)', 'ut'] + tmp_r4c + [
+            'drt', '(^avg)', 'ut'] + tmp_r4c + [
+            'app', '(^avg)', 'ut'] + tmp_r4c
+        csv_row_3c = ['DirectDist_bin', '', ''] + ['ApproxDist_bin'] + [
+            ''] * n_l + ['ApproxDist_bin (^avg)'] + [''] * n_l + [
+            'tim_cost'] + [''] * n_l + [
+            'DistDirect_nonbin', '', '', 'DistApprox_nonbin'] + [
+            ''] * n_l + ['DistApprox_nonbin (^avg)'] + [
+            ''] * n_l + ['tim_cost'] + [''] * n_l + [
+            'StratES', '', '', 'StratRA'] + [''] * n_l + [
+            'StratRA (^avg)'] + [''] * n_l + ['tim_cost'] + [''] * n_l
+        n_l = (n_l + 1) * 3
+        tmp_r2c = [''] * (2 + n_l) + ['extension'] + [
+            ''] * (2 + n_l) + ['convergence'] + [''] * (2 + n_l)
+        csv_row_2c = ['sen-att #1'] + tmp_r2c + ['sen-att #2'] + tmp_r2c
+        csv_row_2c[-1] = '[END]'
+        del tmp_r4c, tmp_r2c, n_l
+        return csv_row_1, csv_row_2c, csv_row_3c * 2, csv_row_4c * 2
 
 
 # -------------------------------------

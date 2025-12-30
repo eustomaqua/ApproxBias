@@ -1600,8 +1600,8 @@ class ConvPlotE_init(GraphSetup):
             ant_X = r'\mathbf{D}_{\mathbf{a}}(S)'
             ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}(S)'
             ant_app = 'ExtendDist'
-            ant_cvg = 'ExactDist (StratES)'
-            ant_arr = 'ExactDist (StratRA)'
+            ant_cvg = 'ExactDist(StratES)'  # 'ExactDist (StratES)'
+            ant_arr = 'ExactDist(StratRA)'  # 'ExactDist (StratRA)'
         elif rmk == 'sen-att':
             ant_X = r'\mathbf{D}_a(S,a_i)'
             ant_Y = r'\hat{\mathbf{D}}_a(S,a_i)'
@@ -1609,10 +1609,11 @@ class ConvPlotE_init(GraphSetup):
             ant_cvg = 'StratES'
             ant_arr = 'StratRA'
         ant_eff = 'EarlyBreak'
-        annotY = ['${}$'.format(ant_eff), '${}$'.format(ant_app),
-                  '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        # annotY = ['${}$'.format(ant_eff), '${}$'.format(ant_app),
+        #           '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
         annot = ['${}$'.format(ant_X), '${}$'.format(ant_Y),
                  '${} = {}$'.format(ant_Y, ant_X)]
+        annotY = [ant_eff, ant_app, ant_cvg, ant_arr]
 
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, suff, snspec='sty3b')
@@ -1802,8 +1803,8 @@ class ConvPlotF_init(ConvPlotE_init):
             ant_X = r'\mathbf{D}_{\mathbf{a}}(S)'
             ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}(S)'
             ant_app = 'ExtendDist'
-            ant_cvg = 'ExactDist (StratES)'
-            ant_arr = 'ExactDist (StratRA)'
+            ant_cvg = 'ExactDist(StratES)'  # 'ExactDist (StratES)'
+            ant_arr = 'ExactDist(StratRA)'  # 'ExactDist (StratRA)'
             ant_Z1 = r'\frac{ \hat{\mathbf{D}}_{\mathbf{a}}(S) }{ \mathbf{D}_{\mathbf{a}}(S) }-1'
             # ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_{\mathbf{a}}(S) }{ \mathbf{D}_{\mathbf{a}}(S) })'
         elif rmk == 'sen-att':
@@ -1852,8 +1853,8 @@ class ConvPlotF_init(ConvPlotE_init):
             ant_X = r'\mathbf{D}_{\mathbf{a}}^\text{avg}(S)'
             ant_Y = r'\hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S)'
             ant_app = 'ExtendDist'
-            ant_cvg = 'ExactDist (StratES)'
-            ant_arr = 'ExactDist (StratRA)'
+            ant_cvg = 'ExactDist(StratES)'  # 'ExactDist (StratES)'
+            ant_arr = 'ExactDist(StratRA)'  # 'ExactDist (StratRA)'
             ant_Z1 = r'\frac{ \hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S) }{ \mathbf{D}_{\mathbf{a}}^\text{avg}(S) }-1'
             ant_Z2 = r'\lg(\frac{ \hat{\mathbf{D}}_{\mathbf{a}}^\text{avg}(S) }{ \mathbf{D}_{\mathbf{a}}^\text{avg}(S) })'
         elif rmk == 'sen-att':
@@ -2107,8 +2108,8 @@ class ConvFig_5H_exact(ConvPlotF_init):
                  r'$\Delta$(specificity)',
                  r'$\Delta$(g_mean)', r'$\Delta$(dp)']
         tag_norm = [i[:1] + i[4:5] + i[3:4] + i[-2:] for i in tag_norm]
-        key_C = BLFAIR[:3] + [r'$\text{ESP}^\text{max}$',
-                              r'$\text{ESP}^\text{avg}$'] + BLFAIR[
+        key_C = BLFAIR[:3] + [  # r'$\text{ESP}^\text{max}$',
+            r'\mathrm{ESP}', r'$\mathrm{ESP}^\text{avg}$'] + BLFAIR[
             -1:] + [r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
         mat_C = np.concatenate([
             df[tag_sa1[:6]].values.astype(DTY_FLT).T,
@@ -2150,8 +2151,8 @@ class ConvFig_5H_exact(ConvPlotF_init):
 
         tmp = self.sub_dat_sen_att(  # .siz=(7+8+8)+8+7*2=23+22=45
             dframe, nb_set, id_set, tag_sa1 + tb, tag_sa2 + tb)
-        key_C = BLFAIR[:3] + [r'$\text{SP}^\text{max}$',
-                              r'$\text{SP}^\text{avg}$'] + BLFAIR[
+        key_C = BLFAIR[:3] + [  # r'$\text{SP}^\text{max}$',
+            r'\mathrm{SP}', r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
             -1:] + [r'$\mathbf{df}_\text{prev}$',
                     r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
         key_D = tag_sa1[:6] + tag_sa1[7:][:1] + tag_sa1[
