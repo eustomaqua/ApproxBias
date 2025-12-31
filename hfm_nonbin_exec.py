@@ -107,7 +107,8 @@ if args.revision:
             'rexp4d', 'rexp5b', 'rexp5c', 'rexp5d', 'rexp5e',):
         kwargs['nb_cls'] = args.nb_cls
     elif trial_type[-2:] in ('9b', '8b', '8c', '8d', '8e',
-                             '9f', '9g', '9c', '9d', '9e',):
+                             '9f', '9g', '9c', '9d', '9e',
+                             '9h'):
         kwargs['nb_cls'] = args.nb_cls
     elif 'exhp5' in trial_type:
         if trial_type[-6:] in ['exhp5a', ]:
@@ -219,4 +220,5 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9f -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9g -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
 python hfm_nonbin_exec.py -rev -exp rept_exhp5a -dat * -nk 2 -m1 20
 python hfm_nonbin_exec.py -rev -exp rept_exhp5b -dat * -nk 2 -m2 8
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9h -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
 """

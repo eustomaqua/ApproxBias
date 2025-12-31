@@ -16,8 +16,6 @@ from hfm.utils.verifiers import check_zero
 
 # =============================================
 # Estimated distance between sets
-
-
 # ---------------------------------------------
 # Algorithm 2
 # Algorithm 1
@@ -25,11 +23,10 @@ from hfm.utils.verifiers import check_zero
 
 # =============================================
 # Harmonic fairness measure via manifolds (HFM)
-
-
 # ---------------------------------------------
-# 1. https://arxiv.org/abs/2405.09251
 
+
+# 1. https://arxiv.org/abs/2405.09251
 
 @fantasy_timer
 def bias_degree_bin(Dy_dis, Df_dis):
@@ -40,9 +37,7 @@ def bias_degree_bin(Dy_dis, Df_dis):
     return tmp - 1.
 
 
-# ---------------------------------------------
 # 2. https://arxiv.org/abs/2408.06099
-
 
 @fantasy_timer
 def bias_degree_nonbin(Dy_dis, Df_dis):
@@ -54,9 +49,6 @@ def bias_degree_nonbin(Dy_dis, Df_dis):
     return float(np.log10(tmp))
 
 
-# ---------------------------------------------
-
-
 @fantasy_timer
 def bias_degree(Dy_dis, Df_dis):
     if (Dy_dis == 0) and (Df_dis == 0):
@@ -65,3 +57,29 @@ def bias_degree(Dy_dis, Df_dis):
         tmp = Df_dis / check_zero(Dy_dis)
     tmp_ver = np.log10(check_zero(tmp))
     return tmp - 1., float(tmp_ver)
+
+
+# ---------------------------------------------
+# differentiate/differentiation (diff.)
+# e.g. t3 = list(map(lambda x,y: y/(x+1), t1, t2))
+
+
+def _diff(drt, app):
+    tmp = app / check_zero(drt)
+    return float(tmp)
+
+
+def differentiate_tim(direct, approx):
+    tmp = list(map(_diff, direct, approx))
+    return np.log10(tmp)
+
+
+def differentiate_val(direct, approx):
+    tmp = list(map(_diff, direct, approx))
+    return np.array(tmp, dtype='float') - 1.
+
+
+# ---------------------------------------------
+
+# =============================================
+#
