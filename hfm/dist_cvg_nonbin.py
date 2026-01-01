@@ -18,6 +18,7 @@ from hfm.dist_est_nonbin import (
     set_belonging, orthogonal_weight, AcceleCore,
     AcceleCoreBack)
 
+# from hfm.dist_est_nonbin import ApproxDist_nonbin as blank
 # https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-reflection-for-list-and-set-types
 from numba.typed import List
 
@@ -27,13 +28,14 @@ from numba.typed import List
 # (Converged version)
 
 
-@numba.jit(nopython=True)
-def sep_helper(idx_y_fx, Ai, X_yfx, proj, i):
-    i_anchor = idx_y_fx[i]
-    A_anchor = Ai[i_anchor]
-    X_yfx_anchor = X_yfx[i_anchor]
-    g_anchor = proj[i_anchor]
-    return i_anchor, A_anchor, X_yfx_anchor, g_anchor
+# # @numba.njit(inline='always')
+# @numba.jit(nopython=True)
+# def sep_helper(idx_y_fx, Ai, X_yfx, proj, i):
+#     i_anchor = idx_y_fx[i]
+#     A_anchor = Ai[i_anchor]
+#     X_yfx_anchor = X_yfx[i_anchor]
+#     g_anchor = proj[i_anchor]
+#     return i_anchor, A_anchor, X_yfx_anchor, g_anchor
 
 
 # ------------------------------------------
@@ -90,8 +92,12 @@ def sep_helper(idx_y_fx, Ai, X_yfx, proj, i):
 
 @numba.jit(nopython=True)
 def sub_accelerator_smaler(X_yfx, proj, Ai, idx_y_fx, i):
-    i_anch, A_anch, X_yfx_anch, g_anch = sep_helper(
-        idx_y_fx, Ai, X_yfx, proj, i)
+    # i_anch, A_anch, X_yfx_anch, g_anch = sep_helper(
+    #     idx_y_fx, Ai, X_yfx, proj, i)
+    i_anch = idx_y_fx[i]
+    A_anch = Ai[i_anch]
+    X_yfx_anch = X_yfx[i_anch]
+    g_anch = proj[i_anch]
 
     j, num_j, min_js = i, 0, np.finfo(np.float32).max
     j = i - 1  # doesn't have to be compared with the anchor
@@ -117,8 +123,12 @@ def sub_accelerator_larger(X_yfx, proj, Ai, idx_y_fx, i):
     # A_anchor = Ai[i_anchor]
     # X_yfx_anchor = X_yfx[i_anchor]
     # g_anchor = proj[i_anchor]
-    i_anch, A_anch, X_yfx_anch, g_anch = sep_helper(
-        idx_y_fx, Ai, X_yfx, proj, i)
+    # i_anch, A_anch, X_yfx_anch, g_anch = sep_helper(
+    #     idx_y_fx, Ai, X_yfx, proj, i)
+    i_anch = idx_y_fx[i]
+    A_anch = Ai[i_anch]
+    X_yfx_anch = X_yfx[i_anch]
+    g_anch = proj[i_anch]
 
     j, num_j, min_jr = i, 0, np.finfo(np.float32).max
     j = i + 1  # doesn't have to be compared with the anchor
@@ -164,6 +174,63 @@ def AcceleDist_nonbin(X_nA_y, A_j, vec_w):
         tmp = min(min_js[0], min_jr[0])
         d_min.append(tmp)
     return max(d_min), sum(d_min)
+
+
+"""
+@fantasy_timer
+def AcceleDist_nonbin(X_nA_y, A_j, vec_w):
+    n = X_nA_y.shape[0]  # number of instances
+    # proj = np.empty(n, dtype='float')
+    # for i, ele in enumerate(X_nA_y):
+    #     proj[i] = projector(ele, vec_w)
+    proj = [projector(ele, vec_w) for ele in X_nA_y]
+    idx_y_fx = np.argsort(proj)
+
+    d_min = []
+    for i in range(n):
+        # Set the anchor data point (xi,yi) in this round
+        # min_js = sub_accelerator_smaler(
+        #     X_nA_y, proj, A_j, idx_y_fx, i)
+        # min_jr = sub_accelerator_larger(
+        #     X_nA_y, proj, A_j, idx_y_fx, i)
+
+        # main loop
+        i_anch = idx_y_fx[i]
+        A_anch = A_j[i_anch]
+        X_yfx_anch = X_nA_y[i_anch]
+        g_anch = proj[i_anch]
+        best = np.inf
+        l, r = i - 1, i + 1  # two pointers
+        while l >= 0 or r < n:
+            # choose nearer side in projection space
+            go_left = False
+            if l >= 0 and r < n:
+                go_left = (g_anch - proj[
+                    idx_y_fx[l]]) <= (proj[idx_y_fx[r]] - g_anch)
+            elif l >= 0:
+                go_left = True
+            if go_left:
+                j = idx_y_fx[l]
+                gap = g_anch - proj[j]
+                l -= 1
+            else:
+                j = idx_y_fx[r]
+                gap = proj[j] - g_anch
+                r += 1
+            # early stop
+            if gap >= best:  # if gap * gap >= best:
+                break
+            if A_j[j] != A_anch:
+                d2 = DistDirect_Euclidean(X_yfx_anch, X_nA_y[j])
+                if d2 < best:
+                    best = d2
+        d_min.append(best)  # d_min[i] = best
+
+        # finally,
+        # tmp = min(min_js[0], min_jr[0])
+        # d_min.append(tmp)
+    return max(d_min), sum(d_min)
+"""
 
 
 # Algorithm 2. ApproxDist
@@ -271,6 +338,8 @@ def StratVacant(X_nA_y, A_j, m1, m2, n_e=2):
         d_max.append(min(t_max))
         d_avg.append(min(t_avg))
     return min(d_max), min(d_avg) / float(n)
+
+# StratVacant = blank
 
 
 '''

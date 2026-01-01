@@ -90,7 +90,7 @@ def EffHD_bin(X_nA_y, idx_Si):
 
 
 @fantasy_timer
-# @numba.jit(nopython=True)
+@numba.njit  # @numba.jit(nopython=True)
 def Naive_bin(X_nA_y, idx_Si):
     Sj, Sj_c = X_nA_y[idx_Si], X_nA_y[~idx_Si]
     half_1 = NaiveHDD(Sj, Sj_c)
@@ -118,7 +118,7 @@ def EffHD_multivar(X_nA_y, idx_Ai_Sj):
 
 
 @fantasy_timer
-# @numba.jit(nopython=True)  # @numba.njit
+@numba.njit  # @numba.jit(nopython=True)
 def Naive_nonbin(X_nA_y, idx_Sjs):
     cmax = 0
     for idx_Si in idx_Sjs:

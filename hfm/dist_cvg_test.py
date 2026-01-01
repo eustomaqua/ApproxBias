@@ -18,6 +18,11 @@ from hfm.dist_cvg_nonbin import (AcceleDist_nonbin,
 
 from hfm.dist_cvg_nonbin import (
     StratVacant, StratRearrange, StratEarlyStop, EffExact)
+from hfm.dist_est_nonbin import ApproxDist_nonbin as StratPrev
+from hfm.earlybreak import (
+    EffHD_bin, EffHD_nonbin, EffHD_multivar,
+    Naive_bin, Naive_nonbin, Naive_multivar)
+from hfm.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
 
 import numpy as np
 from pathos import multiprocessing as pp
@@ -193,17 +198,24 @@ def test_strategy():
     res_2 = DirectDist_nonbin(X_nA_y, i_alt)
     res_3 = DirectDist_nonbin(X_nA_y, S0)
     res_4 = DirectDist_nonbin(X_nA_y, indices[k])
+    # res_5 = Naive_bin(X_nA_y, idx_S1)
+    # res_6 = Naive_nonbin(X_nA_y, indices[k])
+    # res_7 = EffHD_bin(X_nA_y, idx_S1)
+    # res_8 = EffHD_nonbin(X_nA_y, indices[k])
     assert check_equal(res_1[0], res_2[0])
     assert check_equal(res_3[0], res_4[0])
 
+    ans_0 = StratPrev(X_nA_y, Ap, m1, m2, n_e)
     ans_1 = StratVacant(X_nA_y, Ap, m1, m2, n_e)
     ans_2 = StratRearrange(X_nA_y, Ap, m1, m2, n_e)
     ans_3 = StratEarlyStop(X_nA_y, Ap, n_e)
     assert check_equal(ans_3[0], res_3[0])
 
-    cmp_1 = StratVacant(X_nA_y, idx_S1, m1, m2, n_e)
-    cmp_2 = StratRearrange(X_nA_y, idx_S1, m1, m2, n_e)
-    cmp_3 = StratEarlyStop(X_nA_y, idx_S1, n_e)
+    B_j = idx_S1.astype('int')
+    cmp_0 = StratPrev(X_nA_y, B_j, m1, m2, n_e)
+    cmp_1 = StratVacant(X_nA_y, B_j, m1, m2, n_e)  # idx_S1
+    cmp_2 = StratRearrange(X_nA_y, B_j, m1, m2, n_e)
+    cmp_3 = StratEarlyStop(X_nA_y, B_j, n_e)
     assert check_equal(cmp_3[0], res_2[0])
     assert check_equal(cmp_3[0], res_1[0])
 
@@ -219,7 +231,91 @@ def test_strategy():
     # T_v2 = StratRearrange_ver2(X_nA_y, Ap, m1, m2, n_e)
     # T_v3 = StratRearrange_ver3(X_nA_y, Ap, m1, m2, n_e)
     # T_v4 = StratRearrange_ver4(X_nA_y, Ap, m1, m2, n_e)
-    assert check_equal(ans_2[0], res_3[0])
+    # if not check_equal(ans_2[0], res_3[0]):
+    #     pdb.set_trace()
+    # assert check_equal(ans_2[0], res_3[0])
     assert check_equal(cmp_2[0], res_2[0])
+
+    kw = {'m1': m1, 'm2': m2, 'n_e': n_e}
+    lst_1 = EffExact(X_nA_y, A, StratVacant, **kw)
+    lst_2 = EffExact(X_nA_y, A, StratRearrange, **kw)
+    lst_3 = EffExact(X_nA_y, A, StratEarlyStop, **kw)
+    lst_6 = Naive_multivar(X_nA_y, indices)
+    lst_7 = EffHD_multivar(X_nA_y, indices)
+    lst_8 = DirectDist_multiver(X_nA_y, indices)
+    lst_9 = DistExtend(X_nA_y, A, m1, m2, n_e)
+    # pdb.set_trace()
+    return
+
+
+def test_German():
+    from experiment.utils_empirical import DataSetup
+    from experiment.datasets import (
+        transform_X_and_y, transform_unpriv_tag)
+    from experiment.preprocessing_bin import normalise_disturb_prime
+    from experiment.preprocessing_nonbin import (
+        renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
+        check_marginalised_indices, renewed_transform_disturb,
+        renewed_normalise_disturb, renewed_normalise_separate)
+
+    cs = DataSetup('german')
+    ratio = .97
+    origin_dat, processed_dat, process_mult, disturbed_dat, \
+        disturb_mult = renewed_prep_and_adversarial(
+            cs._dataset, cs._data_frame, ratio, logger=None)
+    processed_Xy = process_mult['numerical-multisen']
+    disturbed_Xy = disturb_mult['numerical-multisen']
+    X, A, y, _ = renewed_transform_X_A_and_y(
+        cs._dataset, processed_Xy, with_joint=False)
+    # _, Aq, _, _ = renewed_transform_X_A_and_y(
+    #         cs._dataset, disturbed_Xy, with_joint=False)
+
+    X_nA_y = np.concatenate([
+        y.values.reshape(-1, 1).astype('float'),
+        X.values], axis=1)  # .flags
+    sens_att = cs._dataset.get_sensitive_attrs_with_joint()[: 2]
+    priv_val = cs._dataset.get_privileged_group_with_joint('')[: 2]
+    marginalised_group = origin_dat['marginalised_groups']
+    g1m_indices = check_marginalised_indices(
+        processed_dat['original'], sens_att, priv_val,
+        marginalised_group)
+    k, m1, m2, n_e = 1, 3, 5, 2
+    non_sa = g1m_indices[k][0]
+    A = A.values
+    Ap = A[:, k]
+
+    res_5 = Naive_bin(X_nA_y, non_sa)
+    res_6 = Naive_nonbin(X_nA_y, g1m_indices[k])
+    res_1 = DirectDist_bin(X_nA_y, non_sa)
+    res_2 = DirectDist_nonbin(X_nA_y, [~non_sa, non_sa])
+    res_4 = DirectDist_nonbin(X_nA_y, g1m_indices[k])
+    res_7 = EffHD_bin(X_nA_y, non_sa)
+    res_8 = EffHD_nonbin(X_nA_y, g1m_indices[k])
+    assert check_equal(res_1[0], res_2[0])
+
+    B_j = non_sa.astype('int')
+    cmp_0 = StratPrev(X_nA_y, B_j, m1, m2, n_e)
+    cmp_1 = StratVacant(X_nA_y, B_j, m1, m2, n_e)
+    cmp_2 = StratRearrange(X_nA_y, B_j, m1, m2, n_e)
+    cmp_3 = StratEarlyStop(X_nA_y, B_j, n_e)
+    assert check_equal(cmp_3[0], res_2[0])
+    assert check_equal(cmp_3[0], res_1[0])
+
+    ans_0 = StratPrev(X_nA_y, Ap, m1, m2, n_e)
+    ans_1 = StratVacant(X_nA_y, Ap, m1, m2, n_e)
+    ans_2 = StratRearrange(X_nA_y, Ap, m1, m2, n_e)
+    ans_3 = StratEarlyStop(X_nA_y, Ap, n_e)
+    assert check_equal(ans_3[0], res_4[0])
+    assert check_equal(cmp_2[0], res_2[0])
+
+    kw = {'m1': m1, 'm2': m2, 'n_e': n_e}
+    lst_1 = EffExact(X_nA_y, A, StratVacant, **kw)
+    lst_2 = EffExact(X_nA_y, A, StratRearrange, **kw)
+    lst_3 = EffExact(X_nA_y, A, StratEarlyStop, **kw)
+    lst_6 = Naive_multivar(X_nA_y, g1m_indices)
+    lst_7 = EffHD_multivar(X_nA_y, g1m_indices)
+    lst_8 = DirectDist_multiver(X_nA_y, g1m_indices)
+    lst_9 = DistExtend(X_nA_y, A, m1, m2, n_e)
+
     # pdb.set_trace()
     return

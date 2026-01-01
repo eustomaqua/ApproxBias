@@ -108,8 +108,9 @@ if args.revision:
         kwargs['nb_cls'] = args.nb_cls
     elif trial_type[-2:] in ('9b', '8b', '8c', '8d', '8e',
                              '9f', '9g', '9c', '9d', '9e',
-                             '9h'):
+                             '9h', '9i'):
         kwargs['nb_cls'] = args.nb_cls
+        kwargs['omitted'] = args.omit
     elif 'exhp5' in trial_type:
         if trial_type[-6:] in ['exhp5a', ]:
             kwargs['m1'] = args.m1_chosen
@@ -220,5 +221,6 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9f -dat * -nk 2 --nb-cls 3 -rep
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9g -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
 python hfm_nonbin_exec.py -rev -exp rept_exhp5a -dat * -nk 2 -m1 20
 python hfm_nonbin_exec.py -rev -exp rept_exhp5b -dat * -nk 2 -m2 8
-python hfm_nonbin_exec.py -rev -exp mCV_rexp9h -pre min_max -dat adult -nk 5 --nb-cls 7 -rep
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9h -pre min_max -dat adult -nk 5 --nb-cls 7 -rep # -mp 0
+python hfm_nonbin_exec.py -rev -exp mCV_rexp9i -pre min_max -dat ricci -nk 2 --nb-cls 3 -rep -mp 0
 """

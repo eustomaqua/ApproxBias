@@ -1886,6 +1886,39 @@ class ConvPlotF_init(ConvPlotE_init):
         #     scat_X, scat_Z, annotY, annot, suff + '_s6b', **kws)
         return
 
+    def obtain_multival_senatt(self, dframe, id_set, tag,
+                               tag_s1, tag_s2, first_incl=False):
+        columns = {t2: t1 for t1, t2 in zip(tag_s1, tag_s2)}
+        k = 2 if len(id_set) == 6 else 0
+        df_raw = dframe.iloc[id_set[
+            k] + 1: id_set[k + 1]][tag + tag_s1]
+        for k in ([3, 4] if len(id_set) == 6 else [2, 3]):
+            df_tmp = dframe.iloc[id_set[
+                k] + 1: id_set[k + 1]][tag + tag_s2]
+            df_tmp = df_tmp.rename(columns=columns)
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        df_raw = df_raw.reset_index(drop=True)
+        if not (first_incl and len(id_set) == 6):
+            return df_raw
+        df_tmp = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_s1]
+        return pd.concat([
+            df_raw, df_tmp], axis=0).reset_index(drop=True)
+
+    def obtain_binval_senatt(self, dframe, id_set, tag,
+                             tag_s1, tag_s2):
+        columns = {t2: t1 for t1, t2 in zip(tag_s1, tag_s2)}
+        df_raw = dframe.iloc[id_set[1] + 1: id_set[2]][tag + tag_s1]
+        for k in ([1, 2] if len(id_set) == 6 else [1]):
+            df_tmp = dframe.iloc[id_set[
+                k] + 1: id_set[k + 1]][tag + tag_s2]
+            df_tmp = df_tmp.rename(columns=columns)
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        for k in ([3, 4] if len(id_set) == 6 else [2, 3]):
+            df_tmp = dframe.iloc[id_set[
+                k] + 1: id_set[k + 1]][tag + tag_s1]
+            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        return df_raw
+
 
 class ConvFig_5C_exact(ConvPlotF_init):  # E_init
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
@@ -2094,11 +2127,15 @@ class ConvFig_5H_exact(ConvPlotF_init):
         tb = tag_norm[0] + tag_norm[1]  # tmp_multivar+ #tsa=
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             dframe, nb_row=4, nc_norm=3, nc_sens=4)
-        df_alt = self.sub_dat_multivar(
-            dframe, nb_set, id_set,
-            tb + tmp_multivar)  # tag_sa1+tag_sa2+tb)
-        df = self.sub_dat_grpfair(
-            dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        # df_alt = self.sub_dat_multivar(
+        #     dframe, nb_set, id_set,
+        #     tb + tmp_multivar)  # tag_sa1+tag_sa2+tb)
+        df_alt = self.obtain_multival_senatt(
+            dframe, id_set, tb + tmp_multivar, tag_sa1, tag_sa2)
+        # df = self.sub_dat_grpfair(
+        #     dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        df = df_alt  # df=self.sub_dat_grpfair(df_alt, tag_sa1, tag_sa2)
+        # TODO!!
         key_A = [r'accuracy',  # r'precision', r'recall',
                  r'$\mathrm{f}_1$ score', r'specificity',
                  r'g_mean', r'dp']
@@ -2150,10 +2187,11 @@ class ConvFig_5H_exact(ConvPlotF_init):
             mat_D, key_D[-2], 'Fairness', key_D[3:8], key_C[3:8],
             figname=fgn + '_pc2b', **kws)
 
-        tmp = self.sub_dat_sen_att(  # .siz=(7+8+8)+8+7*2=23+22=45
-            dframe, nb_set, id_set, tag_sa1 + tb, tag_sa2 + tb)
+        # tmp = self.sub_dat_sen_att(  # .siz=(7+8+8)+8+7*2=23+22=45
+        #     dframe, nb_set, id_set, tag_sa1 + tb, tag_sa2 + tb)
+        tmp = df_alt
         key_C = BLFAIR[:3] + [  # r'$\text{SP}^\text{max}$',
-            r'\mathrm{SP}', r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
+            r'$\mathrm{SP}$', r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
             -1:] + [r'$\mathbf{df}_\text{prev}$',
                     r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
         key_D = tag_sa1[:6] + tag_sa1[7:][:1] + tag_sa1[
@@ -2179,28 +2217,39 @@ class ConvFig_5H_exact(ConvPlotF_init):
         pdb.set_trace()  # pdb.set_option()
         return
 
-    def sub_dat_grpfair(self, dframe, nb_set, id_set, tag_sa1, tag_sa2):
-        df_raw = dframe[tag_sa1].iloc[id_set[0] + 1: id_set[0 + 1]]
-        columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
-        operator_max = tag_sa1[3:4] + tag_sa1[
-            7:][:5] + tag_sa1[7 + 8:][:4]
-        operator_avg = tag_sa1[:3] + tag_sa1[4:7] + tag_sa1[
-            7:][5:8] + tag_sa1[7 + 8:][4:]
-        for i in range(1, nb_set):
-            df_tmp = dframe[tag_sa1].iloc[id_set[i] + 1: id_set[i + 1]]
-            df_alt = dframe[tag_sa2].iloc[id_set[i] + 1: id_set[i + 1]]
-            df_alt = df_alt.rename(columns=columns)
+    # def sub_dat_grpfair(self, dframe, nb_set, id_set, tag_sa1, tag_sa2):
+    #     df_raw = dframe[tag_sa1].iloc[id_set[0] + 1: id_set[0 + 1]]
+    #     columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+    #     operator_max = tag_sa1[3:4] + tag_sa1[
+    #         7:][:5] + tag_sa1[7 + 8:][:4]
+    #     operator_avg = tag_sa1[:3] + tag_sa1[4:7] + tag_sa1[
+    #         7:][5:8] + tag_sa1[7 + 8:][4:]
+    #     for i in range(1, nb_set):
+    #         df_tmp = dframe[tag_sa1].iloc[id_set[i] + 1: id_set[i + 1]]
+    #         df_alt = dframe[tag_sa2].iloc[id_set[i] + 1: id_set[i + 1]]
+    #         df_alt = df_alt.rename(columns=columns)
+    #
+    #         tmp = df_alt.copy()
+    #         for j in operator_avg:
+    #             tmp[j] = (df_tmp[j] + df_alt[j]) / 2.
+    #         for j in operator_max:
+    #             tmp[j] = np.max([
+    #                 df_tmp[j].values.astype(DTY_FLT),
+    #                 df_alt[j].values.astype(DTY_FLT)], axis=0)
+    #         df_raw = pd.concat([df_raw, tmp], axis=0)
+    #         del tmp, df_tmp, df_alt
+    #     return df_raw.reset_index(drop=True)
 
-            tmp = df_alt.copy()
-            for j in operator_avg:
-                tmp[j] = (df_tmp[j] + df_alt[j]) / 2.
-            for j in operator_max:
-                tmp[j] = np.max([
-                    df_tmp[j].values.astype(DTY_FLT),
-                    df_alt[j].values.astype(DTY_FLT)], axis=0)
-            df_raw = pd.concat([df_raw, tmp], axis=0)
-            del tmp, df_tmp, df_alt
-        return df_raw.reset_index(drop=True)
+    # def sub_dat_grpfair(self, df_alt, tag_sa1, tag_sa2):
+    #     columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+    #     op_max = tag_sa1[3:4] + tag_sa1[7:][:5] + tag_sa1[7 + 8:][:4]
+    #     op_avg = tag_sa1[:3] + tag_sa1[4:7] + tag_sa1[
+    #         7:][5:8] + tag_sa1[7 + 8:][4:]
+    #     tmp = df_alt.copy()
+    #     for j in op_avg:
+    #         tmp[j] = (df_)
+    #     pdb.set_trace()
+    #     return
 
     def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn):
         nb_set, id_set, _, _, _ = self.recap_sub_data(
@@ -2829,6 +2878,7 @@ class ConvFig_5Iprev_exact(ConvFig_5H_exact):
             32:34] + tag_sa2[26:26 + 6] + tag_sa2[34:]
         tmp = self.sub_dat_sen_att(
             dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        pdb.set_trace()
         tag_tim = tag_sa1[6 + 12 + 4:]
         tag_tim = np.array(tag_tim).reshape(-1, 2).T.tolist()
         fgn += '_singvar'
@@ -2958,6 +3008,7 @@ class ConvFig_5Iprev_exact(ConvFig_5H_exact):
         tag_multivar = tag_conv['multivar'] + tag_conv['tim'][:-1]
         df_alt = self.sub_dat_multivar(
             dframe, nb_set, id_set, tag_multivar)
+        pdb.set_trace()
         tag_tim = [tag_multivar[7:9], tag_multivar[33 + 4:33 + 6],
                    tag_multivar[9 + 6: 9 + 8], tag_multivar[17 + 6:17 + 8],
                    tag_multivar[25 + 6:25 + 8], ]  # EarlyBreak,Vacant|..
@@ -3306,8 +3357,10 @@ class ConvFig_5I_exact(ConvFig_5Iprev_exact):
         #          x2, StratVacant x2, StratES x2, StratRA x2,
         #          DistDirect_nonbin x2            # .siz=12+2  =14
 
-        tmp = self.sub_dat_sen_att(
-            dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        # tmp = self.sub_dat_sen_att(
+        #     dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        tmp = self.obtain_multival_senatt(
+            dframe, id_set, [], tag_sa1, tag_sa2)
         tag_tim = tag_sa1[6 + 12 + 4:]
         tag_tim = np.array(tag_tim).reshape(-1, 2).T.tolist()
         fgn += '_singvar'
@@ -3324,8 +3377,11 @@ class ConvFig_5I_exact(ConvFig_5Iprev_exact):
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             dframe, nb_row=4, nc_norm=3, nc_sens=4)
         tag_multivar = tag_conv['multivar'] + tag_conv['tim'][:-1]
-        df_alt = self.sub_dat_multivar(
-            dframe, nb_set, id_set, tag_multivar)
+        # df_alt = self.sub_dat_multivar(
+        #     dframe, nb_set, id_set, tag_multivar)
+        df_alt = self.obtain_multival_senatt(
+            dframe, id_set, tag_multivar, tag_conv[
+                'sa1'], tag_conv['sa2'])
         tag_tim = [tag_multivar[7:9], tag_multivar[9 + 4:9 + 6],
                    tag_multivar[15 + 6: 15 + 8], tag_multivar[
                    23 + 6:23 + 8], tag_multivar[31 + 6:31 + 8]]
@@ -3340,8 +3396,9 @@ class ConvFig_5I_exact(ConvFig_5Iprev_exact):
         self.thread_multivar(df_alt, tag_tim, fgn, tag_val, tag_avg)
 
         tag_sa1 = tag_conv['sa1']
-        tmp = self.sub_dat_sen_att(dframe, nb_set, id_set, tag_sa1,
-                                   tag_conv['sa2'])
+        # tmp = self.sub_dat_sen_att(dframe, nb_set, id_set, tag_sa1,
+        #                            tag_conv['sa2'])
+        tmp = df_alt
         tag_tim = np.array([tag_sa1[7:9], tag_sa1[9 + 4:9 + 6],
                             tag_sa1[15 + 6:15 + 8],
                             tag_sa1[23 + 6:23 + 8],

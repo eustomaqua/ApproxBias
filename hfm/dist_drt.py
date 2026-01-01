@@ -48,6 +48,7 @@ from hfm.utils.decorators import fantasy_timer
 # """
 
 
+# @numba.njit(inline='always')
 @numba.jit(nopython=True)
 def DistDirect_Euclidean(ele_i, ele_ic):
     return float(np.linalg.norm(ele_i - ele_ic))
@@ -68,6 +69,25 @@ def DistDirect_mediator(X_nA_y, idx_Si):
     elements = [DistDirect_halfway_min(
         ele_i, Sj_c) for ele_i in Sj]
     return max(elements), sum(elements)
+
+
+# @numba.jit(nopython=True)
+# def DistDirect_mediator(Sj, Sj_c):
+#     if len(Sj) == 0 or len(Sj_c) == 0:
+#         return 0., 0.  # default if Sj is an empty set
+#     elements = []      # v_max = v_sum = 0.
+#     for ele_i in Sj:
+#         v_min = float(np.finfo(np.float32).max)
+#         for ele_ic in Sj_c:
+#             d = DistDirect_Euclidean(ele_i, ele_ic)
+#             if d < v_min:
+#                 v_min = d
+#         # v_sum += v_min
+#         # if v_min > v_max:
+#         #     v_max = v_min
+#         elements.append(v_min)
+#     return max(elements), sum(elements)
+#     # return v_max, v_sum
 
 
 # ------------------------------------------

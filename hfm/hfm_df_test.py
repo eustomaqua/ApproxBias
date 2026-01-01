@@ -4,6 +4,7 @@
 #
 
 
+import pdb
 import numpy as np
 from hfm.hfm_df import bias_degree_bin, bias_degree_nonbin
 
@@ -67,15 +68,15 @@ def test_earlybreak():
     idx_Ai_Sj = [idx_Sjs, idx_Sks]
     del idx_Sj, idx_Sk, idx_Sks
 
-    ans = DirectDist_bin(X_nA_y, idx_Si)
     tmp = Naive_bin(X_nA_y, idx_Si)
     res = EffHD_bin(X_nA_y, idx_Si)
+    ans = DirectDist_bin(X_nA_y, idx_Si)
     # pdb.set_trace()
     assert check_equal(ans[0][0], [tmp[0], res[0]])
 
-    ans = DirectDist_nonbin(X_nA_y, idx_Sjs)
     tmp = Naive_nonbin(X_nA_y, idx_Sjs)
     res = EffHD_nonbin(X_nA_y, idx_Sjs)
+    ans = DirectDist_nonbin(X_nA_y, idx_Sjs)
     # pdb.set_trace()
     assert check_equal(ans[0][0], [tmp[0], res[0]])
     '''
@@ -87,9 +88,9 @@ def test_earlybreak():
     (Pdb) ans   ((0.5805998775010773, 0.30795127445857207), 0.0011289119720458984)
     '''
 
-    ans = DirectDist_multiver(X_nA_y, idx_Ai_Sj)
     tmp = Naive_multivar(X_nA_y, idx_Ai_Sj)
     res = EffHD_multivar(X_nA_y, idx_Ai_Sj)
+    ans = DirectDist_multiver(X_nA_y, idx_Ai_Sj)
     # pdb.set_trace()
     ans = (ans[0][:-1], ans[1])
     tmp = (tmp[0][0], tmp[1])

@@ -17,6 +17,7 @@ from pathos import multiprocessing as pp
 from hfm.dist_drt import (
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
 from hfm.dist_drt_test import no_less_than_check
+import pdb
 
 
 def generate_dat(n, nd, na, nai, nc=2):
@@ -185,13 +186,12 @@ def compare_multiver(nai, m1, m2, n_e=2):
     res_4 = ApproxDist_nonbin(X_nA_y, A_j, m1, m2, n_e)
     res_5 = ApproxDist_nonbin_mpver(X_nA_y, A_j, m1, m2, n_e)
     res_6 = ApproxDist_nonbin_mpver(X_nA_y, A_j, m1, m2, n_e, pool)
-
+    # pdb.set_trace()
     res_1, _ = res_1
     res_2, _ = res_2
     res_4, _ = res_4
     res_5, _ = res_5
     res_6, _ = res_6
-    # pdb.set_trace()
 
     for i in [0, 1]:  # max, avg
         no_less_than_check(res_2[i], tmp_1[i])

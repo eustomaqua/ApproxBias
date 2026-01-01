@@ -116,6 +116,7 @@ def sub_accelerator_larger(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
 
 # Projection using \mathbf{w}
 #
+# @numba.njit(inline='always')
 @numba.jit(nopython=True)
 def projector(element, vec_w):
     return float(np.dot(element, vec_w))

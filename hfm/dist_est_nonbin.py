@@ -9,6 +9,7 @@
 
 import numpy as np
 import numba
+from numba.typed import List
 
 from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean
@@ -124,6 +125,7 @@ def AcceleDist_nonbin(X_nA_y, A_j, m2, vec_w):
 def AcceleCore(X_nA_y, A_j, m2, vec_w):
     proj = [projector(ele, vec_w) for ele in X_nA_y]
     idx_y_fx = np.argsort(proj)
+    # idx_y_fx = np.argpartition(proj, range(m2 + 2))
 
     n = X_nA_y.shape[0]  # number of instances
     d_min = []
@@ -143,8 +145,20 @@ def AcceleCore(X_nA_y, A_j, m2, vec_w):
     return d_min  # 4convergence
 
 
+# @numba.njit  # (inline='always')
+# def _window_scan(X_nA_y, A_j, idx_y_fx, pos, m2):
+#     min_js = sub_accelerator_smaler(
+#         X_nA_y, A_j, idx_y_fx, pos, m2)
+#     min_jr = sub_accelerator_larger(
+#         X_nA_y, A_j, idx_y_fx, pos, m2)
+#     return min(min_js, min_jr)
+
+
 def AcceleCoreBack(X_nA_y, A_j, m2, vec_w):
+    # proj = List()
+    # [proj.append(projector(ele, vec_w)) for ele in X_nA_y]
     proj = [projector(ele, vec_w) for ele in X_nA_y]
+    # idx_y_fx = np.argpartition(proj, range(m2 + 2))
     idx_y_fx = np.argsort(proj)
     n = X_nA_y.shape[0]
     dt_min = np.full(n, np.inf, dtype='float').tolist()
