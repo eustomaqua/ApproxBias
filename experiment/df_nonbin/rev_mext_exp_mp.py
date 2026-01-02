@@ -3316,8 +3316,8 @@ class ConvergeF9_with(ConvergeF8_with):
 
         B_j = non_sa.astype(DTY_INT)
         ut_f = time.time()
-        Ds, t_Ds = EffHDD_bin(X_y, B_j)
-        Df, t_Df = EffHDD_bin(X_y_hat, B_j)
+        Ds, t_Ds = EffHDD_bin(X_y, non_sa)      # B_j)
+        Df, t_Df = EffHDD_bin(X_y_hat, non_sa)  # B_j)
         df_prev, _ = fair_degree_v3(Ds, Df)
         ddf, _ = fair_degree_v4(Ds, Df)
         ut_f = time.time() - ut_f
