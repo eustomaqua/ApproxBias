@@ -2090,12 +2090,12 @@ class ConvFig_5H_exact(ConvPlotF_init):
         pms, _, tag_tst = self.prepare_graph()
         tag_norm, tag_dr, tag_hfm, tag_conv = self.incise_graph(tag_tst)
         fgn = f'{self._figname}{pre}'  # _multivar
-        self.subfig_conv_multivar(raw_dframe, tag_conv, fgn,
-                                  tag_hfm=tag_hfm)
-        self.subfig_conv_singvar(raw_dframe, tag_hfm, tag_conv, fgn)
+        # self.subfig_conv_multivar(raw_dframe, tag_conv, fgn,
+        #                           tag_hfm=tag_hfm)
+        # self.subfig_conv_singvar(raw_dframe, tag_hfm, tag_conv, fgn)
 
-        # self.subfig_fair_sp(raw_dframe, tag_norm, tag_dr, tag_hfm,
-        #                     tag_conv, fgn + '_esp')
+        self.subfig_fair_sp(raw_dframe, tag_norm, tag_dr, tag_hfm,
+                            tag_conv, fgn + '_esp')
         return
 
     def subfig_fair_sp(self, dframe, tag_norm,  # tag_fair,
@@ -2131,28 +2131,43 @@ class ConvFig_5H_exact(ConvPlotF_init):
         #     dframe, nb_set, id_set,
         #     tb + tmp_multivar)  # tag_sa1+tag_sa2+tb)
         df_alt = self.obtain_multival_senatt(
+            # df_alt = self.obtain_binval_senatt(
             dframe, id_set, tb + tmp_multivar, tag_sa1, tag_sa2)
         # df = self.sub_dat_grpfair(
         #     dframe, nb_set, id_set, tag_sa1, tag_sa2)
+        '''
         df = df_alt  # df=self.sub_dat_grpfair(df_alt, tag_sa1, tag_sa2)
         # TODO!!
-        key_A = [r'accuracy',  # r'precision', r'recall',
-                 r'$\mathrm{f}_1$ score', r'specificity',
-                 r'g_mean', r'dp']
-        key_B = [r'$\Delta$(accuracy)',  # r'$\Delta$(precision)',
-                 # r'$\Delta$(recall)', r'$\Delta$(specificity)',
-                 # r'$\Delta(\mathrm{f}_1\text{ score})$',
-                 r'$\Delta$($\mathrm{f}_1$ score)',
-                 r'$\Delta$(specificity)',
-                 r'$\Delta$(g_mean)', r'$\Delta$(dp)']
-        tag_norm = [i[:1] + i[4:5] + i[3:4] + i[-2:] for i in tag_norm]
+        # key_A = [r'accuracy',  # r'precision', r'recall',
+        #          r'$\mathrm{f}_1$ score', r'specificity',
+        #          r'g_mean', r'dp']
+        # key_B = [r'$\Delta$(accuracy)',  # r'$\Delta$(precision)',
+        #          # r'$\Delta$(recall)', r'$\Delta$(specificity)',
+        #          # r'$\Delta(\mathrm{f}_1\text{ score})$',
+        #          r'$\Delta$($\mathrm{f}_1$ score)',
+        #          r'$\Delta$(specificity)',
+        #          r'$\Delta$(g_mean)', r'$\Delta$(dp)']
+        # tag_norm = [i[:1] + i[4:5] + i[3:4] + i[-2:] for i in tag_norm]
+
         key_C = BLFAIR[:3] + [  # r'$\text{ESP}^\text{max}$',
-            r'\mathrm{ESP}', r'$\mathrm{ESP}^\text{avg}$'] + BLFAIR[
-            -1:] + [r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
+            # r'$\mathrm{ESP}$', r'$\mathrm{ESP}^\text{avg}$'] + BLFAIR[
+            r'$\mathrm{SP}$', r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
+            -1:] + [r'$\mathbf{df}_\text{prev}$',
+                    r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
+        #     r'$\hat{\mathbf{df}}_\text{prev}$',
+        #     r'$\hat{\mathbf{df}}$', r'$\hat{\mathbf{df}}^\text{avg}$']
+        key_D = tmp_hfm[0][:1] + tmp_conv[0][:1] + tmp_conv[0][4:5]  # tmp_multivar[:1] + tmp_multivar[4:5]
         mat_C = np.concatenate([
             df[tag_sa1[:6]].values.astype(DTY_FLT).T,
-            df_alt[tmp_multivar[:1] + tmp_multivar[4:5]].values.astype(
-                DTY_FLT).T], axis=0)
+            # df_alt[tmp_multivar[:1] + tmp_multivar[4:5]].values.astype(
+            #     DTY_FLT).T,
+            #
+            # df_alt[tmp_hfm[0][0]].values.astype(DTY_FLT).reshape(1, -1),
+            # df_alt[tmp_conv[0][:1] + tmp_conv[0][4:5]].values.astype(
+            #     DTY_FLT).T, df_alt[tag_hfm[0][1]].values.astype(
+            #     DTY_FLT).reshape(1, -1), ], axis=0)[:-1]
+            df_alt[key_D].values.astype(DTY_FLT).T], axis=0)
+        #
         # key_C = BLFAIR[:3] + [r'$\text{ESP}^\text{max}$', ] + BLFAIR[
         #     -1:] + [r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
         # mat_C = np.concatenate([
@@ -2160,17 +2175,21 @@ class ConvFig_5H_exact(ConvPlotF_init):
         #     df_alt[tmp_multivar[:1] + tmp_multivar[4:5]].values.astype(
         #         DTY_FLT).T], axis=0)
 
-        pms = {'cmap_name': 'OrRd', 'rotate': 25}  # ,'figsize': 'L-WS'}
+        pms = {'cmap_name': 'BuGn', 'rotate': 25}  # ,'OrRd','figsize':'L-WS'}
         analogous_confusion_extended(df_alt[
-            tag_norm[0]].values.astype(DTY_FLT).T, mat_C,
+            tag_norm[0][:-1]].values.astype(DTY_FLT).T, mat_C,
             key_A, key_C, f'{fgn}_oo', **pms)
         analogous_confusion_extended(df_alt[
-            tag_norm[1]].values.astype(DTY_FLT).T, mat_C,
+            tag_norm[1][:-1]].values.astype(DTY_FLT).T, mat_C,
             key_B, key_C, f'{fgn}_delt', **pms)
         mat_D = np.concatenate([mat_C.T, df_alt[
-            tag_norm[0][:2]].values.astype(DTY_FLT)], axis=1)
-        key_D = tag_sa1[:6] + tmp_multivar[:1] + tmp_multivar[
-            4:5] + tag_norm[0][:2]
+            # tag_norm[0][:2]
+            tag_norm[0][:1] + tag_norm[0][-1:]
+        ].values.astype(DTY_FLT)], axis=1)
+        # key_D = tag_sa1[:6] + tmp_hfm[0][:1] + tmp_multivar[
+        #     :1] + tmp_multivar[4:5] + tag_norm[
+        #     0][:1] + tag_norm[0][-1:]  # :2] acc,f1_score
+        key_D = tag_sa1[:6] + key_D + tag_norm[0][:1] + tag_norm[0][-1:]
         mat_D = pd.DataFrame(mat_D, columns=key_D)
         # lineplot_with_uncertainty(
         #     mat_D, key_D[-2], 'Fairness', key_D[:4] + key_D[6:8],
@@ -2180,12 +2199,58 @@ class ConvFig_5H_exact(ConvPlotF_init):
         kws = {'alpha_loc': 'b4', 'alpha_rev': True,
                'alpha_clarity': .15, 'cmap_name': 'coolwarm_r',
                'annotY': ' error rate'}
+        # lineplot_with_uncertainty(
+        #     mat_D, key_D[-2], 'Fairness', key_D[:3] + key_D[6:8],
+        #     key_C[:3] + key_C[6:8], figname=fgn + '_pc1b', **kws)
+        # lineplot_with_uncertainty(
+        #     mat_D, key_D[-2], 'Fairness', key_D[3:8], key_C[3:8],
+        #     figname=fgn + '_pc2b', **kws)
+        # kD_sep1 = [0, 1, 2, 6, 7];  kD_sep2 = [3, 4, 5, 7, 8]
+        
         lineplot_with_uncertainty(
             mat_D, key_D[-2], 'Fairness', key_D[:3] + key_D[6:8],
             key_C[:3] + key_C[6:8], figname=fgn + '_pc1b', **kws)
         lineplot_with_uncertainty(
-            mat_D, key_D[-2], 'Fairness', key_D[3:8], key_C[3:8],
-            figname=fgn + '_pc2b', **kws)
+            mat_D, key_D[-2], 'Fairness', key_D[3:6] + key_D[7:9],
+            key_C[3:6] + key_C[7:9], figname=fgn + '_pc2b', **kws)
+        kws['annotY'] = '(1$-$performance)'  # del
+        lineplot_with_uncertainty(
+            mat_D, key_D[-1], 'Fairness', key_D[:3] + key_D[6:8],
+            key_C[:3] + key_C[6:8], figname=fgn + '_pc3b', **kws)
+        lineplot_with_uncertainty(
+            mat_D, key_D[-1], 'Fairness', key_D[3:6] + key_D[7:9],
+            key_C[3:6] + key_C[7:9], figname=fgn + '_pc4b', **kws)
+        pdb.set_trace()
+        '''
+
+        df = df_alt
+        key_A = [r'accuracy', r'precision', r'recall', r'specificity',
+                 r'g_mean', r'dp']  # r'$\mathrm{f}_1$ score',
+        key_B = [r'$\Delta$(accuracy)', r'$\Delta$(precision)',
+                 r'$\Delta$(recall)', r'$\Delta$(specificity)',
+                 # r'$\Delta$($\mathrm{f}_1$ score)',
+                 r'$\Delta$(g_mean)', r'$\Delta$(dp)']
+        tag_norm = [i[:4] + i[5:] + i[4:5] for i in tag_norm]
+        key_C = BLFAIR[:3] + [r'$\mathrm{SP}$',
+                              r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
+            -1:] + [r'$\mathbf{df}_\text{prev}$',
+                    r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
+        key_D = tmp_hfm[0][:1] + tmp_conv[0][:1] + tmp_conv[0][4:5]
+        mat_C = df[tag_sa1[:6] + key_D].values.astype(DTY_FLT).T
+        pms = {'cmap_name': 'Greens', 'rotate': 34}  # 'BuGn'
+        # analogous_confusion_extended(df[tag_norm[0][:-1]].values.astype(
+        #     DTY_FLT).T, mat_C, key_A, key_C, f'{fgn}_mv_oo', **pms)
+        analogous_confusion_extended(df[tag_norm[1][:-1]].values.astype(
+            DTY_FLT).T, mat_C, key_B, key_C, f'{fgn}_mv_delt', **pms)
+        key_D = tag_sa1[:6] + key_D + tag_norm[0][:1] + tag_norm[0][-1:]
+        df = self.obtain_binval_senatt(
+            dframe, id_set, tb + tmp_multivar, tag_sa1, tag_sa2)
+        pms['cmap_name'] = 'Blues'  # 'Spectral'  # 'GnBu_r'
+        mat_C = df[key_D[:-2]].values.astype(DTY_FLT).T
+        # analogous_confusion_extended(df[tag_norm[0][:-1]].values.astype(
+        #     DTY_FLT).T, mat_C, key_A, key_C, f'{fgn}_bi_oo', **pms)
+        analogous_confusion_extended(df[tag_norm[1][:-1]].values.astype(
+            DTY_FLT).T, mat_C, key_B, key_C, f'{fgn}_bi_delt', **pms)
 
         # tmp = self.sub_dat_sen_att(  # .siz=(7+8+8)+8+7*2=23+22=45
         #     dframe, nb_set, id_set, tag_sa1 + tb, tag_sa2 + tb)
@@ -2197,23 +2262,38 @@ class ConvFig_5H_exact(ConvPlotF_init):
         key_D = tag_sa1[:6] + tag_sa1[7:][:1] + tag_sa1[
             7 + 8:][:1] + tag_sa1[15:][4:5]
         mat_C = tmp[key_D].values.astype(DTY_FLT).T
-        analogous_confusion_extended(
-            tmp[tag_norm[0]].values.astype(DTY_FLT).T, mat_C,
-            key_A, key_C, f'{fgn}_sing_oo', **pms)
+        # analogous_confusion_extended(
+        #     tmp[tag_norm[0]].values.astype(DTY_FLT).T, mat_C,
+        #     key_A, key_C, f'{fgn}_sing_oo', **pms)
         analogous_confusion_extended(
             tmp[tag_norm[1]].values.astype(DTY_FLT).T, mat_C,
             key_B, key_C, f'{fgn}_sing_dt', **pms)
-        mat_D = np.concatenate([mat_C.T, tmp[
-            tag_norm[0][:2]].values.astype(DTY_FLT)], axis=1)
-        mat_D = pd.DataFrame(mat_D, columns=key_D + tag_norm[0][:2])
-        lineplot_with_uncertainty(
-            mat_D, tag_norm[0][0], 'Fairness',
-            key_D[:3] + key_D[6:9], key_C[:3] + key_C[6:9],
-            figname=fgn + '_sing_pc1', **kws)
-        lineplot_with_uncertainty(
-            mat_D, tag_norm[0][0], 'Fairness', key_D[3:9],
-            key_C[3:9], figname=fgn + '_sing_pc2', **kws)
-        del kws, pms
+        # mat_D = np.concatenate([mat_C.T, tmp[
+        #     # tag_norm[0][:2]].values.astype(DTY_FLT)], axis=1)
+        #     tag_norm[0][:1] + tag_norm[0][-1:]
+        # ].values.astype(DTY_FLT), ], axis=1)
+        # mat_D = pd.DataFrame(
+        #     mat_D, columns=key_D + tag_norm[0][:1] + tag_norm[0][-1:])
+        # # mat_D = pd.DataFrame(mat_D, columns=key_D + tag_norm[0][:2])
+        # kws = {'alpha_loc': 'b4', 'alpha_rev': True,
+        #        'alpha_clarity': .15, 'cmap_name': 'coolwarm_r',
+        #        'annotY': ' error rate'}
+        # lineplot_with_uncertainty(
+        #     mat_D, tag_norm[0][0], 'Fairness',
+        #     key_D[:3] + key_D[6:9], key_C[:3] + key_C[6:9],
+        #     figname=fgn + '_sing_pc1', **kws)
+        # lineplot_with_uncertainty(
+        #     mat_D, tag_norm[0][0], 'Fairness', key_D[3:9],
+        #     key_C[3:9], figname=fgn + '_sing_pc2', **kws)
+        # kws['annotY'] = '(1$-$performance)'  # del
+        # lineplot_with_uncertainty(
+        #     mat_D, tag_norm[0][-1], 'Fairness',
+        #     key_D[:3] + key_D[6:9], key_C[:3] + key_C[6:9],
+        #     figname=fgn + '_sing_pc3', **kws)
+        # lineplot_with_uncertainty(
+        #     mat_D, tag_norm[0][-1], 'Fairness', key_D[3:9],
+        #     key_C[3:9], figname=fgn + '_sing_pc4', **kws)
+        # del kws, pms
         pdb.set_trace()  # pdb.set_option()
         return
 
@@ -2304,6 +2384,8 @@ class ConvFig_5H_exact(ConvPlotF_init):
             t2: t1 for t1, t2 in zip(*tag_val)})
         df_new = pd.concat([tmp[tag_val[0]], df_new], axis=0)
         self.sub_plt_val_prev(df_new, tag_val[0], fgn + '_valdt')
+        if not tag_avg:
+            return
         if verbose:
             self.sub_plt_avg_prev(tmp, tag_avg[0], fgn + '_avg', 'Ds_avg')
             self.sub_plt_avg_prev(tmp, tag_avg[1], fgn + '_avgf', 'Df_avg')
@@ -3367,7 +3449,7 @@ class ConvFig_5Iprev_exact(ConvFig_5H_exact):
         # del scat_Z, ant_Z, annot
         return
 
-    def sub_plt_val(self, df_tmp, tag, fgn, sgn = 'D.'):
+    def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.'):
         scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
         scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
                   df_tmp[tag[2]].values.astype(DTY_FLT),
@@ -3576,7 +3658,7 @@ class ConvFig_5I_exact(ConvFig_5Iprev_exact):
         tag_avg = np.array([tag_sa1[i] for i in [
             1, 3, 16, 18, 24, 26, 32, 34]]).reshape(4, 2).T.tolist()
         fgn = fgn.replace('multivar', 'whole')
-        pdb.set_trace()
+        # pdb.set_trace()
         self.thread_singvar(tmp, tag_tim, fgn, tag_val, tag_avg)
         return
 
@@ -3642,10 +3724,65 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
         del tmp  # pdb.set_trace()
         return tag_norm, tag_gf, tag_hfm, tag_df_conv
 
-    def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn):
+    def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn,
+                            omitted=False):  # True):
+        if omitted:
+            return
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             dframe, nb_row = 4, nc_norm = 3, nc_sens = 4)
+        tag_sa1 = tag_hfm['dist'][0][4:6] + tag_hfm['dist'][0][
+            2:4] + tag_hfm['dist'][0][6:8] + tag_conv[
+            'dist'][0][2:4] + tag_conv['dist_avg'][0][:2]
+        tag_sa2 = tag_hfm['dist'][1][4:6] + tag_hfm['dist'][1][
+            2:4] + tag_hfm['dist'][1][6:8] + tag_conv[
+            'dist'][1][2:4] + tag_conv['dist_avg'][1][:2]
+        tag_tim = [i[4:6] + i[2:4] + i[6:] + j[
+            2:4] for i, j in zip(tag_hfm['tim'], tag_conv['tim'])]
+        # tag_sa*:  DistDirect_bin{Ds,Df}, EarlyBreak{x2}, ApproxDist
+        #           _bin{x2}, DistDirect_nonbin{Ds,Df, Ds_avg,Df_avg}
+        tmp = self.obtain_binval_senatt(
+            # tmp = self.obtain_multival_senatt(
+            dframe, id_set, [
+            ], tag_sa1 + tag_tim[0], tag_sa2 + tag_tim[1])
+        t_tim = np.array(tag_tim[0]).reshape(-1, 2).T.tolist()
+        fgn += '_singvar'
+        self.thread_previous(tmp, t_tim, fgn, tag_val=np.array(
+            tag_sa1).reshape(-1, 2).T.tolist(), tag_avg=[])
+        return
+
+    def sub_plt_tim_prev(self, df_tmp, tag, fgn, sgn='t_D.'):
+        scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
+                  df_tmp[tag[2]].values.astype(DTY_FLT),
+                  df_tmp[tag[3]].values.astype(DTY_FLT)]
+        ant_X, ant_Y, ant_Z = self.hfm_dict_tim(fgn, sgn)
+        ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
+        annotY = [r'$T_{EarlyBreak}$',  # '${}$'.format(ant_Yq),
+                  r'$T_{ApproxDist \text{(prev)}}$',
+                  # '${}$ (bin-val)'.format(ant_X)]
+                  '${}$'.format(ant_X)]
+        annot = ['${}$ (sec)'.format(ant_Xp), '${}$ (sec)'.format(
+            ant_Yq), '${} = {}$'.format(ant_Yq, ant_Xp)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+        return
+
+    def sub_plt_val_prev(self, df_tmp, tag, fgn, sgn='D.'):
+        scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
+                  df_tmp[tag[2]].values.astype(DTY_FLT),
+                  df_tmp[tag[3]].values.astype(DTY_FLT),
+                  df_tmp[tag[4]].values.astype(DTY_FLT)]
+        ant_X, ant_Y, ant_Z = self.hfm_dict_val(fgn, sgn)
+        ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
         pdb.set_trace()
+        annotY = ['EarlyBreak', '${}$'.format(ant_Yq),
+                  '${}$'.format(ant_X),  # (multival)
+                  '${}$'.format(self.hfm_dict_avg(fgn, sgn)[0])]
+        annot = ['${}$'.format(ant_Xp), '${}$'.format(
+            ant_Yq), '${} = {}$'.format(ant_Yq, ant_Xp)]
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
         return
 
     def subfig_conv_multivar(self, dframe, tag_conv, fgn, tag_hfm):
@@ -3686,6 +3823,80 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             'dist_avg'][0]).reshape(-1, 2).T.tolist()
         fgn = fgn.replace('multivar', 'whole')
         self.thread_singvar(df_alt, tag_tim, fgn, tag_val, tag_avg)
+        return
+
+    def sub_plt_tim(self, df_tmp, tag, fgn, sgn='t_D.'):
+        scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
+                  df_tmp[tag[2]].values.astype(DTY_FLT),
+                  df_tmp[tag[3]].values.astype(DTY_FLT),
+                  df_tmp[tag[4]].values.astype(DTY_FLT)]
+        ant_X, ant_Y, ant_Z = self.hfm_dict_tim(fgn, sgn)
+
+        if 'multivar' in fgn:
+            ant_app = r'T_{ExtendDist}'
+            ant_cvg = r'T_{ExactDist (StratES)}'
+            ant_arr = r'T_{ExactDist (StratRA)}'
+        else:
+            ant_app = r'T_{ApproxDist}'
+            ant_cvg = r'T_{StratES}'
+            ant_arr = r'T_{StratRA}'
+        ant_eff = r'T_{EarlyBreak}'
+        annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        annotY = [  # '${}$ (multival)'.format(ant_eff),
+            '${}$ (multi)'.format(ant_eff), '${}$'.format(ant_app),
+            '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
+        if 'multivar' in fgn:
+            multi_lin_reg_without_distr(
+                scat_X, scat_Y[1:], annotY[1:], annot, fgn,
+                snspec ='sty4c')
+            return
+        scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
+                       df_tmp[tag[6]].values.astype(DTY_FLT)])
+        scat_Y[0] = df_tmp[tag[7]].values.astype(DTY_FLT)
+        ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
+        annotY.extend(['${}$'.format(ant_Xp), '${}$'.format(ant_Yq)])
+        annotY[0] = '${}$'.format(ant_eff)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn,
+            snspec ='sty4')
+        return
+
+    def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.'):
+        scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
+        scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
+                  df_tmp[tag[2]].values.astype(DTY_FLT),
+                  df_tmp[tag[3]].values.astype(DTY_FLT),
+                  df_tmp[tag[4]].values.astype(DTY_FLT)]
+        ant_X, ant_Y, ant_Z = self.hfm_dict_val(fgn, sgn)
+        if 'multivar' in fgn:
+            ant_app = r'ExtendDist'
+            ant_cvg = r'ExactDist(StratES)'
+            ant_arr = r'ExactDist(StratRA)'
+        else:
+            ant_app = r'ApproxDist'
+            ant_cvg = r'StratES'
+            ant_arr = r'StratRA'
+        ant_eff = 'EarlyBreak'
+        annotY = [r'EarlyBreak$^{(multi)}$',  # ant_eff,multival
+                  ant_app, ant_cvg, ant_arr]  # '${}$'
+        annot = ['${}$'.format(ant_X), '${}$'.format(
+            ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
+        if 'multivar' in fgn:
+            multi_lin_reg_without_distr(
+                scat_X, scat_Y[1:], annotY[1:], annot, fgn,
+                snspec='sty3c')
+            return
+        scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
+                       df_tmp[tag[6]].values.astype(DTY_FLT)])
+        scat_Y[0] = df_tmp[tag[7]].values.astype(DTY_FLT)
+        ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
+        annotY.extend(['${}$'.format(ant_Xp), '${}$'.format(ant_Yq)])
+        annotY[0] = ant_eff 
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y, annotY, annot, fgn,
+            snspec='sty3b', figsize='L-WS')  # 'sty3b','L-NT')
         return
 
 
