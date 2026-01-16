@@ -1901,6 +1901,7 @@ class ConvPlotF_init(ConvPlotE_init):
         if not (first_incl and len(id_set) == 6):
             return df_raw
         df_tmp = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_s1]
+        pdb.set_trace()
         return pd.concat([
             df_raw, df_tmp], axis=0).reset_index(drop=True)
 
@@ -1917,6 +1918,7 @@ class ConvPlotF_init(ConvPlotE_init):
             df_tmp = dframe.iloc[id_set[
                 k] + 1: id_set[k + 1]][tag + tag_s1]
             df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        pdb.set_trace()
         return df_raw
 
 
@@ -3387,8 +3389,8 @@ class ConvFig_5Iprev_exact(ConvFig_5H_exact):
         tag_avg = np.array([tag_sa1[i] for i in [
             1, 3, 10, 12, 18, 20, 26, 28]]).reshape(4, 2).T.tolist()
         fgn = fgn.replace('multivar', 'whole')
-        self.thread_singvar(df_alt, tag_tim, fgn, tag_val, tag_avg)
         pdb.set_trace()
+        self.thread_singvar(df_alt, tag_tim, fgn, tag_val, tag_avg)
         return
 
     # def hfm_dict_multivar(self, sgn):
@@ -3478,7 +3480,7 @@ class ConvFig_5Iprev_exact(ConvFig_5H_exact):
             scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
                            df_tmp[tag[6]].values.astype(DTY_FLT)])
             # pdb.set_trace()
-            scat_Y[0] = df_tmp[tag[7]].values.astype(DTY_FLT)
+            # scat_Y[0] = df_tmp[tag[7]].values.astype(DTY_FLT)
             ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
             annotY.extend(['${}$'.format(ant_Xp), '${}$'.format(ant_Yq)])
             annotY[0] = ant_eff  # '${}$'.format(ant_eff[:10])
@@ -3658,7 +3660,7 @@ class ConvFig_5I_exact(ConvFig_5Iprev_exact):
         tag_avg = np.array([tag_sa1[i] for i in [
             1, 3, 16, 18, 24, 26, 32, 34]]).reshape(4, 2).T.tolist()
         fgn = fgn.replace('multivar', 'whole')
-        # pdb.set_trace()
+        pdb.set_trace()
         self.thread_singvar(tmp, tag_tim, fgn, tag_val, tag_avg)
         return
 
@@ -3825,7 +3827,7 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
         self.thread_singvar(df_alt, tag_tim, fgn, tag_val, tag_avg)
         return
 
-    def sub_plt_tim(self, df_tmp, tag, fgn, sgn='t_D.'):
+    def sub_plt_tim(self, df_tmp, tag, fgn, sgn='t_D.', eb=True):
         scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
         scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
                   df_tmp[tag[2]].values.astype(DTY_FLT),
@@ -3841,16 +3843,20 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             ant_app = r'T_{ApproxDist}'
             ant_cvg = r'T_{StratES}'
             ant_arr = r'T_{StratRA}'
-        ant_eff = r'T_{EarlyBreak}'
+        ant_eff = r'T_{EarlyBreak^{multi}}'  # r'T_{EarlyBreak}'
         annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(
             ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
         annotY = [  # '${}$ (multival)'.format(ant_eff),
-            '${}$ (multi)'.format(ant_eff), '${}$'.format(ant_app),
+            # '${}$ (multi)'.format(ant_eff),
+            '${}$'.format(ant_eff), '${}$'.format(ant_app),
             '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
         if 'multivar' in fgn:
             multi_lin_reg_without_distr(
                 scat_X, scat_Y[1:], annotY[1:], annot, fgn,
                 snspec ='sty4c')
+            if eb:
+                multi_lin_reg_without_distr(
+                    scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
             return
         scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
                        df_tmp[tag[6]].values.astype(DTY_FLT)])
@@ -3863,7 +3869,7 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             snspec ='sty4')
         return
 
-    def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.'):
+    def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.', eb=True):
         scat_X = df_tmp[tag[0]].values.astype(DTY_FLT)
         scat_Y = [df_tmp[tag[1]].values.astype(DTY_FLT),
                   df_tmp[tag[2]].values.astype(DTY_FLT),
@@ -3887,16 +3893,28 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             multi_lin_reg_without_distr(
                 scat_X, scat_Y[1:], annotY[1:], annot, fgn,
                 snspec='sty3c')
+            if eb:
+                multi_lin_reg_without_distr(
+                    scat_X, scat_Y, annotY, annot, fgn,
+                    snspec='sty3b')
             return
         scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
                        df_tmp[tag[6]].values.astype(DTY_FLT)])
-        scat_Y[0] = df_tmp[tag[7]].values.astype(DTY_FLT)
+        # scat_Y[0]=df_tmp[tag[7]].values.astype(DTY_FLT) #EarlyBreak_bin
         ant_Xp, ant_Yq = self.hfm_dict_prev(sgn)
         annotY.extend(['${}$'.format(ant_Xp), '${}$'.format(ant_Yq)])
-        annotY[0] = ant_eff 
+        annotY[0] = ant_eff
+        '''
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn,
             snspec='sty3b', figsize='L-WS')  # 'sty3b','L-NT')
+        '''
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y[:4], annotY[:4], annot, fgn,
+            snspec='sty3b', figsize='L-WS')
+        multi_lin_reg_without_distr(
+            scat_X, scat_Y[1:2] + scat_Y[4:], annotY[1:2] + annotY[4:],
+            annot, fgn + '_bin', snspec='sty3e', figsize='L-WS')  # 3d
         return
 
 

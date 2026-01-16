@@ -28,8 +28,12 @@ from experiment.df_nonbin.rev_mext_plt import (
     ConvFig_5C_exact, ConvFig_5D_exact, ConvFig_5E_exact,
     ConvFig_5B_exact, ConvFig_4B_exact,
     # ConvFig_4C_exact, ConvFig_4D_exact, ConvFig_4E_exact)
-    ConvFig_4E_exact, ConvFig_5F_exact, ConvFig_5H_exact,
-    ConvFig_5I_exact, ConvFig_5Isimpl)
+    ConvFig_4E_exact, ConvFig_5F_exact,  # ConvFig_5H_exact,
+)   # ConvFig_5I_exact, ConvFig_5Isimpl)
+from experiment.df_nonbin.rev_mext_plt_cor import (
+    ConvFig_5H_exact, ConvFig_5I_exact, ConvFig_5Isimpl)
+from experiment.df_nonbin.rev_mext_plt_cor import (
+    HPEA_m1fix, HPEB_m2fix)
 
 
 # ===============================
@@ -246,13 +250,34 @@ class Rev_ManfExtDrawing(object):
         elif trial_type[-6: -1] == 'rexp3':
             self.drawing_whole_rexp3(trial_type, prefix, figname, pms)
 
-        elif trial_type[-6: -1] == 'rexp9':  # 'rexp5':
-            self.drawing_whole_expr5(trial_type, prefix, figname, pms)
-        elif trial_type[-6: -1] == 'rexp8':  # 'rexp4':
-            self.drawing_whole_expr4(trial_type, prefix, figname, pms)
+        elif trial_type[-6: -1] == 'rexp9':  # 'rexp5':  # prefix,
+            self.drawing_whole_expr5(trial_type, figname, pms)
+        elif trial_type[-6: -1] == 'rexp8':  # 'rexp4':  # prefix,
+            self.drawing_whole_expr4(trial_type, figname, pms)
+        elif trial_type[-6:] in ('exhp5a', 'exhp5b',
+                                 'exph5a', 'exph5b'):
+            self.drawing_rept_exhp6(trial_type, figname, pms)
         return
 
-    def drawing_whole_expr5(self, trial_type, prefix, figname, pms):
+    def drawing_rept_exhp6(self, trial_type, figname, pms):
+        xlsx_name = '{}_nk{}_r{}_pms_alt'.format(
+            trial_type[:-1], self._nb_iter, int(self._ratio * 100))
+        pre = self._prep.replace('_', '')
+        sheet_name = 'exp{}_{}'.format(trial_type[-2:], pre)
+        # pms['figname'] = figname
+        pms['mp_cores'] = self._mp_cores
+        pms['omitted'] = self._omitted
+        pms['nk'] = self._nb_iter
+        if trial_type[-6:] in ('exhp5a', 'exph5a'):
+            iterator = HPEA_m1fix(figname=figname, **pms)
+        elif trial_type[-6:] in ('exhp5b', 'exph5b'):
+            iterator = HPEB_m2fix(figname=figname, **pms)
+        df = iterator.load_raw_dataset(xlsx_name, sheet_name)
+        iterator.schedule_mspaint(df, pre)
+        del xlsx_name, sheet_name, df, iterator
+        return
+
+    def drawing_whole_expr5(self, trial_type, figname, pms):
         # trial = if trial_type.endswith('5b') else trial_type[:-1]
         # xlsx_name = '{}_nk{}_r{}_pms'.format(  # '5b'
         #     trial_type if trial_type.endswith('9b') else trial_type[
@@ -296,7 +321,7 @@ class Rev_ManfExtDrawing(object):
         self._iterator.schedule_mspaint(df, pre)
         return
 
-    def drawing_whole_expr4(self, trial_type, prefix, figname, pms):
+    def drawing_whole_expr4(self, trial_type, figname, pms):
         pre = self._prep.replace('_', '')
         xlsx_name = '{}_nk{}_r{}_pms'.format(  # '4b'
             trial_type if trial_type.endswith('8b') else trial_type[
@@ -538,4 +563,5 @@ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max  # 8e|9e,
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9g -pre min_max  # 9f|c|d|b
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9h|i # -pre min_max
+python hfm_nonbin_draw.py -rev -ratio .97 -exp rept_exhp5a|b -pre min_max
 """
