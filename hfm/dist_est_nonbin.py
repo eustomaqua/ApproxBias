@@ -9,7 +9,7 @@
 
 import numpy as np
 import numba
-from numba.typed import List
+# from numba.typed import List
 
 from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean

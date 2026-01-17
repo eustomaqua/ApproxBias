@@ -5,9 +5,11 @@
 #
 
 
-from hfm.dist_est_bin import (weight_generator, AcceleDist_bin,
-                              ApproxDist_bin,
-                              ApproxDist_bin_revised)
+from hfm.dist_est_bin import (
+    AcceleDist_bin, ApproxDist_bin, ApproxDist_bin_revised)
+# from hfm.dist_est_bin import (weight_generator, AcceleDist_bin,
+#                               ApproxDist_bin,
+#                               ApproxDist_bin_revised)
 from hfm.dist_est_nonbin import sub_accelerator_larger as larger
 from hfm.dist_est_nonbin import sub_accelerator_smaler as smaler
 from hfm.dist_cvg_nonbin import (AcceleDist_nonbin,
@@ -33,7 +35,6 @@ from hfm.dist_drt_test import no_less_than_check
 from hfm.dist_est_test import generate_dat
 from hfm.dist_est_bin import projector
 from hfm.utils.verifiers import check_equal
-import pdb
 
 
 def test_compare_subproc():
@@ -251,11 +252,11 @@ def test_strategy():
 def test_German():
     from experiment.utils_empirical import DataSetup
     from experiment.datasets import (
-        transform_X_and_y, transform_unpriv_tag)
-    from experiment.preprocessing_bin import normalise_disturb_prime
+        transform_unpriv_tag)  # transform_X_and_y,
+    # from experiment.preprocessing_bin import normalise_disturb_prime
     from experiment.preprocessing_nonbin import (
         renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
-        check_marginalised_indices, renewed_transform_disturb,
+        check_marginalised_indices,  # renewed_transform_disturb,
         renewed_normalise_disturb, renewed_normalise_separate)
 
     cs = DataSetup('german')

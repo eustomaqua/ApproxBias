@@ -156,9 +156,9 @@ class Table2C_comparison(Plot2C_comparison):
             loc_b = (i + 1) * self._nb_iter
             for j in range(nb_col):
                 U_raw[i][j] = df_tmp[loc_a: loc_b][:, j]
-        # U_raw.shape= (nb_clf, nb_col, nb_iter =5)
-        U_avg = U_raw.mean(axis=2)
-        U_std = U_raw.std(axis=2, ddof=ddof)
+        # # U_raw.shape= (nb_clf, nb_col, nb_iter =5)
+        # U_avg = U_raw.mean(axis=2)
+        # U_std = U_raw.std(axis=2, ddof=ddof)
 
         UA_raw, UF_raw = U_raw[:, :-12] * 100, U_raw[:, -12:]
         UA_avg = UA_raw.mean(axis=2)

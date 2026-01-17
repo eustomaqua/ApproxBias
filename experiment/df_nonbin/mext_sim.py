@@ -634,7 +634,7 @@ class ManfExtEmpirical(DataSetup):
         res_iter = []
 
         if 'expt2' in self._trial_type:
-            pm_m = {'m1': self._m1, 'm2': self._m2}
+            # pm_m = {'m1': self._m1, 'm2': self._m2}
             positive_label = self._dataset.get_positive_class_val(
                 'numerical-binsensitive')
             res_iter = self._iterator.schedule_content(

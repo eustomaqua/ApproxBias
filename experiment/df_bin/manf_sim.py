@@ -803,7 +803,7 @@ class ManfPrime_Empirical(ManfEmpirical):
         if "mCV" in self._trial_type:
             split_idx = manual_cross_valid(self._nb_iter, y)
         elif "KFS" in self._trial_type:
-            split_idx = sklearn_stratify(self._nb_iter, y, X)
+            split_idx = sklearn_stratify(self._nb_iter, y, X_and_A)  # X)
         elif "KF" in self._trial_type:  # 'Kcv'
             split_idx = sklearn_k_fold_cv(self._nb_iter, y)
         else:

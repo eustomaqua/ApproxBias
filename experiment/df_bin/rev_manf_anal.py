@@ -4,7 +4,7 @@
 from experiment.utils_empirical import GraphSetupVer1
 from pyfair.utils_empirical import DAT_EXPT_NMS, DAT_EXPT_ORG
 # from pyfair.utils_empirical import GraphSetup
-from pyfair.facil.utils_const import unique_column, DTY_FLT
+from pyfair.facil.utils_const import unique_column  # ,DTY_FLT
 
 from pyfair.granite.draw_fancy import radar_chart, grped_radar_cht
 from pyfair.facil.draw_prelim import DTY_PLT
@@ -21,10 +21,6 @@ class GraphSetup(GraphSetupVer1):
     _cmap_name = 'muted'
     _nb_cv = 5
     _datasets = {'abbr': DAT_EXPT_NMS, 'full': DAT_EXPT_ORG}
-
-    @property
-    def nb_cv(self):
-        return self._nb_cv
 
     @property
     def nb_cv(self):

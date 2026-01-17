@@ -357,10 +357,14 @@ class ComparisonB2_withDirectComput(ComparisonB_setup):
                                          omitted=omitted)  # 13/8
         fair_2, fair_3 = [], []
         n_a = len(g1m_indices)
-        X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1,
-                                 dtype=DTY_FLT).copy()
-        X_and_y_hat = np.concatenate([y_hat.reshape(-1, 1), X],
-                                     axis=1, dtype=DTY_FLT).copy()
+        X_and_y = np.concatenate([
+            y.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
+        X_and_y_hat = np.concatenate([
+            y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
+        # X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1,
+        #                          dtype=DTY_FLT).copy()
+        # X_and_y_hat = np.concatenate([y_hat.reshape(-1, 1), X],
+        #                              axis=1, dtype=DTY_FLT).copy()
         for i in range(n_a):
             tmp = self.count_sing_part2(y, y_hat, y_qtb, g1m_indices[i][0],
                                         positive_label, omitted=omitted)
@@ -842,9 +846,13 @@ class ComparisonE_setup(ComparisonB_setup):
 
         fair_2, fair_3 = [], []
         n_a = len(g1m_indices)
-        X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
+        X_and_y = np.concatenate([
+            y.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
         X_and_y_hat = np.concatenate([
-            y_hat.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
+            y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
+        # X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
+        # X_and_y_hat = np.concatenate([
+        #     y_hat.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
         for i in range(n_a):
             tmp = self.count_sing_part2(y, y_hat, y_qtb, g1m_indices[i][0],
                                         positive_label, omitted=omitted)
@@ -1294,7 +1302,9 @@ class HyperEA_analysis(ParameterE_setup):
                          pool=None,
                          alternative=False):
         X_yfx = np.concatenate([
-            y_fx.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
+        # X_yfx = np.concatenate([
+        #     y_fx.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
         n_l = len(self._m2_set)  # n_l, n_ell, ell
         n_a = len(g1m_indices)
         if not alternative:
@@ -1642,8 +1652,8 @@ class ParameterF_setup(RelativeFairClsf, ParameterE_setup):
         return res_indi  # .shape= (8,) =(4+3+1,)
 
     def sub_sub_proc_part2(self, y, y_hat, y_qtb, non_sa, positive_label):
-        _, _, gones_Cm, gzero_Cm = marginalised_pd_mat(y, y_hat,
-                                                       positive_label, non_sa)
+        _, _, gones_Cm, gzero_Cm = marginalised_pd_mat(
+            y, y_hat, positive_label, non_sa)
         cmp_fair = []
         tmp_0 = unpriv_unaware(gones_Cm, gzero_Cm)
         tmp_1 = unpriv_group_one(gones_Cm, gzero_Cm)
@@ -1913,8 +1923,10 @@ class Multiprocess_GA_comparison(ParallelComputing_G_setup):
 
     def schedule_content(self, X, A, y_fx, g1m_indices, m1, m2,
                          n_e, pool=None):
-        X_yfx = np.concatenate([y_fx.reshape(-1, 1),
-                                X], axis=1, dtype=DTY_FLT).copy()
+        X_yfx = np.concatenate([y_fx.reshape(-1, 1).astype(DTY_FLT),
+                                X], axis=1).copy()
+        # X_yfx = np.concatenate([y_fx.reshape(-1, 1),
+        #                         X], axis=1, dtype=DTY_FLT).copy()
         n_a = len(g1m_indices)
         curr_res = []
 

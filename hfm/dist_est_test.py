@@ -6,8 +6,8 @@
 
 
 from hfm.dist_est_bin import (
-    weight_generator, AcceleDist_bin, ApproxDist_bin,
-    ApproxDist_bin_revised)  # projector,
+    AcceleDist_bin, ApproxDist_bin,  # weight_generator,
+    ApproxDist_bin_revised)          # projector,
 from hfm.dist_est_nonbin import (
     orthogonal_weight, AcceleDist_nonbin, ApproxDist_nonbin,
     ApproxDist_nonbin_mpver)  # , ExtendDist_multiver_mp)
@@ -17,7 +17,6 @@ from pathos import multiprocessing as pp
 from hfm.dist_drt import (
     DirectDist_bin, DirectDist_nonbin, DirectDist_multiver)
 from hfm.dist_drt_test import no_less_than_check
-import pdb
 
 
 def generate_dat(n, nd, na, nai, nc=2):

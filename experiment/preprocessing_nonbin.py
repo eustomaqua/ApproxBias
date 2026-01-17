@@ -275,7 +275,8 @@ def renewed_normalise_separate(X_A_trn, X_A_val, X_A_tst,
 
 
 def renewed_normalise_disturb(scaler, X_A_trn, X_A_val, X_A_tst,
-                              saIndex=list(), trans_A=False):
+                              # saIndex=list(), trans_A=False):
+                              saIndex=tuple(), trans_A=False):
     # all are np.ndarray, not pd.DataFrame
     scaler = scaler.fit(X_A_trn)
     new_XA_trn = scaler.transform(X_A_trn)

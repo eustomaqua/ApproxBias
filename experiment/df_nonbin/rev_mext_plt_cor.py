@@ -1113,7 +1113,7 @@ class ConvFig_5H_exact(ConvPlotF_init):
         # analogous_confusion_extended(df[tag_norm[1][:-1]].values.astype(
         #     DTY_FLT).T, mat_C, key_B, key_C, f'{fgn}_bi_delt', **pms)
 
-        tmp = df  # tmp = df_alt
+        # tmp = df  # tmp = df_alt
         key_C = BLFAIR[:3] + [  # r'$\text{SP}^\text{max}$',
             r'$\mathrm{ESP}$', r'$\mathrm{ESP}^\text{avg}$'] + BLFAIR[
             -1:] + [  # r'$\mathbf{df}_\text{prev}$',
@@ -1195,7 +1195,7 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
         return tag_norm, tag_gf, tag_hfm, tag_df_conv
 
     def subfig_conv_multivar(self, dframe, tag_conv, fgn,
-                             tag_hfm=None):
+                             tag_hfm):  # tag_hfm=None):
         nb_set, id_set, _, _, _ = self.recap_sub_data(
             dframe, nb_row = 4, nc_norm = 3, nc_sens = 4)
         tag_multivar = tag_conv['multivar'] + tag_conv['tim'][: -1]

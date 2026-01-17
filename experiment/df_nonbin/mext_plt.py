@@ -759,7 +759,7 @@ class Plot3_comparison(GraphSetup):
                          pre='minmax'):
         tmp, suffix = self.draw_sub2_jt(joint)
         fig_nm = self._figname.replace('iter5_cls7_', '')[:-1]
-        suff_1 = fig_nm + '_{}_pc1_{}_mat{}'.format(suffix, fig, ind)
+        # suff_1 = fig_nm + '_{}_pc1_{}_mat{}'.format(suffix, fig, ind)
         suff_2 = fig_nm + '_{}_pc2_{}_mat{}'.format(suffix, fig, ind)
         suff_3 = fig_nm + '_{}_pc3_{}_mat{}'.format(suffix, fig, ind)
         del fig_nm
@@ -878,10 +878,10 @@ class Plot3_comparison(GraphSetup):
         del tYs_k4, tYs_k3, tim_ext, tYs_k3_att01, tYs_k4_att01
 
         suff_4 = '_'.join([self._figname[:-1], pre, fig, suffix, 'scat'])
-        suff_5 = '_'.join([self._figname[:-1], pre, fig, suffix, 'tim'])
-        # df_raw = self.draw_sub2_dat2(
-        #     dframe, nb_set, id_set, each_gen, each_att, tmp_f_vm)
-        # df_raw = self.draw_sub3_dat(
+        # suff_5 = '_'.join([self._figname[:-1], pre, fig, suffix, 'tim'])
+        # # df_raw = self.draw_sub2_dat2(
+        # #     dframe, nb_set, id_set, each_gen, each_att, tmp_f_vm)
+        # # df_raw = self.draw_sub3_dat(
         df_raw = self.draw_sub1_dat2(
             dframe, nb_set, id_set, tmp_f_vm, tmp)  # , each_gen, each_att
         tYs = tmp_f_vm[0]  # 19 manf (=6+4+6+3) + 14 manf_ext (=6+6+2)
@@ -1044,7 +1044,7 @@ class Plot3_comparison(GraphSetup):
     def draw_sub4_dat(self, dframe, nb_set, id_set, tag_Ys_merge):
         # tmp_Ys_merge = tag_Ys_merge[0][:-5] + tag_Ys_merge[-1][1:]
         tmp_Ys_merge = tag_Ys_merge[0][:1] + tag_Ys_merge[-1][1:]
-        i, k = 0, 0
+        i = 0  # i, k = 0, 0
         # df_raw = dframe[tag_Ys_merge[0]].iloc[id_set[i] + 1: id_set[i + 1]]
         df_raw = dframe[tmp_Ys_merge].iloc[id_set[i] + 1: id_set[i + 1]]
         # df_raw = df_raw.rename(columns={tmp_Ys_merge[0]: tag_Ys_merge[0][0]})

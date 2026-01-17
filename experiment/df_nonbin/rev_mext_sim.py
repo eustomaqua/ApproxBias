@@ -35,7 +35,6 @@ from experiment.df_nonbin.rev_mext_exp_mp import (
     ConvergeF2_with, ConvergeF3_with, ConvergeF4_with, ConvergeF5_with,
     ConvergeF7_with, ConvergeF8_with, ConvHP_EA_anal, ConvHP_EB_anal,
     ConvergeF9_with, ConvergeF9simpl)
-import pdb
 
 
 # =====================================

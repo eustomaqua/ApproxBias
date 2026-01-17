@@ -4,7 +4,6 @@
 #
 
 
-import pdb
 import numpy as np
 from hfm.hfm_df import bias_degree_bin, bias_degree_nonbin
 
@@ -55,8 +54,8 @@ def test_earlybreak():
     n, nd = 110, 4
     X_nA_y = np.random.rand(n, 1 + nd)
     idx_Si = np.random.randint(2, size=n)
-    Si = X_nA_y[idx_Si]
-    Si_c = X_nA_y[~idx_Si]
+    # Si = X_nA_y[idx_Si]
+    # Si_c = X_nA_y[~idx_Si]
 
     A_j = np.zeros((n, 2))
     idx_Sj = np.random.randint(3, size=n)

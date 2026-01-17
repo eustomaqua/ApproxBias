@@ -159,10 +159,14 @@ class ComparisonB_setup:
 
     def count_sing_part3(self, X, A, y, y_hat, non_sa, m1=20, m2=8):
         cmp_fair = []
-        X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1,
-                                 dtype=DTY_FLT)
-        X_and_y_hat = np.concatenate([y_hat.reshape(-1, 1), X],
-                                     axis=1, dtype=DTY_FLT)
+        # X_and_y = np.concatenate([y.reshape(-1, 1), X], axis=1,
+        #                          dtype=DTY_FLT)
+        # X_and_y_hat = np.concatenate([y_hat.reshape(-1, 1), X],
+        #                              axis=1, dtype=DTY_FLT)
+        X_and_y = np.concatenate([
+            y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        X_and_y_hat = np.concatenate([
+            y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         '''
         idx_sa = ~non_sa  # non_priv
 
@@ -759,8 +763,10 @@ class ComparisonC2_withDirectComput(ComparisonB2_withDirectComput):
     def schedule_content_prime(self, logger,
                                X_A_trn, y_trn, X_Aq_trn, g1_trn, jt_trn,
                                X_A_tst, y_tst, X_Aq_tst, g1_tst, jt_tst,
-                               X_trn, A_trn, X_tst, A_tst,
-                               m1, m2, positive_label):
+                               # X_trn, A_trn, X_tst, A_tst,
+                               # m1, m2, positive_label):
+                               X_trn=None, A_trn=None, X_tst=None, A_tst=None,
+                               m1=20, m2=8, positive_label=1):
         res_iter = []
         tmp = self.subroute_one_norm_att(
             X_A_trn, y_trn, X_Aq_trn, None,
