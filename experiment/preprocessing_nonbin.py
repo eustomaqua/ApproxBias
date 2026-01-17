@@ -259,7 +259,7 @@ def renewed_transform_X_A_and_y(dataset, processed_binsensitive,
 
 
 def renewed_normalise_separate(X_A_trn, X_A_val, X_A_tst,
-                               saIndex=list()):
+                               saIndex=tuple()):  # list()):
     nb_feat = X_A_trn.shape[1]
     non_sa = list(range(nb_feat))
     for i in saIndex:

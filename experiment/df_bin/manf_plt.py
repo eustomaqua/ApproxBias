@@ -75,11 +75,11 @@ class Plot5A_hyperpm(GraphSetup):
     def schedule_mspaint(self, raw_dframe):
         nb_set, Ys_dir, Ys_app, Ys_ut, \
             picked_keys = self.painting_prep(raw_dframe)
-        # X = self._m2_set.copy()
-        '''
-        self.painting_fig2(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
-        self.painting_fig1(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
-        '''
+        # # X = self._m2_set.copy()
+        # '''
+        # self.painting_fig2(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
+        # self.painting_fig1(nb_set, X, Ys_dir, Ys_app, Ys_ut, picked_keys)
+        # '''
 
         nb_set, id_set = self.recap_sub_data(raw_dframe, nb_row=3)
         # nb_set, id_set = nb_set - 1, id_set[:-1]
@@ -97,8 +97,8 @@ class Plot5A_hyperpm(GraphSetup):
 
     def drawing_fig3_alt(self, dframe, nb_set, id_set,
                          tag_direct, tag_approx, ind='ua',
-                         picked_m2=[2, 3, 4, 5],
-                         picked_set=[0, 1, 2, 3, 4, ],
+                         picked_m2=(2, 3, 4, 5),
+                         picked_set=(0, 1, 2, 3, 4, ),
                          joint='and|or', distrib=False):
         if ind == 'ua':
             curr_tag_dir = tag_direct[-2]
@@ -143,7 +143,7 @@ class Plot5A_hyperpm(GraphSetup):
             identity = '{:2s}'.format('') + identity
         kws['distrib'] = distrib  # False
         line_reg_with_marginal_distr(
-            df_raw, curr_tag_dir, col_Y, curr_tag_app, picked_keys, 
+            df_raw, curr_tag_dir, col_Y, curr_tag_app, picked_keys,
             annotX, annotY, figname=suff_6 + '_x', invt_a=False,
             identity=identity, **kws)
 
@@ -693,8 +693,8 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
     if not diff:
         return
     scat_Z = np.zeros_like(scat_Y) - 1.
-    for i in range(len(scat_Y)):
-        tmp = np.abs(scat_Y[i] - scat_X[i])
+    for i, yi in enumerate(scat_Y):   # range(len(scat_Y)):
+        tmp = np.abs(yi - scat_X[i])  # np.abs(scat_Y[i] - scat_X[i])
         scat_Z[i] = tmp / check_zero(scat_X[i])
     annotZ = r'\frac{abs(\hat{\mathbf{D}}_\cdot-\mathbf{D}_\cdot)}{\mathbf{D}_\cdot}'
     annots = ['${}$'.format(annotX), '${}$'.format(annotZ),
@@ -879,7 +879,7 @@ class Plot2A_comparison(Plot2_comparison):
 
         kws = {'joint': 'none', 'fig': 'tst', 'split': False}
         kws['corrected'] = True
-        self.drawing_fig2_alt(raw_dframe, tag_tst, nb_set, id_set, 
+        self.drawing_fig2_alt(raw_dframe, tag_tst, nb_set, id_set,
                               each_gen, each_att, **kws)
 
     def picking_fig_tags(self, tag, ind=0):
@@ -891,7 +891,7 @@ class Plot2A_comparison(Plot2_comparison):
         col_X = tag_acc[ind]  # ↑ aka. tmp_f_vm
         return tag_acc, tag_f_vot, tag_f_man, tag_Ys, col_X
 
-    def drawing_fig2_alt(self, dframe, tag, nb_set, id_set, 
+    def drawing_fig2_alt(self, dframe, tag, nb_set, id_set,
                          each_gen, each_att, joint='none', fig='tst',
                          split=False, corrected=False):
         _, _, tag_f_man, _, _ = self.picking_fig_tags(

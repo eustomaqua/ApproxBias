@@ -11,7 +11,7 @@ import csv
 import numpy as np
 import pandas as pd
 # import matplotlib.pyplot as plt
-# import pdb
+import pdb
 
 from pyfair.granite.draw_addtl import (
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
@@ -56,8 +56,8 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
     if not diff:
         return
     scat_Z = np.zeros_like(scat_Y) - 1.
-    for i in range(len(scat_Y)):
-        tmp = np.abs(scat_Y[i] - scat_X[i])
+    for i, yi in enumerate(scat_Y):   # range(len(scat_Y)):
+        tmp = np.abs(yi - scat_X[i])  # np.abs(scat_Y[i] - scat_X[i])
         scat_Z[i] = tmp / check_zero(scat_X[i])
     annotZ = r'\frac{abs(\hat{\mathbf{D}}_\cdot-\mathbf{D}_\cdot)}{\mathbf{D}_\cdot}'
     annots = ['${}$'.format(annotX), '${}$'.format(annotZ),
@@ -314,13 +314,13 @@ def _ext_sub_show_tim(df_raw, tYs, suff, diff=False):
     scat_Z_bin = df_raw[tYs[18]].values.astype(DTY_FLT)  # mext approx.bin
     scat_X_mu = df_raw[tYs[31]].values.astype(DTY_FLT)  # direct.multivar
     scat_Y_mu = df_raw[tYs[32]].values.astype(DTY_FLT)  # approx.multivar
-    '''
-    annotX = r'T_{\mathbf{D}} + T_{\mathbf{D}_f}'
-    annotY = r'T_{\hat{\mathbf{D}}} + T_{\hat{\mathbf{D}}_f}'
-    annotZ = [
-        r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1',
-        r'\lg(\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} })']
-    '''
+    # '''
+    # annotX = r'T_{\mathbf{D}} + T_{\mathbf{D}_f}'
+    # annotY = r'T_{\hat{\mathbf{D}}} + T_{\hat{\mathbf{D}}_f}'
+    # annotZ = [
+    #     r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1',
+    #     r'\lg(\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} })']
+    # '''
     annotX = r'T_{\mathbf{D}_\mathbf{a}(S,a_i)} + T_{\mathbf{D}_{f,\mathbf{a}}(S,a_i)}'
     annotY = r'T_{\hat{\mathbf{D}}_\mathbf{a}(S,a_i)} + T_{\hat{\mathbf{D}}_{f,\mathbf{a}}(S,a_i)}'
     annotZ = [
@@ -978,16 +978,18 @@ class Plot3_comparison(GraphSetup):
         # df_raw = self.draw_sub2_dat2(dframe, nb_set, id_set, each_gen, each_att, tmp_f_vm[:2])
         df_raw = self.draw_sub1_dat2(dframe, nb_set, id_set, tmp_f_vm[:2], tmp)
         kws = {'cmap_name': self._cmap_name, 'snspec': 'sty1', 'identity': 'identity'}
-        '''
-        scatter_with_marginal_distrib(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct[1:], pikced_keys + picked_direct, annotXpz, annotY, figname=suff_pre + '_pc3s', **kws)
-        scatter_with_marginal_distrib(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx[1:], pikced_keys + picked_approx, annotXpz, annotY, figname=suff_pre + '_pc3t', **kws)
-        '''
-        line_reg_with_marginal_distr(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct,
-                                     pikced_keys + picked_direct, annotXpz, annotY,
-                                     figname=suff_pre + '_pc3s', **kws)
-        line_reg_with_marginal_distr(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx,
-                                     pikced_keys + picked_approx, annotXpz, annotY,
-                                     figname=suff_pre + '_pc3t', **kws)
+        # '''
+        # scatter_with_marginal_distrib(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct[1:], pikced_keys + picked_direct, annotXpz, annotY, figname=suff_pre + '_pc3s', **kws)
+        # scatter_with_marginal_distrib(df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx[1:], pikced_keys + picked_approx, annotXpz, annotY, figname=suff_pre + '_pc3t', **kws)
+        # '''
+        line_reg_with_marginal_distr(
+            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_direct,
+            pikced_keys + picked_direct, annotXpz, annotY,
+            figname=suff_pre + '_pc3s', **kws)
+        line_reg_with_marginal_distr(
+            df_raw, tmp_f_vm[0][0], col_Y, tag_Ys_approx,
+            pikced_keys + picked_approx, annotXpz, annotY,
+            figname=suff_pre + '_pc3t', **kws)
         kws = {'alpha_loc': 'b4', 'alpha_rev': True, 'annotY': annotZ,
                'cmap_name': 'viridis_r', 'alpha_clarity': .15}  # 'coolwarm_r'
         picked_direct[0] = r'$\mathbf{df}$      prev'
@@ -2197,7 +2199,7 @@ class Table4_comparison(Plot4_comparison):
                            'FairGBM (fpr)', 'FairGBM (fnr)',
                            'FairGBM (fpr,fnr)', 'AdaFair']
 
-    def picking_tab_tags(self, tag, ind=[0, 1, 2, 3, 5], dist_df='both',
+    def picking_tab_tags(self, tag, ind=(0, 1, 2, 3, 5), dist_df='both',
                          omitted=True):  # ind=[0,1,2,3,7]
         '''
         acc_orgin = tag[: 13 - 1]  # origin 13-1
@@ -2281,7 +2283,7 @@ class Table4_comparison(Plot4_comparison):
         return tmp_a1, tmp_a2, tmp_f_vm, tmp_f_ext
 
     def tabulating_fifth_alt(self, dframe, tag_trn, tag_tst, nb_set, id_set,
-                             each_gen, each_att, ind=[0, 1, 2, 3, 5], ddof=1,
+                             each_gen, each_att, ind=(0, 1, 2, 3, 5), ddof=1,
                              dist_df='both', picked_clf=0, csv_w=None,
                              suffix='suff', alpha=.5):  # suffix,prefix
         tYs_k2_k3 = [0, 1, 2, 3, ] + [4, 7, ]  # [4, 5, 6, 7, 8]
@@ -2496,7 +2498,7 @@ class Table4_comparison(Plot4_comparison):
         return
 
     def tabulating_sixth_alt(self, dframe, tag_trn, tag_tst, nb_set, id_set,
-                             each_gen, each_att, ind=[0, 1, 2, 3, 5], ddof=1,
+                             each_gen, each_att, ind=(0, 1, 2, 3, 5), ddof=1,
                              dist_df='both', picked_clf=2, csv_w=None,
                              suffix='suff', alpha=.5):
         tYs_k2_k3 = [3, 4, 7, ]  # [0, 1, 2, 3, ] + [4, 7, ]  # DR,df.ecai,hat_df.ecai
@@ -2592,7 +2594,7 @@ class Table4_comparison(Plot4_comparison):
         for j in range(nb_ind * 2 + 12, nb_ind * 2 + 14):
             U_cp_raw[:, j - 5, :] = U_f1_raw[:, j, :]  # <     16,17  >> 11,12  =?-5
         # for j in range(nb_ind * 2 + 11, nb_ind * 2 + 13):     # array([15,16])   #10,11 #14,
-        #   U_cp_raw[:, j - 5, :] = U_f1_raw[:, j, :]  # < 15,16 >> 11,12 
+        #   U_cp_raw[:, j - 5, :] = U_f1_raw[:, j, :]  # < 15,16 >> 11,12
         nb_ind = nb_ind * 2  # 4,5,6, 7,8,9, 10,11 <-- 4,7,8, 9,12,13, 15,16
         # updated:     4,5,6, 7,8,9, 10, 11,12 <-- 4,7,8, 9,12,13, 14, 16,17
         assert np.all(U_cp_raw[:, :nb_ind, :] == U_f1_raw[:, :nb_ind, :])
@@ -2670,7 +2672,7 @@ class Table4_comparison(Plot4_comparison):
         return
 
     def tabulating_third(self, dframe, tag_trn, tag_tst, nb_set, id_set,
-                         each_gen, each_att, ind=[0, 3], ddof=0,
+                         each_gen, each_att, ind=(0, 3), ddof=0,
                          alpha=.7, dist_df='both', csv_w=None):
         tmp_a_org, _, tmp_f_vm, tmp_ext = self.picking_tab_tags(
             tag_trn, ind, dist_df)

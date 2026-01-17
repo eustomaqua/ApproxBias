@@ -209,7 +209,8 @@ class ManfEmpirical(DataSetup):
         csv_row_2a = ['data_name', 'binary', 'abbr_cls', 'nb_iter',
                       'gen', 'rep/cvs', 'm1', 'm2']
         csv_row_2b = ['#sens_attr', '#iter', '#eval']
-        if not 'expt2' in self._trial_type:
+        # if not 'expt2' in self._trial_type:
+        if 'expt2' not in self._trial_type:
             csv_row_1, csv_r2c, csv_r3c = self._iterator.prepare_trial()
             csv_row_2 = csv_row_2a + csv_row_2b + csv_r2c
             csv_w.writerows([csv_row_1, csv_row_2, [''] * 11 + csv_r3c])

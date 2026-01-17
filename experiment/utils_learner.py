@@ -131,7 +131,7 @@ CONCISE_INDIVIDUALS = {
 # def achieve_ensemble_from_train_set(name_ens, abbr_cls, nb_cls,
 #                                     X_trn, y_trn, X_val, X_tst):
 #     """
-#     X/y_trn/val/tst: list, np.ndarray, pd.DataFrame? 
+#     X/y_trn/val/tst: list, np.ndarray, pd.DataFrame?
 #     """
 #     name_cls = INDIVIDUALS[abbr_cls]
 #     coef, clfs, indices = EnsembleAlgorithm(name_ens, name_cls, nb_cls,
@@ -277,7 +277,8 @@ AVAILABLE_ENSF = [
 class RelativeFairClsf(IndividualClsf):
     def __init__(self, abbr_cls, nb_cls=3,
                  constraint_type='FPR,FNR',
-                 saIndex=list(), saValue=list()):
+                 # saIndex=list(), saValue=list()):
+                 saIndex=tuple(), saValue=tuple()):
         self._abbr_cls = abbr_cls
 
         self._initial_pm = {
@@ -304,7 +305,8 @@ class RelativeFairClsf(IndividualClsf):
 
     def prepare_fair_relative(self, abbr_cls, nb_cls=3,
                               constraint_type='FPR,FNR',
-                              saIndex=list(), saValue=list()):
+                              # saIndex=list(), saValue=list()):
+                              saIndex=tuple(), saValue=tuple()):
         if abbr_cls in ['bagging', 'Bagging']:
             clf = BaggingClassifier(n_estimators=nb_cls)
         elif abbr_cls in ['AdaBoost', 'adaboost']:

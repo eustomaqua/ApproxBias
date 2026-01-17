@@ -27,12 +27,12 @@ class PartE_ParaSen(IndividualClsf):
 
     def schedule_subrout(self, X_yfx, idx_S0, idx_S1):
         ans = []  # tuple()
-        '''
-        dist_10, tim_elapsed = DirectDist(X_yfx, idx_S1, idx_S0)
-        ans.extend([dist_10, tim_elapsed])
-        dist_01, tim_elapsed = DirectDist(X_yfx, idx_S0, idx_S1)
-        ans.extend([dist_01, tim_elapsed])
-        '''
+        # '''
+        # dist_10, tim_elapsed = DirectDist(X_yfx, idx_S1, idx_S0)
+        # ans.extend([dist_10, tim_elapsed])
+        # dist_01, tim_elapsed = DirectDist(X_yfx, idx_S0, idx_S1)
+        # ans.extend([dist_01, tim_elapsed])
+        # '''
         dist_10, tim_elapsed = DirectDist(X_yfx, idx_S0)
         ans.extend([dist_10, tim_elapsed])
         dist_01, tim_elapsed = DirectDist(X_yfx, idx_S1)
@@ -102,8 +102,10 @@ class PartE3_ParamsSen(PartE_ParaSen):
         self._m1_set = list(range(3, 23, 2))  # 3, 50, 2)) # siz 10
 
     def schedule_content(self, X, A, y_fx, idx_S0, idx_S1):
-        X_yfx = np.concatenate([y_fx.reshape(-1, 1), X], axis=1,
-                               dtype=DTY_FLT)
+        X_yfx = np.concatenate([
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        # X_yfx = np.concatenate([y_fx.reshape(-1, 1), X], axis=1,
+        #                        dtype=DTY_FLT)
         ans_app_m1, ans_ut = [], []
         for m1 in self._m1_set:
             ans_app_m2 = [ApproxDist(
@@ -131,7 +133,8 @@ class PartE3_ParamsSen(PartE_ParaSen):
 class PartF_ParaSen(RelativeFairClsf, PartE_ParaSen):
     def __init__(self, abbr_cls, nb_cls=1,
                  constraint_type='FPR,FNR',
-                 saIndex=list(), saValues=list()):
+                 # saIndex=list(), saValues=list()):
+                 saIndex=tuple(), saValues=tuple()):
         super().__init__(
             abbr_cls, nb_cls, constraint_type, saIndex, saValues)
 
@@ -332,7 +335,7 @@ class PartF2_ParaSenAnalysis(PartF_ParaSen):
 
 
 # -------------------------------
-# RQ4. 
+# RQ4.
 
 
 # -------------------------------

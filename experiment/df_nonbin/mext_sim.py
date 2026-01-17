@@ -503,14 +503,14 @@ class ManfExtEmpirical(DataSetup):
 
         # NON- k-FOLD CROSS VALIDATION
 
-        '''
-    if self._nb_iter <= 0:
-      elegant_print("Running /executing as a whole", logger)
-    elegant_print("Not-repetitively, via cv_split?: {}".format(
-        'Yes' if self._rep_iter else 'No'), logger)  # cv_split
-    if not self._rep_iter:
-      elegant_print("nb_iter={}, repeat".format(self._nb_iter), logger)
-    '''
+        #     '''
+        # if self._nb_iter <= 0:
+        #   elegant_print("Running /executing as a whole", logger)
+        # elegant_print("Not-repetitively, via cv_split?: {}".format(
+        #     'Yes' if self._rep_iter else 'No'), logger)  # cv_split
+        # if not self._rep_iter:
+        #   elegant_print("nb_iter={}, repeat".format(self._nb_iter), logger)
+        # '''
 
         # CROSS VALIDATION, usually 5-fold cross validation
 

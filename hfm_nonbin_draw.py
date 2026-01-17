@@ -108,11 +108,12 @@ class ManfExtDrawing(object):
 
         pre = self._prep.replace('_', '')
         # figname = 'exp{}_{}_'.format(trial_type[-2:], pre)
-        pms = {'nb_iter': self._nb_iter, 'nb_cls': self._nb_cls,
+        pms = {'nb_iter': self._nb_iter,  # 'nb_cls': self._nb_cls,
                'm1': self._m1, 'm2': self._m2, 'n_e': self._n_e}
         figname = 'exp{}_'.format(trial_type[-2:])
 
         if trial_type[-6:] in ['expt3b', 'expt3c', 'expt3d']:
+            pms['nb_cls'] = self._nb_cls
             if trial_type.endswith('expt3b'):
                 self._iterator = CurrPlot3B_comparison(figname=figname,
                                                        **pms)
@@ -124,6 +125,7 @@ class ManfExtDrawing(object):
                                                        **pms)
             self.drawing_whole_exp3_exp4(pre, prefix)
         elif trial_type[-6:] in ['expt4b', 'expt4c', 'expt4d']:
+            pms['nb_cls'] = self._nb_cls
             if trial_type.endswith('expt4b'):
                 self._iterator = CurrPlot4B_comparison(figname=figname,
                                                        **pms)
@@ -138,7 +140,7 @@ class ManfExtDrawing(object):
             self.drawing_whole_exp3_exp4(pre, prefix)
 
         elif trial_type[-6:] in ['expt7a']:
-            del pms['nb_cls']
+            # del pms['nb_cls']
             pms['mp_cores'] = self._mp_cores
             self._iterator = Distributed_GA_mp(figname=figname, **pms)
             xlsx_name = '{}_iter{}_pms_ma{}_mb{}'.format(
@@ -151,7 +153,7 @@ class ManfExtDrawing(object):
             del xlsx_name, sheet_name, raw_df
 
         elif trial_type[-6:] in ['expt5a', 'expt5b']:
-            del pms['nb_cls']
+            # del pms['nb_cls']
             pms['mp_cores'] = self._mp_cores
             pms['omitted'] = self._omitted
             if trial_type.endswith('expt5a'):

@@ -265,7 +265,7 @@ def test_German():
         disturb_mult = renewed_prep_and_adversarial(
             cs._dataset, cs._data_frame, ratio, logger=None)
     processed_Xy = process_mult['numerical-multisen']
-    disturbed_Xy = disturb_mult['numerical-multisen']
+    # disturbed_Xy = disturb_mult['numerical-multisen']
     X, A, y, _ = renewed_transform_X_A_and_y(
         cs._dataset, processed_Xy, with_joint=False)
     # _, Aq, _, _ = renewed_transform_X_A_and_y(

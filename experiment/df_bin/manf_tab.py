@@ -48,12 +48,12 @@ class Table2C_comparison(Plot2C_comparison):
         # log_document = self._figname + '_table_third.csv'
         csv_t = open(log_document, 'w')
         csv_w = csv.writer(csv_t)
-        '''
-        self.tabulating_third(
-            raw_dframe, tag_trn, tag_tst, nb_set, id_set,
-            each_gen, each_att, ind=[0, 3], ddof=0,
-            alpha=.1, dist_df='both', csv_w=csv_w)
-        '''
+        # '''
+        # self.tabulating_third(
+        #     raw_dframe, tag_trn, tag_tst, nb_set, id_set,
+        #     each_gen, each_att, ind=[0, 3], ddof=0,
+        #     alpha=.1, dist_df='both', csv_w=csv_w)
+        # '''
 
         self.tabulating_third(
             raw_dframe, tag_trn, tag_tst, nb_set, id_set,
@@ -84,16 +84,16 @@ class Table2C_comparison(Plot2C_comparison):
         csv_t.close()
         del csv_t, csv_w
 
-        '''
-        log_document = self._figname + '_table_second.csv'
-        csv_t = open(log_document, 'w')
-        csv_w = csv.writer(csv_t)
-        csv_t.close()
-        del csv_t, csv_w
-        '''
+        # '''
+        # log_document = self._figname + '_table_second.csv'
+        # csv_t = open(log_document, 'w')
+        # csv_w = csv.writer(csv_t)
+        # csv_t.close()
+        # del csv_t, csv_w
+        # '''
         return
 
-    def picking_tab_tags(self, tag, ind=[0, 1, 2, 3, 7],
+    def picking_tab_tags(self, tag, ind=(0, 1, 2, 3, 7),
                          dist_df='both'):
         acc_orgin = tag[: 13 - 1]  # origin
         acc_delta = tag[13 * 2: 13 * 3 - 1]
@@ -122,7 +122,7 @@ class Table2C_comparison(Plot2C_comparison):
         return tmp_a1, tmp_a2, tmp_f_vm
 
     def tabulating_first(self, dframe, tag, nb_set, id_set,
-                         ind=[0, 1, 2, 3, 7], csv_w=None):
+                         ind=(0, 1, 2, 3, 7), csv_w=None):
         tmp_a_org, tmp_a_det, tmp_f_vm = self.picking_tab_tags(tag, ind)
         tag_a_f = tmp_a_det + tmp_a_org + tmp_f_vm[0] + tmp_f_vm[1]
 
@@ -145,7 +145,7 @@ class Table2C_comparison(Plot2C_comparison):
         return
 
     def tabulating_first_sub1(self, df_set, ddof=0,
-                              ind_acc=[0, 1, 2, 3, 7]):
+                              ind_acc=(0, 1, 2, 3, 7)):
         nb_row, nb_col = df_set.shape
         nb_clf = nb_row // self._nb_iter
         df_tmp = df_set.values.astype(DTY_FLT)
@@ -197,7 +197,7 @@ class Table2C_comparison(Plot2C_comparison):
 
     def tabulating_third(self,
                          dframe, tag_trn, tag_tst, nb_set, id_set,
-                         each_gen, each_att, ind=[0, 3], ddof=0,
+                         each_gen, each_att, ind=(0, 3), ddof=0,
                          alpha=.7, dist_df='both', csv_w=None):
         tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(tag_trn, ind,
                                                        dist_df)
@@ -450,7 +450,7 @@ class Table2C_comparison(Plot2C_comparison):
 
     def tabulating_forth(self,
                          dframe, tag_trn, tag_tst, nb_set, id_set,
-                         each_gen, each_att, ind=[0, 3], ddof=0,
+                         each_gen, each_att, ind=(0, 3), ddof=0,
                          alpha=.1, dist_df='both', csv_w=None):
         # fourth (fairness), is relevant to third (accuracy / performance)
         tmp_a_org, _, tmp_f_vm = self.picking_tab_tags(
@@ -545,7 +545,7 @@ class Table2C_comparison(Plot2C_comparison):
 
     def tabulating_forth_sub2(self, U_trn_raw, U_tst_raw,
                               U_trn_tmp, U_tst_tmp,
-                              ind=[0, 1, 2, 3], ddof=0):
+                              ind=(0, 1, 2, 3), ddof=0):
         # U_trn/tst_raw .shape= (#clf, 1+#fair, #iter) =(14+4, 7, 5)
         # U_trn/tst_tmp .shape= (#clf,   #fair, #iter) =(14+4, 6, 5)
 

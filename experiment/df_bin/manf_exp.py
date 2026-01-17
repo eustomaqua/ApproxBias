@@ -167,23 +167,23 @@ class ComparisonB_setup:
             y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         X_and_y_hat = np.concatenate([
             y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
-        '''
-        idx_sa = ~non_sa  # non_priv
-
-        ut_a = time.time()
-        Ds_01, t_Ds = DirectDist(X_and_y, idx_sa, non_sa)
-        Df_01, t_Df = DirectDist(X_and_y_hat, idx_sa, non_sa)
-        ddf, t_ddf = fair_degree(Ds_01, Df_01)
-        ut_a = time.time() - ut_a
-        cmp_fair.extend((Ds_01, Df_01) + ddf + (t_Ds, t_Df, t_ddf))  # siz=7
-
-        ut_b = time.time()
-        Ds_01, t_Ds = ApproxDist(X_and_y, A, idx_sa, non_sa, m1, m2)
-        Df_01, t_Df = ApproxDist(X_and_y_hat, A, idx_sa, non_sa, m1, m2)
-        ddf, t_ddf = fair_degree(Ds_01, Df_01)
-        ut_b = time.time() - ut_b
-        cmp_fair.extend((Ds_01, Df_01) + ddf + (t_Ds, t_Df, t_ddf))  # siz=7
-        '''
+        # '''
+        # idx_sa = ~non_sa  # non_priv
+        #
+        # ut_a = time.time()
+        # Ds_01, t_Ds = DirectDist(X_and_y, idx_sa, non_sa)
+        # Df_01, t_Df = DirectDist(X_and_y_hat, idx_sa, non_sa)
+        # ddf, t_ddf = fair_degree(Ds_01, Df_01)
+        # ut_a = time.time() - ut_a
+        # cmp_fair.extend((Ds_01, Df_01) + ddf + (t_Ds, t_Df, t_ddf))  # siz=7
+        #
+        # ut_b = time.time()
+        # Ds_01, t_Ds = ApproxDist(X_and_y, A, idx_sa, non_sa, m1, m2)
+        # Df_01, t_Df = ApproxDist(X_and_y_hat, A, idx_sa, non_sa, m1, m2)
+        # ddf, t_ddf = fair_degree(Ds_01, Df_01)
+        # ut_b = time.time() - ut_b
+        # cmp_fair.extend((Ds_01, Df_01) + ddf + (t_Ds, t_Df, t_ddf))  # siz=7
+        # '''
 
         ut_a = time.time()
         Ds_01, t_Ds = DirectDist(X_and_y, non_sa)
@@ -217,7 +217,8 @@ class ComparisonB_setup:
 
 class ComparisonB1_withDirectComput(ComparisonB_setup):
     def __init__(self, nb_cls=1,
-                 saIndex=list(), saValue=list()):
+                 # saIndex=list(), saValue=list()):
+                 saIndex=tuple(), saValue=tuple()):
         # super().__init__(
         #     abbr_cls, nb_cls, constraint_type, saIndex, saValue)
         # self._abbr_cls = abbr_cls  # useless
@@ -403,7 +404,8 @@ class ComparisonB1_withDirectComput(ComparisonB_setup):
 
 
 class ComparisonB2_withDirectComput(ComparisonB_setup):
-    def __init__(self, nb_cls=1, saIndex=list(), saValue=list()):
+    # def __init__(self, nb_cls=1, saIndex=list(), saValue=list()):
+    def __init__(self, nb_cls=1, saIndex=tuple(), saValue=tuple()):
         self._nb_cls = nb_cls
         self.saIndex = saIndex
         self.saValue = saValue

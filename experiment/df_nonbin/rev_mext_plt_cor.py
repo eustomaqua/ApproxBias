@@ -308,7 +308,8 @@ class HPEB_m2fix(Plot5_hyperpm):
 
 class ConvPlotF_init(GraphSetup):
     def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        pms, _, tag_tst = self.prepare_graph()
+        _, _, tag_tst = self.prepare_graph()
+        # pms, _, tag_tst = self.prepare_graph()
         tag_norm, tag_dr, tag_hfm, tag_conv = self.incise_graph(tag_tst)
         fgn = f'{self._figname}{pre}'  # _multivar
         self.subfig_conv_multivar(raw_dframe, tag_conv, fgn,
@@ -1594,10 +1595,10 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
         dt = self.obtn_clf_result(df_nonbin, clf, **kw)  # tb,tag_sa1,[],
         ta = ta[:4] + tag_sa1[:4] + tag_sa1[-4:]
         ans_tex, cmp_tex = [], []
-        for jj in range(len(dt)):
+        for jj in dt:  # for jj in range(len(dt)):
             tmp_tex, tmp_my = [''], ['']
             for k, v in enumerate(ta):
-                ii = dt[jj][v].values.astype(DTY_FLT)
+                ii = jj[v].values.astype(DTY_FLT)  # dt[jj][v]
                 if k < 4:
                     ii *= 100.
                 tmp_tex.append(_encode_sign(
@@ -1614,10 +1615,10 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
         pdb.set_trace()
         dt = self.obtn_clf_result(df_bin, clf, **kw)
         ans_tex, cmp_tex = [], []
-        for jj in range(len(dt)):  # nb_set):
+        for jj in dt:  # range(len(dt)):  # nb_set):
             tmp_tex, tmp_my = [''], ['']
             for k, v in enumerate(ta):
-                ii = dt[jj][v].values.astype(DTY_FLT)
+                ii = jj[v].values.astype(DTY_FLT)  # dt[jj][v]
                 if k < 4:
                     ii *= 100.
                 tmp_tex.append(_encode_sign(

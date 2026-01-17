@@ -217,11 +217,11 @@ class ComparisonB_setup:
         del df_ecai, ut_ddf_ecai, df_nips, ut_ddf_nips, v3_df_avg, v4_df_avg
 
         ut_b = time.time()
-        '''
-        idx_sa = ~non_sa  # actually, doesn't need A here
-        Ds_01, t_Ds = ApproxDist_bin(X_y, A_j, idx_sa, non_sa, m1, m2)
-        Df_01, t_Df = ApproxDist_bin(X_y_hat, A_j, idx_sa, non_sa, m1, m2)
-        '''
+        # '''
+        # idx_sa = ~non_sa  # actually, doesn't need A here
+        # Ds_01, t_Ds = ApproxDist_bin(X_y, A_j, idx_sa, non_sa, m1, m2)
+        # Df_01, t_Df = ApproxDist_bin(X_y_hat, A_j, idx_sa, non_sa, m1, m2)
+        # '''
         Ds_01, t_Ds = ApproxDist_bin(X_y, A_j, non_sa, m1, m2)
         Df_01, t_Df = ApproxDist_bin(X_y_hat, A_j, non_sa, m1, m2)
         df_ecai, _ = fair_degree_v3(Ds_01, Df_01)
@@ -315,7 +315,8 @@ class ComparisonB_setup:
 
 
 class ComparisonB2_withDirectComput(ComparisonB_setup):
-    def __init__(self, nb_cls=1, saIndex=list(), saValue=list(),
+    def __init__(self, nb_cls=1,  # saIndex=list(), saValue=list(),
+                 saIndex=tuple(), saValue=tuple(),
                  n_e=3, *, omitted=True):
         super().__init__(omitted=omitted)
         self._nb_cls = nb_cls
@@ -1374,8 +1375,8 @@ class HyperEA_analysis(ParameterE_setup):
             # X_yfx, A_j, ~non_sa, non_sa, m1, m2) for m2 in self._m2_set]
             X_yfx, A_j, non_sa, m1, m2) for m2 in self._m2_set]
         ans_approx, ans_ut = zip(*ans_approx)
-        curr_res.append([Ds_01, Ds_avg, t_Ds
-                         ] + list(ans_approx) + [''] * n_l + list(ans_ut))
+        curr_res.append([Ds_01, Ds_avg, t_Ds] + list(
+            ans_approx) + [''] * n_l + list(ans_ut))
 
         # fairmanf_ext, bin-val
         # ↓ one sensitive attribute, with binary value
@@ -1384,8 +1385,8 @@ class HyperEA_analysis(ParameterE_setup):
         ans_approx = [DistApprox(X_yfx, B_j, m1, m2, n_e, pool) for m2 in self._m2_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds_01, hat_Ds_avg = zip(*ans_approx)
-        curr_res.append([''] * 3 + 
-                        list(hat_Ds_01) + list(hat_Ds_avg) + list(ans_ut))
+        curr_res.append([''] * 3 + list(
+            hat_Ds_01) + list(hat_Ds_avg) + list(ans_ut))
         return curr_res  # .shape= (3,66) =(1+2, 3+21*3)
 
     def sub_process_core(self, X_yfx, A_j, non_sa, m1, n_e, n_l=21,
@@ -1583,7 +1584,8 @@ class HyperEB_analysis(ParameterE_setup):
 
 class ParameterF_setup(RelativeFairClsf, ParameterE_setup):
     def __init__(self, abbr_cls, nb_cls=1, constraint_type='FPR,FNR',
-                 saIndex=list(), saValue=list(), *, omitted=True):
+                 # saIndex=list(), saValue=list(), *, omitted=True):
+                 saIndex=tuple(), saValue=tuple(), *, omitted=True):
         super().__init__(abbr_cls, nb_cls,
                          constraint_type, saIndex, saValue)
         self._raw_abbr_cls = abbr_cls

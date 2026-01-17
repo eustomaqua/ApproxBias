@@ -242,20 +242,20 @@ def ApproxDist_nonbin(X_nA_y, A_j, n_e=2):
     n, n_d = X_nA_y.shape  # n_d-1=#nonsa
     # n_d-1: number of non-sensitive attributes
 
-    '''
-    d_max, d_avg = [], []
-    for _ in range(m1):
-        W, _ = orthogonal_weight(n_d, n_e)
-
-        tmp = [AcceleDist_nonbin(
-            X_nA_y, A_j,  # m2,
-            W[k]) for k in range(n_e)]
-        tmp, _ = zip(*tmp)
-        t_max, t_avg = zip(*tmp)
-        d_max.append(min(t_max))
-        d_avg.append(min(t_avg))
-    return min(d_max), min(d_avg) / float(n)
-    '''
+    # '''
+    # d_max, d_avg = [], []
+    # for _ in range(m1):
+    #     W, _ = orthogonal_weight(n_d, n_e)
+    #
+    #     tmp = [AcceleDist_nonbin(
+    #         X_nA_y, A_j,  # m2,
+    #         W[k]) for k in range(n_e)]
+    #     tmp, _ = zip(*tmp)
+    #     t_max, t_avg = zip(*tmp)
+    #     d_max.append(min(t_max))
+    #     d_avg.append(min(t_avg))
+    # return min(d_max), min(d_avg) / float(n)
+    # '''
 
     W, _ = orthogonal_weight(n_d, n_e)
     tmp = [AcceleDist_nonbin(
