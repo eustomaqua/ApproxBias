@@ -2,6 +2,7 @@
 # cor_mext_plt.py
 
 import pdb
+import csv
 import numpy as np
 import pandas as pd
 
@@ -10,6 +11,7 @@ from experiment.df_nonbin.rev_mext_plt import GraphSetup
 from pyfair.granite.draw_addtl import (
     hyper_params_lin_reg, multi_lin_reg_without_distr)
 from pyfair.granite.draw_chart import analogous_confusion_extended
+from pyfair.marble.draw_hypos import _encode_sign, _avg_and_stdev
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from hfm.utils.recorders import BLFAIR
@@ -309,43 +311,78 @@ class ConvPlotF_init(GraphSetup):
         pms, _, tag_tst = self.prepare_graph()
         tag_norm, tag_dr, tag_hfm, tag_conv = self.incise_graph(tag_tst)
         fgn = f'{self._figname}{pre}'  # _multivar
-        # self.subfig_conv_multivar(raw_dframe, tag_conv, fgn,
-        #                           tag_hfm=tag_hfm)
-        # self.subfig_conv_singvar(raw_dframe, tag_hfm, tag_conv, fgn)
-
+        self.subfig_conv_multivar(raw_dframe, tag_conv, fgn,
+                                  tag_hfm=tag_hfm)
+        self.subfig_conv_singvar(raw_dframe, tag_hfm, tag_conv, fgn)
         self.subfig_fair_sp(raw_dframe, tag_norm, tag_dr, tag_hfm,
                             tag_conv, fgn)  # +'_delt') #'_esp')
         return
 
-    def obtain_multival_senatt(self, dframe, id_set, tag, tag_sa1, tag_sa2,
-                               first_incl=True):  # False):
+    def obtn_sa_nonbin(self, dframe, id_set, tag, tag_sa1, tag_sa2,
+                       first_incl=True):
         columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
         nb_set = len(id_set) - 1
         k = 2 if nb_set == 5 else 0
         df_raw = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1]
+        df_raw = [df_raw, ]
         for k in ([3, 4] if nb_set == 5 else [2, 3]):
             df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa2]
             df_tmp = df_tmp.rename(columns=columns)
-            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+            df_raw.append(df_tmp)
         if first_incl and nb_set == 5:
             df_tmp = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_sa1]
-            df_raw = pd.concat([df_tmp, df_raw], axis=0)
-        # pdb.set_trace()
-        return df_raw.reset_index(drop=True)
+            df_raw = [df_tmp, ] + df_raw
+        return df_raw
 
-    def obtain_binval_senatt(self, dframe, id_set, tag, tag_sa1, tag_sa2):
+    def obtn_sa_bin(self, dframe, id_set, tag, tag_sa1, tag_sa2):
         columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
         nb_set = len(id_set) - 1  # k = 1
         df_raw = dframe.iloc[id_set[1] + 1: id_set[2]][tag + tag_sa1]
+        df_raw = [df_raw, ]
         for k in ([1, 2] if nb_set == 5 else [1]):
             df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa2]
             df_tmp = df_tmp.rename(columns=columns)
-            df_raw = pd.concat([df_raw, df_tmp], axis=0)
+            df_raw.append(df_tmp)
         for k in ([3, 4] if nb_set == 5 else [2, 3]):
             df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1]
-            df_raw = pd.concat([df_raw, df_tmp], axis=0)
-        # pdb.set_trace()
-        return df_raw.reset_index(drop=True)
+            df_raw.append(df_tmp)
+        return df_raw
+
+    def obtain_multival_senatt(self, dframe, id_set, tag, tag_sa1, tag_sa2,
+                               first_incl=True):  # False):
+        # columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+        # nb_set = len(id_set) - 1
+        # k = 2 if nb_set == 5 else 0
+        # df_raw = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1]
+        # for k in ([3, 4] if nb_set == 5 else [2, 3]):
+        #     df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa2]
+        #     df_tmp = df_tmp.rename(columns=columns)
+        #     df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        # if first_incl and nb_set == 5:
+        #     df_tmp = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_sa1]
+        #     df_raw = pd.concat([df_tmp, df_raw], axis=0)
+        # # pdb.set_trace()
+        # return df_raw.reset_index(drop=True)
+
+        df_raw = self.obtn_sa_nonbin(dframe, id_set, tag, tag_sa1, tag_sa2, first_incl)
+        return pd.concat(df_raw, axis=0).reset_index(drop=True)
+
+    def obtain_binval_senatt(self, dframe, id_set, tag, tag_sa1, tag_sa2):
+        # columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+        # nb_set = len(id_set) - 1  # k = 1
+        # df_raw = dframe.iloc[id_set[1] + 1: id_set[2]][tag + tag_sa1]
+        # for k in ([1, 2] if nb_set == 5 else [1]):
+        #     df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa2]
+        #     df_tmp = df_tmp.rename(columns=columns)
+        #     df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        # for k in ([3, 4] if nb_set == 5 else [2, 3]):
+        #     df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1]
+        #     df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        # # pdb.set_trace()
+        # return df_raw.reset_index(drop=True)
+
+        df_raw = self.obtn_sa_bin(dframe, id_set, tag, tag_sa1, tag_sa2)
+        return pd.concat(df_raw, axis=0).reset_index(drop=True)
 
     # def obtn_sa_bin(self):
     #     return
@@ -355,16 +392,25 @@ class ConvPlotF_init(GraphSetup):
     #     return
 
     def obtn_fulfil_ricci(self, dframe, id_set, tag, tag_sa1, tag_sa2):
-        # k = 0  # columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
-        # for t1, t2 in zip(tag_sa1, tag_sa2):
-        #     df_raw[t2] = df_raw[t1]
+        # # k = 0  # columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+        # # for t1, t2 in zip(tag_sa1, tag_sa2):
+        # #     df_raw[t2] = df_raw[t1]
+        # df_raw = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_sa1 + tag_sa2]
+        # df_raw = df_raw.assign(**{t2: df_raw[t1] for t1, t2 in zip(tag_sa1, tag_sa2)})
+        # # pdb.set_trace()
+        # for k in range(1, 5):
+        #     df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1 + tag_sa2]
+        #     df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        # return df_raw.reset_index(drop=True)
+
         df_raw = dframe.iloc[id_set[0] + 1: id_set[1]][tag + tag_sa1 + tag_sa2]
         df_raw = df_raw.assign(**{t2: df_raw[t1] for t1, t2 in zip(tag_sa1, tag_sa2)})
-        # pdb.set_trace()
+        df_raw = [df_raw, ]
         for k in range(1, 5):
             df_tmp = dframe.iloc[id_set[k] + 1: id_set[k + 1]][tag + tag_sa1 + tag_sa2]
-            df_raw = pd.concat([df_raw, df_tmp], axis=0)
-        return df_raw.reset_index(drop=True)
+            df_raw.append(df_tmp)  # df_raw = pd.concat([df_raw, df_tmp], axis=0)
+        return df_raw  # return df_raw.reset_index(drop=True)
+        # after return:  df = pd.concat(df, axis=0).reset_index(drop=True)
 
     def thread_multivar(self, df_alt, tag_tim, fgn,
                         tag_val, tag_avg, verbose=False):
@@ -704,9 +750,15 @@ class ConvFig_5H_exact(ConvPlotF_init):
             annotY.extend(['${}$'.format(ant_Xp), '${}$'.format(ant_Yq)])
         annot = ['${}$ (sec)'.format(ant_X), '${}$ (sec)'.format(
             ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
-        multi_lin_reg_without_distr(
-            scat_X, scat_Y, annotY, annot, fgn,
-            snspec='sty4c')  # 'sty4d')'sty4')
+        multi_lin_reg_without_distr(  # 'sty4d')'sty4')
+            scat_X, scat_Y, annotY, annot, fgn, snspec='sty4c')
+
+        # scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(  # 'sty6d')#'sty6')
+            scat_X, scat_Z, annotY, annot, fgn + '_s', snspec='sty6c')
+        del scat_Z, ant_Z, annot
         return
 
     def sub_plt_val(self, df_tmp, tag, fgn, sgn = 'D.'):
@@ -728,6 +780,13 @@ class ConvFig_5H_exact(ConvPlotF_init):
             ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
         multi_lin_reg_without_distr(  # 'sty3d')'sty3b')
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty3c')
+
+        # scat_Z = [k / scat_X - 1. for k in scat_Y]
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(  # 'sty6d')#'sty6')
+            scat_X, scat_Z, annotY, annot, fgn + '_s', snspec='sty6c')
+        del scat_Z, ant_Z, annot
         return
 
     def sub_plt_avg(self, df_tmp, tag, fgn, sgn = 'D._avg'):
@@ -749,6 +808,13 @@ class ConvFig_5H_exact(ConvPlotF_init):
             ant_Y), '${} = {}$'.format(ant_Y, ant_X)]
         multi_lin_reg_without_distr(  # 'sty3d')#'sty3b')
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty3c')
+
+        # scat_Z = [k / scat_X - 1. for k in scat_Y]
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(  # 'sty6d')#'sty6c')
+            scat_X, scat_Z, annotY, annot, fgn + '_s', snspec='sty6c')
+        del scat_Z, ant_Z, annot
         return
 
     def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn):
@@ -797,6 +863,14 @@ class ConvFig_5H_exact(ConvPlotF_init):
             ant_Y), '${}$ (bin-val)$= {}$'.format(ant_Y, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty4c')  # 'sty4')
+
+        kws = {'snspec': 'sty6c'}  # 'sty6'}
+        # scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
         return
 
     def sub_plt_val_prev(self, df_tmp, tag, fgn, sgn = 'D.'):
@@ -814,6 +888,14 @@ class ConvFig_5H_exact(ConvPlotF_init):
             ant_Y), '${}$ (bin-val) $= {}$'.format(ant_Y, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty3c')  # 'sty3b')
+
+        kws = {'snspec': 'sty6c'}  # 'sty6'}
+        # scat_Z = [k / scat_X - 1. for k in scat_Y]
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
         return
 
     def sub_plt_avg_prev(self, df_tmp, tag, fgn, sgn = 'D._avg'):
@@ -827,6 +909,64 @@ class ConvFig_5H_exact(ConvPlotF_init):
             ant_Y), '${} = {}$ (bin-val)'.format(ant_Y, ant_X)]
         multi_lin_reg_without_distr(  # 'sty3d')'sty3b')
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty3c')
+
+        kws = {'snspec': 'sty6c'}  # 'sty6d'}#'sty6'}
+        # scat_Z = [k / scat_X - 1. for k in scat_Y]
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
+        return
+
+    def thread_fair(self, dframe, tb, tag_sa1, tag_sa2, fgn):
+        key_A = [r'accuracy', r'precision', 'recall', r'specificity',
+                 r'g_mean', r'dp']  # r'$\mathrm{f}_1$ score'
+        key_B = [r'$\Delta$(accuracy)', r'$\Delta$(precision)',
+                 r'$\Delta$(recall)', r'$\Delta$(specificity)',
+                 # r'$\Delta$($\mathrm{f}_1$ score)',
+                 r'$\Delta$(g_mean)', r'$\Delta$(dp)']
+        key_C = BLFAIR[:3] + [r'$\mathrm{SP}$',
+                              r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
+            -1:] + [r'$\mathbf{df}_\text{prev}$',
+                    r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            dframe, nb_row=4, nc_norm=3, nc_sens=4)
+        key_D = tag_sa1[:6 + 1] + tag_sa1[-2:]
+        # pdb.set_trace()
+        pms = {'rotate': 34, 'cmap_name': 'Blues'}
+        df_bin = self.obtain_binval_senatt(
+            dframe, id_set, tb, tag_sa1, tag_sa2)
+        mat_D = df_bin[key_D].values.astype(DTY_FLT).T
+        mat_B = df_bin[tb[:6]].values.astype(DTY_FLT).T
+        analogous_confusion_extended(
+            mat_B, mat_D, key_B, key_C, f'{fgn}_dt_bin', **pms)
+        pms['cmap_name'] = 'Greens'
+        df_nonbin = self.obtain_multival_senatt(
+            dframe, id_set, tb, tag_sa1, tag_sa2)
+        mat_E = df_nonbin[key_D].values.astype(DTY_FLT).T
+        mat_A = df_nonbin[tb[:6]].values.astype(DTY_FLT).T
+        analogous_confusion_extended(
+            mat_A, mat_E, key_B, key_C, f'{fgn}_dt_nonbin', **pms)
+
+        pms['cmap_name'] = 'OrRd'
+        df = self.obtn_fulfil_ricci(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df = pd.concat(df, axis=0).reset_index(drop=True)
+        key_E = tag_sa2[:6 + 1] + tag_sa2[-2:]
+        mat_D = df[key_D].values.astype(DTY_FLT).T
+        mat_E = df[key_E].values.astype(DTY_FLT).T
+        key_C[3] = r'$\mathrm{ESP}$'
+        key_C[4] = r'$\mathrm{ESP}^\text{avg}$'
+        key_C = key_C[:6] + key_C[-2:]
+        mat_C = np.zeros_like(mat_D, dtype=DTY_FLT)[:-1]
+        for k in [0, 1, 2, 4, 5]:
+            mat_C[k] = (mat_D[k] + mat_E[k]) / 2.
+        for k in range(mat_C.shape[1]):
+            mat_C[3][k] = max(mat_D[3][k], mat_E[3][k])
+        mat_C[6] = df[tb[12:][0]].values.astype(DTY_FLT)
+        mat_C[7] = df[tb[12:][4]].values.astype(DTY_FLT)
+        analogous_confusion_extended(df[tb[:6]].values.astype(
+            DTY_FLT).T, mat_C, key_B, key_C, f'{fgn}_delt_mv', **pms)
         return
 
     def subfig_fair_sp(self, dframe, tag_norm, tag_dr, tag_hfm, tag_conv, fgn):
@@ -851,6 +991,17 @@ class ConvFig_5H_exact(ConvPlotF_init):
         # tmp_hfm : Direct_bin df_prev, ApproxDist_bin df_prev,
         #           StratVacant,StratES,StratRA, ..df_avg
         # tmp_conv: Direct_nonbin,StratVacant,StratES,StratRA, ..df_avg
+
+        tag_sa1 = tmp_hfm[0][:2] + tmp_conv[0][:1] + tmp_conv[0][4:5]
+        tag_sa2 = tmp_hfm[1][:2] + tmp_conv[1][:1] + tmp_conv[1][4:5]
+        tag_sa1 = tmp_dr[0][:-1] + tag_sa1
+        tag_sa2 = tmp_dr[1][:-1] + tag_sa2
+        tmp_norm = [i[:4] + i[5:] + i[4:5] for i in tag_norm]
+        tb = tmp_norm[1][:-1] + tmp_norm[0][:-1]  # delta,oo
+        self.thread_fair(dframe, tb + tmp_multivar, tag_sa1, tag_sa2, fgn)
+        '''
+        pdb.set_trace()
+
         tag_sa1 = tmp_dr[0] + tmp_hfm[0] + tmp_conv[0]
         tag_sa2 = tmp_dr[1] + tmp_hfm[1] + tmp_conv[1]
         tb = tag_norm[0] + tag_norm[1]
@@ -889,6 +1040,7 @@ class ConvFig_5H_exact(ConvPlotF_init):
         # mat_C = np.zeros_like(mat_D, dtype=DTY_FLT)[:-1]
         # analogous_confusion_extended(mat_B, )
         pdb.set_trace()
+        '''
         return
 
     def subfig_fair_sp_prev(self, dframe, tag_norm, tag_dr, tag_hfm, tag_conv, fgn):
@@ -924,6 +1076,7 @@ class ConvFig_5H_exact(ConvPlotF_init):
         # df = df_alt
         df = self.obtn_fulfil_ricci(
             dframe, id_set, tb + tmp_multivar, tag_sa1, tag_sa2)
+        df = pd.concat(df, axis=0).reset_index(drop=True)
         key_A = [r'accuracy', r'precision', r'recall', r'specificity',
                  r'g_mean', r'dp']  # r'$\mathrm{f}_1$ score',
         key_B = [r'$\Delta$(accuracy)', r'$\Delta$(precision)',
@@ -1139,6 +1292,13 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
             annotY[0] = '${}$'.format(ant_eff)
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec ='sty4')  # 'sty4d')
+
+        # scat_Z = [np.log10(k / scat_X) for k in scat_Y]
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(  # 'sty6d')
+            scat_X, scat_Z, annotY, annot, fgn + '_s', snspec ='sty6')
+        del scat_Z, ant_Z, annot
         return
 
     def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.'):
@@ -1170,6 +1330,14 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
             annotY[0] = ant_eff
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec = 'sty3b')  # 'sty3d')
+
+        # scat_Z = [k / scat_X - 1. for k in scat_Y]
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s',
+            snspec = 'sty6')  # 'sty6d')
+        del scat_Z, ant_Z, annot
         return
 
     def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn):
@@ -1220,6 +1388,13 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
             ant_Y), '${}$ (bin-val)$= {}$'.format(ant_Y, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec = 'sty4')
+
+        kws = {'snspec': 'sty6'}
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
         return
 
     def sub_plt_val_prev(self, df_tmp, tag, fgn, sgn = 'D.'):
@@ -1247,6 +1422,13 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
             ant_Y), '${}$ (bin-val) $= {}$'.format(ant_Y, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec = 'sty3b')
+
+        kws = {'snspec': 'sty6'}
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
         return
 
     def sub_plt_avg_prev(self, df_tmp, tag, fgn, sgn = 'D._avg'):
@@ -1260,7 +1442,227 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
             ant_Y), '${} = {}$ (bin-val)'.format(ant_Y, ant_X)]
         multi_lin_reg_without_distr(  # 'sty3b','sty3d')
             scat_X, scat_Y, annotY, annot, fgn, snspec = 'sty3c')
+
+        kws = {'snspec': 'sty6c'}  # 'sty6'}#'sty6d'}
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, kws, ant_Z
         return
+
+    def subfig_fair_sp(self, dframe, tag_norm, tag_dr, tag_hfm, tag_conv, fgn):
+        tmp_dr = [i[:3] + i[5:7] + i[3:4] for i in tag_dr]  # GFx3,SPx2,DR
+        tmp_hfm = [[i[j] for j in [
+            0, 3, 2, 1, 5, 7, 9, 6, 8, 10]] for i in tag_hfm['df']]
+        tmp_conv = [i[4:7] + i[9:][3:4] + i[
+            9 + 6:][4:6] + i[9 + 6 + 8:][4:6] + i[9 + 6 + 8 + 8:][
+            4:6] for i in [tag_conv['sa1'], tag_conv['sa2']]]
+        tmp_multivar = tag_conv['multivar'][4:7] + tag_conv['multivar'][
+            9:][3:4] + tag_conv['multivar'][9 + 6:][4:6] + tag_conv['multivar'][
+            9 + 6 + 8:][4:6] + tag_conv['multivar'][9 + 6 + 8 + 8:][4:6]
+        # tmp_hfm:      DistDirect_bin df_prev, EarlyBreak df_prev,
+        #               ApproxDist_bin df_prev, DistDirect_bin df,
+        #               Vacant|StratES|StratRA df, Vacant|StratES|StratRA df_avg
+        # tmp_conv:     DistDirect_nonbin {df_prev, df,df_avg}, EffHD_nonbin {df},
+        #               Vacant {df,df_avg}, StratES x2, StratRA x2
+        # tmp_multivar: DistDirect_multivar {df_prev, df,df_avg}, EffHD_multivar{
+        #               df}, Vacant {df,df_avg}, StratES x2, StratRA x2
+        tmp_norm = [i[:4] + i[5:] + i[4:5] for i in tag_norm]
+        tag_sa1 = tmp_dr[0] + tmp_hfm[0][:4] + tmp_conv[0][:3]
+        tag_sa2 = tmp_dr[1] + tmp_hfm[1][:4] + tmp_conv[1][:3]
+        tb = tmp_norm[1][:-1] + tmp_norm[0][:-1]  # delta,oo
+        self.thread_fair(dframe, tb + tmp_multivar, tag_sa1, tag_sa2, fgn)
+
+        tb = tmp_norm[1] + tmp_norm[0]  # add f1_score
+        tag_sa1 = tmp_dr[0] + tmp_hfm[0][:1] + tmp_conv[0][1:3]
+        tag_sa2 = tmp_dr[1] + tmp_hfm[1][:1] + tmp_conv[0][1:3]
+        self.thread_tabulate(dframe, tb + tmp_multivar[1:3], tag_sa1, tag_sa2,
+                             fgn.replace('exp', 'tab'))  # f'{fgn}tab_')
+        return
+
+    def thread_fair(self, dframe, tb, tag_sa1, tag_sa2, fgn, verbose=False):
+        key_A = [r'accuracy', r'precision', 'recall', r'specificity',
+                 r'g_mean', r'dp']  # r'$\mathrm{f}_1$ score'
+        key_B = [r'$\Delta$(accuracy)', r'$\Delta$(precision)',
+                 r'$\Delta$(recall)', r'$\Delta$(specificity)',
+                 # r'$\Delta$($\mathrm{f}_1$ score)',
+                 r'$\Delta$(g_mean)', r'$\Delta$(dp)']
+        key_C = BLFAIR[:3] + [r'$\mathrm{SP}$',
+                              r'$\mathrm{SP}^\text{avg}$'] + BLFAIR[
+            -1:] + [r'$\mathbf{df}_\text{prev}$'] + ([
+                r'', r'', ] if verbose else []) + [
+            r'$\mathbf{df}$', r'$\mathbf{df}^\text{avg}$']
+        key_C[3] = r'SP'
+        key_C[4] = r'SP$^\text{avg}$'
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            dframe, nb_row=4, nc_norm=3, nc_sens=4)
+        df_bin = self.obtain_binval_senatt(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df_nonbin = self.obtain_multival_senatt(dframe, id_set, tb, tag_sa1, tag_sa2)
+        key_D = tag_sa1[6:][:1] + tag_sa1[6:][3:4] + tag_sa1[6 + 4:][:3]
+        if not verbose:
+            key_D = tag_sa1[6:][:1] + tag_sa1[6 + 4:][1:3]
+
+        mat_D = df_bin[tag_sa1[:6] + key_D].values.astype(DTY_FLT).T
+        mat_E = df_nonbin[tag_sa1[:6] + key_D].values.astype(DTY_FLT).T
+        mat_B = df_bin[tb[:6]].values.astype(DTY_FLT).T
+        mat_A = df_nonbin[tb[:6]].values.astype(DTY_FLT).T
+        pms = {'rotate': 34, 'cmap_name': 'Blues', 'figsize': 'L-ET'}  # 'extra'}
+        if not verbose:
+            del pms['figsize']
+        analogous_confusion_extended(mat_B, mat_D, key_B, key_C, f'{fgn}_dt_bin', **pms)
+        # analogous_confusion_extended(df_bin[tb[6:12]].values.astype(DTY_FLT).T, mat_D, key_A, key_C, f'{fgn}_oo_bin', **pms)
+        pms['cmap_name'] = 'Greens'
+        analogous_confusion_extended(mat_A, mat_E, key_B, key_C, f'{fgn}_dt_nonbin', **pms)
+        # analogous_confusion_extended(df_nonbin[tb[6:12]].values.astype(DTY_FLT).T, mat_E, key_A, key_C, f'{fgn}_oo_nonbin', **pms)
+        # pdb.set_trace()  # tb[6:12] --> tb[7:13] no longer needed
+
+        pms['cmap_name'] = 'OrRd'
+        df = self.obtn_fulfil_ricci(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df = pd.concat(df, axis=0).reset_index(drop=True)
+        key_E = tag_sa2[6:][:1] + tag_sa2[6:][3:4] + tag_sa2[6 + 4:][:3]
+        if not verbose:
+            key_E = tag_sa2[6:][:1] + tag_sa2[6 + 4:][1:3]
+        key_D = tag_sa1[:6] + key_D
+        key_E = tag_sa2[:6] + key_E
+        mat_D = df[key_D].values.astype(DTY_FLT).T
+        mat_E = df[key_E].values.astype(DTY_FLT).T
+        for k in [0, 1, 2]:
+            key_C[k] += r'$^\prime$'
+        key_C[3] = r'ESP'  # r'$\mathrm{ESP}$'
+        key_C[4] = r'ESP$^\text{avg}$'  # r'$\mathrm{ESP}^\text{avg}$'
+        key_C = key_C[:6] + key_C[-2:]
+        mat_C = np.zeros_like(mat_D, dtype=DTY_FLT)  # [:-1]
+        for k in [0, 1, 2, 4, 5]:
+            mat_C[k] = (mat_D[k] + mat_E[k]) / 2.
+        for k in range(mat_C.shape[1]):
+            mat_C[3][k] = max(mat_D[3][k], mat_E[3][k])
+        mat_C[6] = df[tb[12:][1]].values.astype(DTY_FLT)
+        mat_C[7] = df[tb[12:][2]].values.astype(DTY_FLT)
+        mat_C[8] = df[tb[12:][0]].values.astype(DTY_FLT)
+        # pdb.set_trace()  # (mat_D[5] == mat_E[5]).all()
+        # key_C.append(r'$\mathbf{df}_\text{prev}$\n(multival)')
+        # key_C.append(r'$\mathbf{df}_\text{prev}$ (multival)')
+        key_C.append(r'$\mathbf{df}_\text{prev}^{(multival)}$')
+        analogous_confusion_extended(df[tb[:6]].values.astype(
+            DTY_FLT).T, mat_C[:-1], key_B, key_C[:-1], f'{fgn}_delt_mv', **pms)
+        return
+
+    def thread_tabulate(self, dframe, tb, tag_sa1, tag_sa2, fgn,
+                        ddof=1, rez=4, clf=3):
+        nb_set, id_set, _, _, _ = self.recap_sub_data(
+            dframe, nb_row=4, nc_norm=3, nc_sens=4)
+        # df_bin = self.obtain_binval_senatt(dframe, id_set, tb, tag_sa1, tag_sa2)
+        # df_nonbin = self.obtain_multival_senatt(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df = self.obtn_fulfil_ricci(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df_bin = self.obtn_sa_bin(dframe, id_set, tb, tag_sa1, tag_sa2)
+        df_nonbin = self.obtn_sa_nonbin(dframe, id_set, tb, tag_sa1, tag_sa2)
+
+        kw = {'nc_norm': 3, 'nc_sens': 4}  # ,'id_set':id_set,'nb_set':nb_set}
+        # t = self.obtn_clf_result(df, tb, tag_sa1, tag_sa2, 3, **kw) #lightGBM
+        # dt = self.obtn_clf_result(df, tb, tag_sa1, tag_sa2, 3 + 3, **kw)
+        # dt = self.obtn_clf_result(df, tb, tag_sa1, tag_sa2, 7 + 3, **kw)
+        #   3: lightGBM;    3|7+3: FairGBM|FPR,FNR; 4|7+4: AdaFair
+        dt = self.obtn_clf_result(df, clf, **kw)  # tb, tag_sa1, tag_sa2,
+        ta = [tb[7:14], tb[:7], tb[14:]]  # acc,f1,delta(acc,f1),hfm_ext
+        ta = ta[0][:1] + ta[0][-1:] + ta[1][:1] + ta[1][-1:] + ta[2]
+        ta = ta[:4] + tag_sa1[5:6] + tag_sa2[5:6] + ta[-2:]  # +DR x2, hfm x2
+        ans_tex, cmp_tex = [], []  # 对照组
+        for j in range(nb_set):
+            tmp_tex, tmp_my = [''], ['']
+            for k, v in enumerate(ta):
+                ii = dt[j][v].values.astype(DTY_FLT)
+                if k < 4:
+                    ii *= 100.
+                tmp_tex.append(_encode_sign(
+                    ii.mean().tolist(), ii.std(ddof=ddof).tolist(), rez))
+                mu, _, sigma = _avg_and_stdev(ii.tolist(), self._nb_iter)
+                tmp_my.append(_encode_sign(mu, sigma, rez))
+            ans_tex.append(tmp_tex)
+            cmp_tex.append(tmp_my)
+
+        # pdb.set_trace()
+        log_document = f'{fgn}_fifth.csv'  # suff + 'tab_fifth.csv'
+        csv_t = open(log_document, 'w')
+        csv_w = csv.writer(csv_t)
+        csv_w.writerow(['df'])
+        csv_w.writerows(ans_tex)
+        csv_w.writerow([''])
+        csv_w.writerows(cmp_tex)
+        csv_w.writerows([[''], ] * 4)  # [['', ] * 4])
+
+        dt = self.obtn_clf_result(df_nonbin, clf, **kw)  # tb,tag_sa1,[],
+        ta = ta[:4] + tag_sa1[:4] + tag_sa1[-4:]
+        ans_tex, cmp_tex = [], []
+        for jj in range(len(dt)):
+            tmp_tex, tmp_my = [''], ['']
+            for k, v in enumerate(ta):
+                ii = dt[jj][v].values.astype(DTY_FLT)
+                if k < 4:
+                    ii *= 100.
+                tmp_tex.append(_encode_sign(
+                    ii.mean().tolist(), ii.std(ddof=ddof).tolist(), rez))
+                mu, _, sigma = _avg_and_stdev(ii.tolist(), self._nb_iter)
+                tmp_my.append(_encode_sign(mu, sigma, rez))
+            ans_tex.append(tmp_tex)
+            cmp_tex.append(tmp_my)
+        csv_w.writerow(['df_nonbin'])
+        csv_w.writerows(ans_tex)
+        csv_w.writerow([''])
+        csv_w.writerows(cmp_tex)
+        csv_w.writerows([[''], ] * 4)
+        pdb.set_trace()
+        dt = self.obtn_clf_result(df_bin, clf, **kw)
+        ans_tex, cmp_tex = [], []
+        for jj in range(len(dt)):  # nb_set):
+            tmp_tex, tmp_my = [''], ['']
+            for k, v in enumerate(ta):
+                ii = dt[jj][v].values.astype(DTY_FLT)
+                if k < 4:
+                    ii *= 100.
+                tmp_tex.append(_encode_sign(
+                    ii.mean().tolist(), ii.std(ddof=ddof).tolist(), rez))
+                mu, _, sigma = _avg_and_stdev(ii.tolist(), self._nb_iter)
+                tmp_my.append(_encode_sign(mu, sigma, rez))
+            ans_tex.append(tmp_tex)
+            cmp_tex.append(tmp_my)
+        csv_w.writerow(['df_bin'])
+        csv_w.writerows(ans_tex)
+        csv_w.writerow([''])
+        csv_w.writerows(cmp_tex)
+        csv_w.writerows([[''], ] * 4)
+
+        csv_t.close()
+        del csv_t, csv_w, log_document
+        return
+
+    # def obtn_clf_result(self, df,  # tb, tag_sa1, tag_sa2, clf,
+    #                     clf, nb_set, id_set, nc_norm=3, nc_sens=4):
+    #     df_alt = []  # nk = self._nb_iter
+    #     if clf <= nc_norm + nc_sens:
+    #         k = id_set[0] + 1
+    #         start_i = k + (clf - 1) * self._nb_iter
+    #         end_i = k + clf * self._nb_iter - 1  # start_i+nk-1
+    #         df_alt = df[0].loc[start_i: end_i]   # df[0][:nk]
+    #         df_alt = [df_alt, ]
+    #     for k in range(1, nb_set):
+    #         start_i = id_set[k] + 1 + (clf - 1) * self._nb_iter
+    #         end_i = start_i + self._nb_iter - 1
+    #         pdb.set_trace()
+    #         df_alt.append(df[k].loc[start_i: end_i])
+    #     return df_alt  # pdb.set_trace()
+
+    def obtn_clf_result(self, df, clf, nc_norm=3, nc_sens=4):
+        df_alt = []
+        if clf <= nc_norm + nc_sens:
+            start_i = (clf - 1) * self._nb_iter
+            end_i = clf * self._nb_iter
+            df_alt = df[0][start_i: end_i]  # df[0].iloc[start_i:end_i]
+            df_alt = [df_alt, ]
+        for k in df[1:]:
+            start_i = (clf - 1) * self._nb_iter
+            df_alt.append(k[start_i: start_i + self._nb_iter])
+        return df_alt
 
 
 class ConvFig_5Isimpl(ConvFig_5I_exact):
@@ -1392,6 +1794,12 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             annotY[0] = r'$T_{EarlyBreak^{multi}}$'
             multi_lin_reg_without_distr(
                 scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+
+            scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+            annot[1] = '${}$'.format(ant_Z)
+            multi_lin_reg_without_distr(
+                scat_X, scat_Z, annotY, annot, fgn + '_s', snspec='sty6')
+            del scat_Z, ant_Z, annot
             return
         scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
                        df_tmp[tag[6]].values.astype(DTY_FLT)])
@@ -1406,6 +1814,15 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
         multi_lin_reg_without_distr(
             scat_X, scat_Y[1:2] + scat_Y[4:], annotY[1:2] + annotY[4:],
             annot, fgn + '_bin', snspec='sty4e')  # 'sty4d'
+
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(scat_X, scat_Z[:4], annotY[:4],
+                                    annot, fgn + '_s', snspec='sty6')
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z[1:2] + scat_Z[4:], annotY[1:2] + annotY[4:],
+            annot, fgn + '_s_bin', snspec='sty6e')
+        del scat_Z, ant_Z, annot
         return
 
     def sub_plt_val(self, df_tmp, tag, fgn, sgn='D.', eb=True):
@@ -1435,6 +1852,11 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             # if eb:
             multi_lin_reg_without_distr(
                 scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+
+            scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+            annot[1] = '${}$'.format(ant_Z)
+            multi_lin_reg_without_distr(
+                scat_X, scat_Z, annotY, annot, fgn + '_s', snspec='sty6')
             return
         scat_Y.extend([df_tmp[tag[5]].values.astype(DTY_FLT),
                        df_tmp[tag[6]].values.astype(DTY_FLT)])
@@ -1450,6 +1872,14 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
         multi_lin_reg_without_distr(
             scat_X, scat_Y[1:2] + scat_Y[4:], annotY[1:2] + annotY[4:],
             annot, fgn + '_bin', snspec='sty3e')  # , figsize='L-WS')  # 3d
+
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z[:4], annotY[:4], annot, fgn + '_s', snspec='sty6')
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z[1:2] + scat_Z[4:], annotY[1:2] + annotY[4:],
+            annot, fgn + '_s_bin', snspec='sty6e')
         return
 
     def subfig_conv_singvar(self, dframe, tag_hfm, tag_conv, fgn,
@@ -1470,7 +1900,7 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             dframe, id_set, [], tag_sa1 + tag_tim[0], tag_sa2 + tag_tim[1])
         t_tim = np.array(tag_tim[0]).reshape(-1, 2).T.tolist()
         fgn += '_singvar'
-        pdb.set_trace()
+        # pdb.set_trace()
         self.thread_previous(tmp, t_tim, fgn, tag_val=np.array(
             tag_sa1).reshape(-1, 2).T.tolist(), tag_avg=[])
         return
@@ -1489,6 +1919,13 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             ant_Yq), '${} = {}$'.format(ant_Yq, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+
+        kws = {'snspec': 'sty6'}
+        scat_Z = [differentiate_tim(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s', **kws)
+        del scat_Z, ant_Z, kws
         return
 
     def sub_plt_val_prev(self, df_tmp, tag, fgn, sgn='D.'):
@@ -1508,6 +1945,40 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
             ant_Yq), '${} = {}$'.format(ant_Yq, ant_Xp)]
         multi_lin_reg_without_distr(
             scat_X, scat_Y, annotY, annot, fgn, snspec='sty3b')
+
+        kws = {'snspec': 'sty6'}
+        scat_Z = [differentiate_val(scat_X, k) for k in scat_Y]
+        annot[1] = '${}$'.format(ant_Z)
+        multi_lin_reg_without_distr(
+            scat_X, scat_Z, annotY, annot, fgn + '_s_bin', **kws)
+        del scat_Z, kws, ant_Z
+        return
+
+    def subfig_fair_sp(self, dframe, tag_norm, tag_dr, tag_hfm, tag_conv, fgn):
+        tmp_dr = [i[:3] + i[5:7] + i[3:4] for i in tag_dr]  # GFx3,SPx2,DR
+        tmp_hfm = [[i[j] for j in [2, 0, 4, 3]] for i in tag_hfm['df']]
+        tmp_conv = [i[2:5] + i[1:2] + i[5:] for i in tag_conv['df']]
+        tmp_multivar = tag_conv['multivar'][6:][4:7] + tag_conv['multivar'][
+            3:4] + tag_conv['multivar'][6 + 9:][4:6] + tag_conv['multivar'][
+            6 + 9 + 8:][4:6] + tag_conv['multivar'][6 + 9 + 8 + 8:][4:6]
+        # tmp_hfm:      {DistDirect_bin|EarlyBreak|ApproxDist_bin} df_prev,
+        #               {DistDirect_bin} df
+        # tmp_conv:     DistDirect_nonbin {df_prev,df,df_avg}, EffHD_nonbin{
+        #               df}, Vacant {df,df_avg}, StratES x2, StratRA x2
+        # tmp_multivar: DistDirect_multivar {df_prev, df,df_avg},
+        #               EffHD_multivar{df}, Vacant {df,df_avg}, StratES x2,
+        #               StratRA x2
+        tmp_norm = [i[:4] + i[5:] + i[4:5] for i in tag_norm]
+        tag_sa1 = tmp_dr[0] + tmp_hfm[0][:4] + tmp_conv[0][:3]
+        tag_sa2 = tmp_dr[1] + tmp_hfm[1][:4] + tmp_conv[1][:3]
+        tb = tmp_norm[1][:-1] + tmp_norm[0][:-1]  # delta,oo
+        self.thread_fair(dframe, tb + tmp_multivar, tag_sa1, tag_sa2, fgn)
+
+        tb = tmp_norm[1] + tmp_norm[0]  # add f1_score
+        tag_sa1 = tmp_dr[0] + tmp_hfm[0][:1] + tmp_conv[0][1:3]
+        tag_sa2 = tmp_dr[1] + tmp_hfm[1][:1] + tmp_conv[0][1:3]
+        self.thread_tabulate(dframe, tb + tmp_multivar[1:3], tag_sa1, tag_sa2,
+                             fgn.replace('exp', 'tab'))  # f'{fgn}tab_')
         return
 
 
