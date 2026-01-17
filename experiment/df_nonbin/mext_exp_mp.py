@@ -625,7 +625,8 @@ class ComparisonB2_withDirectComput(ComparisonB_setup):
 
 
 class ComparisonC2_withDirectComput(ComparisonB2_withDirectComput):
-    def __init__(self, nb_cls=1, saIndex=list(), saValue=list(),
+    def __init__(self, nb_cls=1,  # saIndex=list(), saValue=list(),
+                 saIndex=tuple(), saValue=tuple(),
                  n_e=3, *, omitted=True):
         super().__init__(nb_cls, saIndex, saValue, n_e, omitted=omitted)
         self._abbr_clfs = ['DT', 'NB', 'LR1', 'LR2', 'LM1', 'LM2',
@@ -1448,7 +1449,9 @@ class HyperEB_analysis(ParameterE_setup):
                          pool=None,
                          alternative=False):
         X_yfx = np.concatenate([
-            y_fx.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1).copy()
+        # X_yfx = np.concatenate([
+        #     y_fx.reshape(-1, 1), X], axis=1, dtype=DTY_FLT).copy()
         n_l = len(self._m1_set)  # n_ell
         n_a = len(g1m_indices)
         if not alternative:

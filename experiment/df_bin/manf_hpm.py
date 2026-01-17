@@ -77,8 +77,10 @@ class PartE2_ParaSenAnalysis(PartE_ParaSen):
         self._m1_set = list(range(3, 50, 2))  # len=24
 
     def schedule_content(self, X, A, y_fx, idx_S0, idx_S1, m2):
-        X_yfx = np.concatenate([y_fx.reshape(-1, 1), X], axis=1,
-                               dtype=DTY_FLT)
+        X_yfx = np.concatenate([
+            y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        # X_yfx = np.concatenate([y_fx.reshape(-1, 1), X], axis=1,
+        #                        dtype=DTY_FLT)
         ans_app = [ApproxDist(
             X_yfx, A, idx_S1, m1, m2) for m1 in self._m1_set]
         ans_app, ans_ut = zip(*ans_app)
@@ -266,13 +268,21 @@ class PartF2_ParaSenAnalysis(PartF_ParaSen):
                          X_tst, A_tst, y_tst, y_pred, s0_tst, s1_tst,
                          m2):
         X_and_y_trn = np.concatenate([
-            y_trn.reshape(-1, 1), X_trn], axis=1, dtype=DTY_FLT)
+            y_trn.reshape(-1, 1).astype(DTY_FLT), X_trn], axis=1)
         X_and_y_tst = np.concatenate([
-            y_tst.reshape(-1, 1), X_tst], axis=1, dtype=DTY_FLT)
+            y_tst.reshape(-1, 1).astype(DTY_FLT), X_tst], axis=1)
         X_and_y_insp = np.concatenate([
-            y_insp.reshape(-1, 1), X_trn], axis=1, dtype=DTY_FLT)
+            y_insp.reshape(-1, 1).astype(DTY_FLT), X_trn], axis=1)
         X_and_y_pred = np.concatenate([
-            y_pred.reshape(-1, 1), X_tst], axis=1, dtype=DTY_FLT)
+            y_pred.reshape(-1, 1).astype(DTY_FLT), X_tst], axis=1)
+        # X_and_y_trn = np.concatenate([
+        #     y_trn.reshape(-1, 1), X_trn], axis=1, dtype=DTY_FLT)
+        # X_and_y_tst = np.concatenate([
+        #     y_tst.reshape(-1, 1), X_tst], axis=1, dtype=DTY_FLT)
+        # X_and_y_insp = np.concatenate([
+        #     y_insp.reshape(-1, 1), X_trn], axis=1, dtype=DTY_FLT)
+        # X_and_y_pred = np.concatenate([
+        #     y_pred.reshape(-1, 1), X_tst], axis=1, dtype=DTY_FLT)
         ans_app = []
 
         for m1 in self._m1_set:

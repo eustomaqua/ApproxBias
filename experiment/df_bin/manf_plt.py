@@ -298,8 +298,8 @@ class Plot5B_hyperpm(GraphSetup):
 
     def drawing_fig3_alt(self, dframe, nb_set, id_set,
                          tag_direct, tag_approx, ind='ua',
-                         picked_m1=[3, 5, 7, 9],
-                         picked_set=[0, 1, 2, 3, 4, ],
+                         picked_m1=(3, 5, 7, 9),
+                         picked_set=(0, 1, 2, 3, 4, ),
                          joint='and|or', distrib=False):
         if ind == 'ua':
             curr_tag_dir = tag_direct[-2]

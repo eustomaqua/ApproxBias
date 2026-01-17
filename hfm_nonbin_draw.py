@@ -562,8 +562,6 @@ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp1b -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp2c -pre min_max
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
 
-python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max  # 8e|9e,
-python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9g -pre min_max  # 9f|c|d|b
-python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9h|i # -pre min_max
+python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9i
 python hfm_nonbin_draw.py -rev -ratio .97 -exp rept_exhp5a|b -pre min_max
 """

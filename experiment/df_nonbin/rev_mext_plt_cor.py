@@ -1612,7 +1612,7 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
         csv_w.writerow([''])
         csv_w.writerows(cmp_tex)
         csv_w.writerows([[''], ] * 4)
-        pdb.set_trace()
+        # pdb.set_trace()
         dt = self.obtn_clf_result(df_bin, clf, **kw)
         ans_tex, cmp_tex = [], []
         for jj in dt:  # range(len(dt)):  # nb_set):
@@ -1987,6 +1987,12 @@ class ConvFig_5Isimpl(ConvFig_5I_exact):
 
 
 # ------------------------------
+
+
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9e -pre min_max  # 8e|9e,
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9g -pre min_max  # 9f|c|d|b
+# python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9h|i # -pre min_max
+
 
 # python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9i
 # python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9h

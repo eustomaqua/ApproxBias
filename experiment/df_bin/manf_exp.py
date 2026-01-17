@@ -667,7 +667,8 @@ class ComparisonB2_withDirectComput(ComparisonB_setup):
 
 
 class ComparisonC2_withDirectComput(ComparisonB2_withDirectComput):
-    def __init__(self, nb_cls=1, saIndex=list(), saValue=list()):
+    # def __init__(self, nb_cls=1, saIndex=list(), saValue=list()):
+    def __init__(self, nb_cls=1, saIndex=tuple(), saValue=tuple()):
         super().__init__(nb_cls, saIndex, saValue)
         self._abbr_clfs = ['DT', 'NB', 'LR1', 'LR2', 'LM1', 'LM2',
                            'kNNu', 'kNNd', 'MLP', 'linSVM', 'SVM']

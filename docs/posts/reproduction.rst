@@ -12,6 +12,18 @@ The `experimental data <https://github.com/eustomaqua/ApproxBias/tree/master/fin
 
 To reproduce our empirical results for **non-binary cases** [#P2]_, you may do as follows.
 
+.. $ # cd ~/ApproxBias
+.. $ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9i   # Fig. 1, 2, 4 & Table 2
+.. $ python hfm_nonbin_draw.py -rev -ratio .97 -exp rept_exhp5a  # Fig. 3(a-f), 5(a-f)
+.. $ python hfm_nonbin_draw.py -rev -ratio .97 -exp rept_exhp5b  # Fig. 3(g-l), 5(g-l)
+.. $ python hfm_nonbin_draw.py -exp mCV_expt4b                   # Fig. 7
+.. $ python hfm_nonbin_draw.py -exp rept_expt7a -m1 20 -m2 8     # Fig. 9
+.. $ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp1b   # Fig. 6
+.. $ python hfm_nonbin_draw.py -exp rept_expt5a -m1 20           # Fig. 8(a-d)
+.. $ python hfm_nonbin_draw.py -exp rept_expt5b -m2 8            # Fig. 8(e-h)
+.. $ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp2c   # Fig. 10
+
+
 .. code-block:: console
   :linenos:
 
@@ -25,6 +37,7 @@ To reproduce our empirical results for **non-binary cases** [#P2]_, you may do a
   $ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e  # Fig. 3
 
 .. # To get Fig. 1, 2, 5 & 4, as well as Table 3
+
 
 
 .. To reproduce our empirical results for **binary cases** [#P1]_, you may do as follows.
