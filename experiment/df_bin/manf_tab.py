@@ -385,6 +385,7 @@ class Table2C_comparison(Plot2C_comparison):
         kwargs['cmap_name'] = 'PuBu'  # 'OrRd,RdPu'
         kwargs['annots'] = r'aggr.rank.{}'.format(
             self._pick_metric[ind[-1]].lower())
+        # kwargs['rotation'] = 24
         if not figname.endswith('cp'):
             stat_chart_stack(
                 idx_bar, name_baseline, figname + '_stack',

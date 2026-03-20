@@ -2,8 +2,7 @@
 
 ![CircleCI](https://img.shields.io/circleci/build/github/eustomaqua/ApproxBias/master)
 [![Documentation Status](https://readthedocs.org/projects/approxbias/badge/?version=latest)](https://approxbias.readthedocs.io/en/latest/?badge=latest)
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) 
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d0f9d3235ebf4454b3f43beb137bb2c7)](https://app.codacy.com/gh/eustomaqua/ApproxBias/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) 
 
 <!--
 Does machine bring in extra bias in learning? Approximating discrimination within models quickly 
@@ -25,7 +24,8 @@ We release the code of proposed methods from our following papers here, to help 
 We release the code of proposed methods from our following papers here, to help people who are interested in reproducing our results.
 -->
 
-We release the code of the proposed methods from our following papers here, to help people who are interested in our work reproduce those results.
+Here, we release the code of the proposed methods from our following papers, to help people who are interested in our work reproduce those results.
+
 - \[**P1**\] Does machine bring in extra bias in learning? Approximating fairness in models promptly. [[arXiv]](https://arxiv.org/abs/2405.09251)
 - \[**P2**\] Approximating discrimination within models when faced with several non-binary sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
 - Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival poster, [OpenReview](https://openreview.net/pdf?id=ywqVkVQZDj)).
