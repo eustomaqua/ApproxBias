@@ -9,6 +9,9 @@ import argparse
 from experiment.df_bin.manf_sim import (
     ManfPrime_Empirical, ManfSimulative)  # ManfEmpirical
 
+from experiment.df_bin.rev_manf_sim import RevisedManfEmpirical
+import sys
+
 
 def default_parameters():
     parser = argparse.ArgumentParser()
@@ -22,6 +25,7 @@ def default_parameters():
         "-prep", "--data-preprocessing", type=str,
         default='min_max', choices=[
             'none', 'standard', 'min_max', 'normalize'])
+    parser.add_argument('-v', '--round', type=str, default='ver4')
 
     parser.add_argument('-nk', "--nb-iter", type=int, default=5,
                         help="Cross validation")
@@ -75,6 +79,21 @@ if trial_type[-6:] in ('expt5a', 'expt6a'):
 elif trial_type[-6:] in ('expt5b', 'expt6b'):
     kwargs['m2'] = args.m2_chosen
 
+if args.round == 'ver4':
+    # del kwargs['nb_iter']  # kwargs['nb_iter'] = 5
+    kwargs['nb_cls'] = args.nb_cls
+    kwargs['rep'] = True  # args.rep_iter
+    kwargs['m1'] = args.m1_chosen
+    kwargs['m2'] = args.m2_chosen
+    kwargs['ratio'] = args.ratio
+    # kwargs['gen'] = args.gen_iter
+    # kwargs['rep'] = args.rep_iter
+    case = RevisedManfEmpirical(
+        trial_type, data_type, screen=screen, logged=logged, **kwargs)
+    case.trial_one_process()
+    sys.exit()
+
+
 if trial_type[-6:] in ['expt5a', 'expt5b', 'expt5c']:
     if trial_type.startswith(
             'repetit') or trial_type.startswith('rept'):
@@ -125,4 +144,6 @@ python hfm_bin_exec.py -exp mCV_expt6a -dat ricci --abbr-cls bagging/FairGBM/Ada
 python hfm_bin_exec.py -exp mCV_expt6b -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
 
 python hfm_bin_exec.py -exp mCV_expt2a|2b|2c|2d|2e -dat ricci --nb-cls 3 -m1 25 -m2 11
+python hfm_bin_exec.py -v ver4 -exp mCV_expt2c|2a|8a -dat * --nb-cls 3 -m1 25 -m2 11 -nk 1  # --gen-iter True --rep-iter False
+python hfm_bin_exec.py -exp mCV_expt8a -dat german --nb-cls 3 -m1 25 -m2 11 --ratio .97
 """

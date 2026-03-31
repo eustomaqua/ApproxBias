@@ -347,6 +347,10 @@ class ManfEmpirical(DataSetup):
                 res_aux.append(['bagging', 'adaboost', 'lightgbm'] +
                                ['fairgbm : fpr', 'fairgbm : fnr',
                                 'fairgbm : fpr,fnr', 'adafair'])  # *2)
+        elif 'expt8' in self._trial_type:
+            res_aux.append(['bagging', 'adaboost', 'lightgbm',
+                            'fairgbm : FPR', 'fairgbm : FNR',
+                            'fairgbm : FPR,FNR', 'adafair'])
 
         if self._nb_iter <= 0:  # not cv_split
             elegant_print("Running /executing as a whole", logger)
@@ -544,6 +548,16 @@ class ManfEmpirical(DataSetup):
             # expt2a: res_iter, siz= (1|2, 7,  77)
             # expt2b: res_iter, siz= (1|2, 7, 147)
             # expt2c: res_iter, siz= (14+4*{1|2}, 199)
+
+        elif 'expt8' in self._trial_type:
+            positive_label = self._dataset.get_positive_class_val(
+                'numerical-binsensitive')
+            pm = {'m1': self._m1, 'm2': self._m2,
+                  'pos_label': positive_label}
+            res_iter = self._iterator.schedule_content(
+                logger,
+                X_trn, A_trn, y_trn, Aq_trn, g1_trn, jt_trn,
+                X_tst, A_tst, y_tst, Aq_tst, g1_tst, jt_tst, **pm)
         else:
             pass
 

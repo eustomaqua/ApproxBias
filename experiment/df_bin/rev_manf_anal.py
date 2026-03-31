@@ -6,7 +6,8 @@ from pyfair.utils_empirical import DAT_EXPT_NMS, DAT_EXPT_ORG
 # from pyfair.utils_empirical import GraphSetup
 from pyfair.facil.utils_const import unique_column  # ,DTY_FLT
 
-from pyfair.granite.draw_fancy import radar_chart, grped_radar_cht
+from pyfair.granite.draw_fancy import (
+    radar_chart, grped_radar_cht, tabular_chart)
 from pyfair.facil.draw_prelim import DTY_PLT
 
 # import numpy as np
@@ -263,6 +264,103 @@ class PlotA_drawing(PlotA_initial):
         # pdb.set_trace()
         return
 
+    def depict_sep_tabular(self, pick_set, pick_clf, df, id_set,
+                           mk='tst', fgn=''):  # ,verbose=False):
+        tag_acc, tag_sa1, tag_sa2 = self.obtain_tag_col(mk)
+        sub_my = tag_acc[16:][5 + 3:]
+        sub_my = [sub_my[2], sub_my[0]]  # L_fair, L_loss
+        sub_grp = tag_sa1[:3] + sub_my[:-1]
+        sub_idv = tag_acc[16:][: 5 + 1]
+        sub_idv = [sub_idv[2], sub_idv[5]]
+        del sub_my
+        sub_my = [tag_sa1[4 + 2], tag_sa1[4 + 4 + 2]]  # hfm
+        labels = GRP_FAIR_COMMON + ['DR', r'GEI ($\gamma$=0.5)', 'Theil',
+                                    r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
+        # if verbose:
+        #     labels = labels[:4] + [
+        #         r'{:7s}GEI ($\gamma$=0.2)'.format(''),
+        #         r'GEI ($\gamma$=0.5)',
+        #         r'GEI ($\gamma$=0.8){:7s}'.format('')] + labels[-3:]
+        #     sub_idv = tag_acc[16:][: 5 + 1]
+        #     sub_idv = [sub_idv[i] for i in [1, 2, 3, 5]]
+        currX = sub_grp + sub_idv + sub_my
+
+        def _internal(ps, pc):
+            df_at_1, df_at_2 = self.obtain_sing_dat_cls(
+                ps, pc, tag_acc, tag_sa1, tag_sa2, df, id_set)
+            df_tmp = df_at_1[currX].reset_index(drop=True)
+            for i in currX:
+                df_tmp.loc[:, i] = float(df_tmp[i].mean())
+            df_tmp = df_tmp.iloc[:2]
+            df_alt = df_at_2[currX]
+            for i in currX:
+                df_tmp.iloc[1][i] = float(df_alt[i].mean())
+            return df_tmp
+
+        anotY = ['SA #1', 'SA #2']
+        # labels[4] = 'GEI'
+        nm_set = ['Ricci', 'Credit', 'Income', 'PPR', 'PPVR']
+        nm_clf = ['bagging', 'AdaBoost', 'LightGBM',
+                  'FairGBM', 'FairGBM', 'FairGBM', 'AdaFair (SA #1)',
+                  'FairGBM', 'FairGBM', 'FairGBM', 'AdaFair (SA #2)']
+        for ps in pick_set:
+            for pc in pick_clf:
+                # df_at_1, df_at_2 = self.obtain_sing_dat_cls(
+                #     ps, pc, tag_acc, tag_sa1, tag_sa2, df, id_set)
+                # if ps > 0 and pc > 2:
+                #     df_as_1, df_as_2 = self.obtain_sing_dat_cls(
+                #         ps, pc + 4, tag_acc, tag_sa1, tag_sa2, df, id_set)
+                df_tmp = _internal(ps, pc)
+                # radar_chart(df_tmp, currX, labels, anotY,
+                #             figname=f'{fgn}_s{ps}c{pc}_radar', clockwise=True)
+                tabular_chart(df_tmp, currX, labels[:4] + ['GEI'] + labels[5:],
+                              anotY, figname=f'{fgn}_s{ps}c{pc}', data=nm_set[ps],
+                              algo=nm_clf[pc], cumulate=True)
+            # pdb.set_trace()
+        return
+
+    def depict_grouped_invt(self, pick_set, pick_clf_pl, df, id_set,
+                            mk='tst', fgn='', verbose=True):
+        tag_acc, tag_sa1, tag_sa2 = self.obtain_tag_col()
+        sub_my = tag_acc[16:][5 + 3:][2]  # dr
+        sub_grp = tag_sa1[:3] + [sub_my]
+        sub_idv = tag_acc[16:][:5 + 1]
+        sub_idv = [sub_idv[2], sub_idv[5]]
+        sub_my = [tag_sa1[4 + 2], tag_sa1[4 + 4 + 2]]  # hfm
+        labels = GRP_FAIR_COMMON + [
+            'DR', r'GEI ($\gamma$=0.5)', 'Theil',
+            r'$\mathbf{df}$', r'$\hat{\mathbf{df}}$']
+        if verbose:
+            labels = labels[:4] + [
+                r'{:7s}GEI ($\gamma$=0.2)'.format(''),
+                r'GEI ($\gamma$=0.5)',
+                r'GEI ($\gamma$=0.8){:7s}'.format('')] + labels[-3:]
+            sub_idv = tag_acc[16:][:5 + 1]
+            sub_idv = [sub_idv[i] for i in [1, 2, 3, 5]]
+        currX = sub_grp + sub_idv + sub_my
+
+        df_tmp_pl = []
+        for pick_clf in pick_clf_pl:
+            df_at_1, df_at_2 = self.obtain_sing_dat_cls(
+                pick_set, pick_clf, tag_acc, tag_sa1, tag_sa2, df, id_set)
+            df_tmp = df_at_1[currX].reset_index(drop=True)
+            for i in currX:
+                df_tmp.loc[:, i] = float(df_tmp[i].mean())
+            if pick_set == 0:
+                df_tmp_pl.append(df_tmp.iloc[:1])
+                continue
+            df_tmp = df_tmp.iloc[:2]
+            df_alt = df_at_2[currX]
+            for i in currX:
+                df_tmp.iloc[1][i] = float(df_alt[i].mean())
+            df_tmp_pl.append(df_tmp)
+
+        anotY = ['$Att_{sen}$ #1', '$Att_{sen}$ #2']
+        fgn = f'{fgn}_s{pick_set}c_sa'
+        grped_radar_cht(df_tmp_pl, currX, labels, anotY,
+                        clockwise=True, figname=fgn)
+        return
+
     def depict_grouped(self, pick_set_pl, pick_clf, df, id_set,
                        mk='tst', fgn='', verbose=True):
         tag_acc, tag_sa1, tag_sa2 = self.obtain_tag_col(mk)
@@ -325,11 +423,21 @@ class Ver2_PlotA_fair_ens(PlotA_drawing):
         #             pks, pkc, raw_dframe, id_set, mk, fgn)
         # # self.depict_separately(2, 2, raw_dframe, id_set, mk, fgn)
 
-        for pkc in [0, 1, 2, 5, 6, 5 + 4, 6 + 4]:
-            self.depict_grouped([
-                1, 2, 3, 4], pkc, raw_dframe, id_set, mk, fgn)
-        # self.depict_grouped([
-        #     0, 1, 2, 3, 4], 2, raw_dframe, id_set, mk, fgn)
+        # for pkc in [0, 1, 2, 5, 6, 5 + 4, 6 + 4]:
+        #     self.depict_grouped([
+        #         1, 2, 3, 4], pkc, raw_dframe, id_set, mk, fgn)
+        # # self.depict_grouped([
+        # #     0, 1, 2, 3, 4], 2, raw_dframe, id_set, mk, fgn)
+
+        for pks in [1, 2, 3, 4]:
+            self.depict_grouped_invt(pks, [
+                0, 1, 2, 6, 6 + 4],
+                raw_dframe, id_set, mk, fgn, verbose=False)
+
+        fgn = f'{figname}_tab'
+        self.depict_sep_tabular([1, 2, 3, 4], [
+            # 0, 1, 2, 5, 6, 5 + 4, 6 + 4],
+            0, 1, 2, 6, 6 + 4], raw_dframe, id_set, mk, fgn)
         return
 
 

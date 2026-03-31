@@ -7,7 +7,7 @@
 
 import numpy as np
 import pandas as pd
-# import pdb
+import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
 from experiment.utils_empirical import GraphSetupVer1 as GraphSetup
@@ -1846,6 +1846,9 @@ class Replot2C_comparison(Replot2B_comparison):
         analogous_confusion_extended(
             Mat_C, Mat_B, key_C, self._picked_keys,
             figname=suff_4 + '_advr', **kwargs)
+
+        # Mat_A = 
+        # pdb.set_trace()
         return
 
 

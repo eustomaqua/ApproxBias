@@ -7,6 +7,7 @@
 import argparse
 import time
 import sys
+import os
 
 from hfm.utils.recorders import elegant_print
 from hfm.utils.decorators import elegant_durat, elegant_dated
@@ -181,6 +182,11 @@ class Replot_ManfDrawing(ManfDrawing):
                                        self._prep)
         raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_dframe=raw_df, pre=pre)
+
+        if trial_type.endswith('expt2a'):
+            fgn = f'{figname}{pre}_tst_lc2_mat'
+            for i in [0, 3, 1, 2, 7]:
+                os.remove(fgn + str(i) + '.pdf')
         return
 
 
@@ -212,6 +218,17 @@ class FairManfRevision:
         elegant_print("[BEGAN {}]".format(elegant_dated(since)))
         # START
 
+        if 'exp1' in self._trial_type:
+            self.revision_ver2()
+
+        # END
+        tim_elapsed = time.time() - since
+        elegant_print(["Duration /TimeCost: {}".format(
+            elegant_durat(tim_elapsed, False)),
+            "[ENDED] {}".format(elegant_dated(time.time()))])
+        return
+
+    def revision_ver2(self):
         xlsx_name = '{}_iter{}_pms'.format(
             self._trial_type[:-1], self._nb_cv)
         xlsx_name = f'{xlsx_name}_fair_int'
@@ -227,12 +244,6 @@ class FairManfRevision:
             xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_df, sheet_name)
         del xlsx_name, sheet_name, raw_df, self._iterator
-
-        # END
-        tim_elapsed = time.time() - since
-        elegant_print(["Duration /TimeCost: {}".format(
-            elegant_durat(tim_elapsed, False)),
-            "[ENDED] {}".format(elegant_dated(time.time()))])
         return
 
 

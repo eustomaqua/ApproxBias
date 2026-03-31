@@ -12,6 +12,7 @@ from hfm.hfm_df import bias_degree as fair_degree
 
 from hfm.utils.verifiers import unique_column, DTY_FLT
 from experiment.utils_learner import IndividualClsf, RelativeFairClsf
+from hfm.earlybreak import EffHD_bin
 
 
 # -------------------------------
