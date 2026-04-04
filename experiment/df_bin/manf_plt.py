@@ -17,7 +17,8 @@ from pyfair.granite.draw_addtl import (
     scatter_k_cv_with_real, approximated_dist_comparison,
     multiple_scatter_comparison,
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
-    line_reg_with_marginal_distr, single_line_reg_with_distr)
+    line_reg_with_marginal_distr, single_line_reg_with_distr,
+    multi_lin_reg_without_distr)
 from pyfair.granite.draw_chart import analogous_confusion_extended
 
 
@@ -673,7 +674,7 @@ def _sub_depict_sep(df_raw, tYs, suff, fig='_Ds', diff=True):
     return
 
 
-def _sub_depict_scat(df_raw, tYs, suff, diff=False):
+def _sub_depict_scat(df_raw, tYs, suff, diff=False, leq=False):
     scat_X = np.concatenate([
         df_raw[tYs[0]].values.astype(DTY_FLT),
         df_raw[tYs[2]].values.astype(DTY_FLT)], axis=0)
@@ -689,6 +690,9 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
     single_line_reg_with_distr(
         scat_X, scat_Y, annots,
         suff + '_sty3', linreg=True, snspec='sty3b')
+    # multi_lin_reg_without_distr(
+    #     scat_X, [scat_Y], [''], annots, suff + '_sty8',
+    #     figsize='S-NT', snspec='sty8b')
 
     if not diff:
         return
@@ -699,14 +703,24 @@ def _sub_depict_scat(df_raw, tYs, suff, diff=False):
     annotZ = r'\frac{abs(\hat{\mathbf{D}}_\cdot-\mathbf{D}_\cdot)}{\mathbf{D}_\cdot}'
     annots = ['${}$'.format(annotX), '${}$'.format(annotZ),
               '${}={}$'.format(annotY, annotX)]
+    if leq:
+        # annots[2] = '${}={}$ ({:.2f}%$\leq\!$)'.format(
+        #     annotY, annotX,  # annotY, annotX,
+        #     # (scat_Y <= scat_X).mean().tolist() * 100.)
+        #     (scat_Z <= 0).mean().tolist() * 100.)
+        annots[2] += ' ($\!\leq${:.2f}%)'.format(
+            (scat_Z <= 0).mean().tolist() * 100.)
     single_line_reg_with_distr(
         scat_X, scat_Z, annots,
         suff + '_sty6', linreg=True, snspec='sty6')
+    # multi_lin_reg_without_distr(
+    #     scat_X, [scat_Z], [''], annots, suff + '_sty8',
+    #     figsize='S-NT', snspec='sty6c|6d')
     return
 
 
 def _sub_depict_tim(df_raw, tYs, suff, diff=False,
-                    log_taken=False):
+                    log_taken=False, leq=False):
     scat_X = df_raw[tYs[4]].values.astype(DTY_FLT)  # direct,ut
     scat_Y = df_raw[tYs[5]].values.astype(DTY_FLT)  # approx,ut
 
@@ -731,6 +745,9 @@ def _sub_depict_tim(df_raw, tYs, suff, diff=False,
     annotZ = r'\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} }-1'
     annots = ['${}$  (sec)'.format(annotX), '${}$'.format(annotZ),
               '${}={}$'.format(annotY, annotX)]
+    if leq:
+        annots[2] += ' ($\!\leq${:.2f}%)'.format(
+            (scat_Z <= 0.).mean().tolist() * 100.)
     single_line_reg_with_distr(
         scat_X, scat_Z, annots,
         suff + '_sty6a', linreg=True, snspec='sty6')
@@ -741,9 +758,13 @@ def _sub_depict_tim(df_raw, tYs, suff, diff=False,
     annotZ = r'\lg(\frac{ T_{\hat{\mathbf{D}}}+T_{\hat{\mathbf{D}}_f} }{ T_{\mathbf{D}}+T_{\mathbf{D}_f} })'
     annots = ['${}$ (sec)'.format(annotX), '${}$'.format(annotZ),
               '${}={}$'.format(annotY, annotX)]
+    if leq:
+        annots[2] += ' ($\!\leq${:.2f}%)'.format(
+            (scat_Z <= 0.).mean().tolist() * 100.)
     single_line_reg_with_distr(
         scat_X, scat_Z, annots,
         suff + '_sty6b', linreg=True, snspec='sty6')
+    # pdb.set_trace()
     return
 
 

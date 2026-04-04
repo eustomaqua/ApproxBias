@@ -8,6 +8,8 @@ for DAT in ricci german ppr ppvr adult
 do
     python hfm_nonbin_exec.py -rev -exp $EXP -pre $PRE -dat $DAT -nk 5 --nb-cls 7  -rep
     # python hfm_nonbin_exec.py -rev -exp $EXP -pre $PRE -dat $DAT -nk 5 --nb-cls 7  # cde
+    
+    python hfm_bin_exec.py -v ver4 -exp $EXP -pre $PRE -dat $DAT -nk 5 --nb-cls 7 -m1 25 -m2 11  # -rep
 done
 
 

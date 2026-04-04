@@ -144,6 +144,6 @@ python hfm_bin_exec.py -exp mCV_expt6a -dat ricci --abbr-cls bagging/FairGBM/Ada
 python hfm_bin_exec.py -exp mCV_expt6b -dat ricci --abbr-cls bagging/FairGBM/AdaFair --nb-cls 3
 
 python hfm_bin_exec.py -exp mCV_expt2a|2b|2c|2d|2e -dat ricci --nb-cls 3 -m1 25 -m2 11
-python hfm_bin_exec.py -v ver4 -exp mCV_expt2c|2a|8a -dat * --nb-cls 3 -m1 25 -m2 11 -nk 1  # --gen-iter True --rep-iter False
+python hfm_bin_exec.py -v ver4 -exp mCV_expt2c|2a|8a|8b -dat * --nb-cls 3 -m1 25 -m2 11 -nk 1  # --gen-iter True --rep-iter False
 python hfm_bin_exec.py -exp mCV_expt8a -dat german --nb-cls 3 -m1 25 -m2 11 --ratio .97
 """

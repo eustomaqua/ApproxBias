@@ -164,6 +164,7 @@ class PartH_efficient:
         tmp = self.count_sing_part1(y, y_hat, pos_label)
         adv = self.count_sing_part1(y, y_qtb, pos_label)
         res_ans.extend(tmp)
+        # res_ans.extend(adv)
         res_ans.extend([abs(i - j) for i, j in zip(tmp, adv)])
 
         # res_ans.extend(self.count_sing_part2(y, y_hat, y_qtb, g1))
@@ -173,7 +174,7 @@ class PartH_efficient:
         else:
             res_ans.extend(self.count_sing_part2(y, y_hat, g1m[1]))
             res_ans.extend(self.count_sing_part2(y, y_hat, idx_jt[0]))
-            res_ans.append(self.count_sing_part2(y, y_hat, idx_jt[1]))
+            res_ans.extend(self.count_sing_part2(y, y_hat, idx_jt[1]))
         res_ans.append(hat_L_fair(y_hat, y_qtb))
         res_ans.append(hat_L_loss(y_hat, y))
 
@@ -181,6 +182,10 @@ class PartH_efficient:
             y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         X_and_y_hat = np.concatenate([
             y_hat.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        if X.dtype == 'O':
+            X_and_y = X_and_y.astype(DTY_FLT)
+            X_and_y_hat = X_and_y_hat.astype(DTY_FLT)
+            A = A.astype(DTY_FLT)
         res_ans.extend(self.count_sing_part3(
             X_and_y, X_and_y_hat, A, g1m[0], m1, m2))
         if len(idx_jt) == 0:
@@ -192,7 +197,7 @@ class PartH_efficient:
                 X_and_y, X_and_y_hat, A, idx_jt[0], m1, m2))
             res_ans.extend(self.count_sing_part3(
                 X_and_y, X_and_y_hat, A, idx_jt[1], m1, m2))
-        return res_ans
+        return res_ans  # 7*2+ 3*4+2+ 21*4= 14+14+84 =112
 
     def count_scores(self,
                      X_trn, A_trn, y_trn, y_insp, yq_insp, g1_trn, jt_trn,
@@ -287,7 +292,7 @@ class PartH1_earlybreak(PartH_efficient):
             X_tst, A_tst, y_tst, y_pred, yq_pred, g1_tst, jt_tst,  # nsa_tst,
             positive_label, m1, m2)
         res_attr.append([ut] + tmp)
-        return res_attr
+        return res_attr  # shape=(3,1+112*2)
 
     def subroute_one_sens_att(self,
                               X_A_trn, y_trn, X_Aq_trn, nsa_trn,
@@ -320,7 +325,7 @@ class PartH1_earlybreak(PartH_efficient):
             positive_label, m1, m2)
         res_attr.append([ut] + tmp)
 
-        return res_attr
+        return res_attr  # shape=(4,1+112*2)
 
     # def schedule_content(self, X, A, y_fx, idx_S0, idx_S1, m1):
     #     X_yfx = np.concatenate([
@@ -345,6 +350,7 @@ class PartH1_earlybreak(PartH_efficient):
             X_A_trn, y_trn, X_Aq_trn, g1_trn[0],
             X_A_tst, y_tst, X_Aq_tst, g1_tst[0],
             self.saIndex[0], self.saValue[0], **pms)
+        # pdb.set_trace()
         res_iter.extend(tmp)
         if len(jt_trn) == 0:
             return res_iter
@@ -359,26 +365,27 @@ class PartH1_earlybreak(PartH_efficient):
         csv_row_1 = unique_column(10 + 1 + 112 * 2)
         csv_row_2c = ['Ensem'] + ['Training set'] + [''] * 13 + [
             'Grp fairness'] + [''] * 11 + ['fairvote', '', 'fairmanf'] + [
-            ''] * 27 + ['Test set'] + [''] * 13 + ['Grp fairness'] + [
-            ''] * 11 + ['fairvote', '', 'fairmanf'] + [''] * 27
+            ''] * 83 + ['Test set'] + [''] * 13 + ['Grp fairness'] + [
+            ''] * 11 + ['fairvote', '', 'fairmanf'] + [''] * 83  # *27
 
         tmp_3_1 = ['Normal'] + [''] * 6 + ['abs()'] + [''] * 6
         tmp_3_2 = ['sa#1,sa#2,jt*2', '', ''] + [''] * 3 * 3 + ['DR(loss)', '']
-        tmp_3_3 = ['HFM sa#1'] + [''] * 6 + ['HFM sa#2'] + [''] * 6 + [
-            'HFM jt#&'] + [''] * 6 + ['HFM jt#|'] + [''] * 6
-        tmp_3 = tmp_3_1 + tmp_3_2 + tmp_3_3
+        tmp_3_3 = ['HFM sa#1'] + [''] * 20 + ['HFM sa#2'] + [''] * 20 + [
+            'HFM jt#&'] + [''] * 20 + ['HFM jt#|'] + [''] * 20  # not *6
+        tmp_3 = tmp_3_1 + tmp_3_2 + tmp_3_3  # 14+12+2+21*4 =28+84=112
         csv_row_3c = ['Time cost (sec)'] + tmp_3 + tmp_3
         del tmp_3, tmp_3_1, tmp_3_2, tmp_3_3
 
         tmp_4_1 = ['Accuracy', 'Precision', 'Recall/sensitivity',
                    'Specificity', 'f1_score', 'g_mean', 'dp']
-        tmp_4_2 = ['g1', 'g0'] * 3 * 4 + ['hat_L(fair)', 'hat_L(loss)']
-        tmp_4_3 = ['Ds', 'Df', 'ddf', '', 't_Ds', 't_Df', 't(...)']  # *4
-        tmp_4 = tmp_4_1 * 2 + tmp_4_2 + tmp_4_3 * 4  # 7*2+14+28=56
-        csv_row_4c = ['ut'] + tmp_4 + tmp_4_3
+        # tmp_4_2 = ['g1', 'g0'] * 3 * 4 + ['hat_L(fair)', 'hat_L(loss)']
+        tmp_4_2 = ['DP', 'EOpp', 'PP'] * 4 + ['hat_L(fair)', 'hat_L(loss)']
+        tmp_4_3 = ['Ds', 'Df', 'ddf', '', 't_Ds', 't_Df', 't(...)'] * 3
+        tmp_4 = tmp_4_1 * 2 + tmp_4_2 + tmp_4_3 * 4  # 7*2+14+3*28=56+56=112
+        csv_row_4c = ['ut'] + tmp_4 + tmp_4
         del tmp_4, tmp_4_1, tmp_4_2, tmp_4_3  # 
 
-        pdb.set_trace()
+        # pdb.set_trace()
         # return [], [], [], []
         return csv_row_1, csv_row_2c, csv_row_3c, csv_row_4c
 
@@ -416,7 +423,19 @@ class PartH2_earlybreak(PartH1_earlybreak):
                 X_tst, A_tst, y_tst, y_pred, yq_pred, g1_tst, jt_tst,
                 pos_label, m1, m2)
             res_iter.append([ut] + tmp)
+        # pdb.set_trace()
         return res_iter
+
+
+class PartH_prime_efficient(PartH_efficient):
+    def count_sing_part4(self):
+        pdb.set_trace()
+        return
+
+    def count_single_member(self, X, A, y, y_hat, y_qtb, g1m, idx_jt,
+                            pos_label=1, m1=20, m2=8):
+        pdb.set_trace()
+        return
 
 
 # -------------------------------
@@ -630,7 +649,7 @@ class RevisedManfEmpirical(DataSetup):
                     csv_w.writerow([''] * 7 + ['---', tmp_b, 0] + res_data[0][t_b])
                     for k in range(1, self._nb_iter):
                         csv_w.writerow([''] * 7 + ['', '', k] + res_data[k][t_b])
-            # pdb.set_trace()
+                # pdb.set_trace()
             del sens_att, abbr_clf
 
         elif self._trial_type[-6:] in ['expt2a', 'expt2b']:
@@ -705,7 +724,7 @@ class RevisedManfEmpirical(DataSetup):
                     'bagging', 'adaboost'])
             elif 'expt2e' in self._trial_type:
                 res_aux.append(CURR_CLFS)  # + CURR_CLFS[3:])
-        elif self._trial_type[-6:] in ('expt8a',):
+        elif self._trial_type[-6:] in ('expt8a', 'expt8b',):
             res_aux.append(self._iterator._abbr_clfs)
 
         elegant_print('Not-repetitively, via cv_split?: {}'.format(

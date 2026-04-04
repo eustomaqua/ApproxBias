@@ -19,7 +19,9 @@ from experiment.df_bin.manf_plt import (
 from experiment.df_bin.manf_tab import Table2C_comparison
 
 from experiment.df_bin.rev_manf_anal import (
-    Ver2_PlotA_fair_ens, Ver2_PlotA_norm_cls)
+    Ver2_PlotA_fair_ens, Ver2_PlotA_norm_cls,
+    Ver4_PlotH_fair_ens, Ver4_PlotH_norm_cls, Ver4_PlotH_gather)
+import pdb
 
 
 # ===============================
@@ -221,6 +223,13 @@ class FairManfRevision:
         if 'exp1' in self._trial_type:
             self.revision_ver2()
 
+        elif self._trial_type[-6:-1] in ('expt8', 'expt2'):
+            self.revision_ver4()
+        # if self._trial_type[-6:-1] == 'expt8':
+        #     self.revision_ver4_new()
+        # elif self._trial_type[-6:-1] == 'expt2':
+        #     self.revision_ver4_old()
+
         # END
         tim_elapsed = time.time() - since
         elegant_print(["Duration /TimeCost: {}".format(
@@ -244,6 +253,88 @@ class FairManfRevision:
             xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_df, sheet_name)
         del xlsx_name, sheet_name, raw_df, self._iterator
+        return
+
+    def revision_ver4(self):
+        figname = f'exp{self._trial_type[-2:]}_'
+        pre = self._prep.replace('_', '')
+        xlsx_name = '{}_iter{}_cls{}_pms_rat{}_rep'.format(self._trial_type[
+            :-1], self._nb_cv, self._nb_cls, int(self._ratio * 100))
+        sheet_name = 'exp{}_{}'.format(self._trial_type[-2:], pre)
+        if 'expt2' in self._trial_type:
+            self._ver4_internal_old(xlsx_name, sheet_name, figname, pre)
+            return
+
+        if '8g' in self._trial_type:  # .endswith('8gather')
+            self._iterator = Ver4_PlotH_gather()
+            # sheet_name = sheet_name.replace('8gather', '8g')
+            rdf_fair = self._iterator.load_raw_dataset(
+                xlsx_name, sheet_name.replace('8g', '8a'))
+            rdf_norm = self._iterator.load_raw_dataset(
+                xlsx_name, sheet_name.replace('8g', '8b'))
+            self._iterator.schedule_mspaint([
+                # xlsx_name, sheet_name
+                rdf_fair, rdf_norm], sheet_name.replace('8gather', '8g'))
+            del rdf_fair, rdf_norm
+            return
+
+        if self._trial_type.endswith('8a'):
+            self._iterator = Ver4_PlotH_fair_ens()
+        elif self._trial_type.endswith('8b'):
+            self._iterator = Ver4_PlotH_norm_cls()
+        raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        self._iterator.schedule_mspaint(raw_df, sheet_name)
+        del xlsx_name, sheet_name, figname, pre
+        # pdb.set_trace()
+        # self._iterator.schedule_mspaint(raw_dframe=raw_df, pre=pre)
+        return
+
+    def _ver4_internal_old(self, xlsx_name, sheet_name, figname, pre):
+        if self._trial_type.endswith('expt2a'):
+            self._iterator = Replot2A_comparison(
+                self._nb_cv, self._nb_cls, self._m1, self._m2, figname)
+        elif self._trial_type.endswith('expt2c'):
+            figname += 'nk{}cls{}_'.format(self._nb_cv, self._nb_cls)
+            # self._iterator = Replot2C_comparison(
+            #     self._nb_cv, self._nb_cls, self._m1, self._m2, figname)
+            self._iterator = Table2C_comparison(
+                self._nb_cv, self._nb_cls, self._m1, self._m2, figname + pre)
+
+        raw_df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        if trial_type.endswith('expt2a'):
+            self._iterator.schedule_mspaint(raw_dframe=raw_df, pre=pre)
+            fgn = f'{figname}{pre}_tst_lc2_mat'
+            os.remove(fgn + '0.pdf')
+            os.remove(fgn + '3.pdf')
+            os.remove(fgn + '1.pdf')
+            os.remove(fgn + '2.pdf')
+            os.remove(fgn + '7.pdf')
+        elif trial_type.endswith('expt2c'):
+            self._iterator.schedule_mspaint(raw_dframe=raw_df)
+            # os.remove(fgn + '0.pdf')
+            # os.remove(fgn + '3.pdf')
+            os.remove(f'exp3c_{pre}_n_tst_tim_sty6a.pdf')
+            fgn = f'{figname}{pre}_n_pc2_tst_mat'
+            os.remove(fgn + '0_b4.pdf')
+            os.remove(fgn + '1_b4.pdf')
+            os.remove(fgn + '2_b4.pdf')
+            os.remove(fgn + '3_b4.pdf')
+            os.remove(fgn + '7_b4.pdf')
+            fgn = fgn.replace('pc2', 'pc1')
+            os.remove(fgn + '0_s.pdf')
+            os.remove(fgn + '1_s.pdf')
+            os.remove(fgn + '2_s.pdf')
+            os.remove(fgn + '3_s.pdf')
+            os.remove(fgn + '7_s.pdf')
+            fgn = fgn.replace('exp2c', 'exp2b')
+            os.remove(fgn + '0_s.pdf')
+            os.remove(fgn + '1_s.pdf')
+            os.remove(fgn + '2_s.pdf')
+            os.remove(fgn + '3_s.pdf')
+            os.remove(fgn + '7_s.pdf')
+            self._iterator.schedule_spreadsheet(raw_dframe=raw_df)
+        # pdb.set_trace()
+        del fgn
         return
 
 
@@ -321,6 +412,17 @@ if args.round == 'ver2':
     case = FairManfRevision(trial_type, **kwargs)
     case.trial_one_process()
     sys.exit()
+elif args.round == 'ver4':
+    kwargs['nb_iter'] = 5
+    kwargs['ratio'] = .99
+    # kwargs['rep'] = True
+    kwargs['nb_cls'] = 9
+    if trial_type[-6:-1] != 'expt8':
+        # else:  # expt2*
+        kwargs['nb_cls'] = args.nb_cls
+    case = FairManfRevision(trial_type, **kwargs)
+    case.trial_one_process()
+    sys.exit()
 
 
 if trial_type[-6:] in ['expt5a', 'expt5b']:
@@ -360,4 +462,6 @@ python hfm_bin_draw.py -exp mCV_expt2a -pre min_max -re
 # python hfm_bin_draw.py -exp mCV_expt2b -pre min_max
 # python hfm_bin_draw.py -v ver2 -exp mCV_exp1c -pre min_max
 python hfm_bin_draw.py -v ver2 -exp mCV_exp1b -pre min_max
+
+python hfm_bin_draw.py -v ver4 -exp mCV_expt8a|8b|8gather -pre min_max  # 2a|2c|
 """

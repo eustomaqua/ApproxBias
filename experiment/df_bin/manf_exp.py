@@ -2,6 +2,7 @@
 # Experiments
 
 
+# import pdb
 import time
 import numpy as np
 
@@ -184,6 +185,11 @@ class ComparisonB_setup:
         # ut_b = time.time() - ut_b
         # cmp_fair.extend((Ds_01, Df_01) + ddf + (t_Ds, t_Df, t_ddf))  # siz=7
         # '''
+        if X.dtype == 'O':
+            X_and_y = X_and_y.astype(DTY_FLT)
+            X_and_y_hat = X_and_y_hat.astype(DTY_FLT)
+            A = A.astype(DTY_FLT)
+        # pdb.set_trace()
 
         ut_a = time.time()
         Ds_01, t_Ds = DirectDist(X_and_y, non_sa)
