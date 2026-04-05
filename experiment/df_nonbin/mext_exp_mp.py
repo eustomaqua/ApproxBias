@@ -1530,8 +1530,8 @@ class HyperEB_analysis(ParameterE_setup):
         ans_approx = [DistApprox(X_yfx, B_j, m1, m2, n_e, pool) for m1 in self._m1_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds_01, hat_Ds_avg = zip(*ans_approx)
-        curr_res.append([''] * 3 + 
-                        list(hat_Ds_01) + list(hat_Ds_avg) + list(ans_ut))
+        curr_res.append([''] * 3 + list(
+            hat_Ds_01) + list(hat_Ds_avg) + list(ans_ut))
         return curr_res  # .shape= (3,75) =(1+2, 3+24*3)
 
     def sub_process_core(self, X_yfx, A_j, non_sa, m2, n_e, n_l=24,

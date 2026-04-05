@@ -6,7 +6,7 @@
 
 
 from hfm.dist_est_bin import (
-    AcceleDist_bin, ApproxDist_bin, ApproxDist_bin_revised)
+    AcceleDist_bin, ApproxDist_bin)  # ,ApproxDist_bin_revised)
 # from hfm.dist_est_bin import (weight_generator, AcceleDist_bin,
 #                               ApproxDist_bin,
 #                               ApproxDist_bin_revised)
@@ -251,13 +251,13 @@ def test_strategy():
 
 def test_German():
     from experiment.utils_empirical import DataSetup
-    from experiment.datasets import (
-        transform_unpriv_tag)  # transform_X_and_y,
+    # from experiment.datasets import (
+    #     transform_X_and_y, transform_unpriv_tag)
     # from experiment.preprocessing_bin import normalise_disturb_prime
     from experiment.preprocessing_nonbin import (
         renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
         check_marginalised_indices,  # renewed_transform_disturb,
-        renewed_normalise_disturb, renewed_normalise_separate)
+        renewed_normalise_separate)  # renewed_normalise_disturb,
 
     cs = DataSetup('german')
     ratio = .97

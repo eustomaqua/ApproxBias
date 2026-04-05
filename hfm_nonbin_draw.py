@@ -26,7 +26,7 @@ from experiment.df_nonbin.rev_mext_plt import (
 
 from experiment.df_nonbin.rev_mext_plt import (
     ConvFig_5C_exact, ConvFig_5D_exact, ConvFig_5E_exact,
-    ConvFig_5B_exact, ConvFig_4B_exact,
+    ConvFig_5B_exact,  # ConvFig_4B_exact,
     # ConvFig_4C_exact, ConvFig_4D_exact, ConvFig_4E_exact)
     ConvFig_4E_exact, ConvFig_5F_exact,  # ConvFig_5H_exact,
 )   # ConvFig_5I_exact, ConvFig_5Isimpl)

@@ -7,7 +7,7 @@
 
 import numpy as np
 import pandas as pd
-import pdb
+# import pdb
 
 from hfm.utils.verifiers import unique_column, check_zero, DTY_FLT
 from experiment.utils_empirical import GraphSetupVer1 as GraphSetup
@@ -18,7 +18,7 @@ from pyfair.granite.draw_addtl import (
     multiple_scatter_comparison,
     scatter_with_marginal_distrib, lineplot_with_uncertainty,
     line_reg_with_marginal_distr, single_line_reg_with_distr,
-    multi_lin_reg_without_distr)
+)  # multi_lin_reg_without_distr)
 from pyfair.granite.draw_chart import analogous_confusion_extended
 
 
@@ -1868,7 +1868,7 @@ class Replot2C_comparison(Replot2B_comparison):
             Mat_C, Mat_B, key_C, self._picked_keys,
             figname=suff_4 + '_advr', **kwargs)
 
-        # Mat_A = 
+        # Mat_A =
         # pdb.set_trace()
         return
 

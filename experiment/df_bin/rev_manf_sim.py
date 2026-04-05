@@ -1,14 +1,14 @@
 # coding: utf-8
 
 
-from copy import deepcopy
+# from copy import deepcopy
 import csv
 import json
 import os
 import sys
 import time
 import numpy as np
-import pandas as pd
+# import pandas as pd
 import pdb
 
 from hfm.utils.decorators import (
@@ -21,22 +21,21 @@ from pyfair.facil.data_split import (
 from pyfair.datasets import preprocess
 from pyfair.preprocessing_dr import (
     adversarial, transform_X_and_y, transform_unpriv_tag)
-from pyfair.preprocessing_hfm import binarized_data_set
-# from pyfair.preprocessing_hfm import (
-#     binarized_data_set,  transform_X_A_and_y,
-#     transform_disturb_prime, normalise_disturb_prime,
-#     normalise_disturb_whole, renewed_transform_disturb,
-#     renewed_normalise_disturb, renewed_normalise_separate)
+# from pyfair.preprocessing_hfm import binarized_data_set
+# # from pyfair.preprocessing_hfm import (
+# #     binarized_data_set,  transform_X_A_and_y,
+# #     transform_disturb_prime, normalise_disturb_prime,
+# #     normalise_disturb_whole, renewed_transform_disturb,
+# #     renewed_normalise_disturb, renewed_normalise_separate)
 
 from experiment.utils_empirical import DataSetup
-from experiment.utils_learner import AVAILABLE_ENSF
-# from experiment.datasets import (
-#     preprocess, adversarial, transform_X_and_y,
-#     transform_unpriv_tag)
+# # from experiment.datasets import (
+# #     preprocess, adversarial, transform_X_and_y,
+# #     transform_unpriv_tag)
 from experiment.preprocessing_bin import (
     #     binarized_data_set, transform_X_A_and_y,
     #     transform_disturb_prime, normalise_disturb_prime,
-    normalise_disturb_whole, transform_X_A_and_y)
+    transform_X_A_and_y)  # normalise_disturb_whole,
 from experiment.preprocessing_nonbin import (
     renewed_transform_disturb, renewed_normalise_disturb,
     renewed_normalise_separate)
@@ -385,7 +384,7 @@ class PartH1_earlybreak(PartH_efficient):
         tmp_4_3 = ['Ds', 'Df', 'ddf', '', 't_Ds', 't_Df', 't(...)'] * 3
         tmp_4 = tmp_4_1 * 2 + tmp_4_2 + tmp_4_3 * 4  # 7*2+14+3*28=56+56=112
         csv_row_4c = ['ut'] + tmp_4 + tmp_4
-        del tmp_4, tmp_4_1, tmp_4_2, tmp_4_3  # 
+        del tmp_4, tmp_4_1, tmp_4_2, tmp_4_3
 
         # pdb.set_trace()
         # return [], [], [], []
@@ -414,9 +413,9 @@ class PartH2_earlybreak(PartH1_earlybreak):
                          X_A_tst, y_tst, X_Aq_tst, g1_tst, jt_tst,
                          X_trn, A_trn, X_tst, A_tst, m1, m2, pos_label):
         res_iter = []
-        pms = {'positive_label': pos_label, 'm1': m1, 'm2': m2,
-               'X_trn': X_trn, 'A_trn': A_trn, 'g1_trn': g1_trn, 'jt_trn': jt_trn,
-               'X_tst': X_tst, 'A_tst': A_tst, 'g1_tst': g1_tst, 'jt_tst': jt_tst}
+        # pms = {'positive_label': pos_label, 'm1': m1, 'm2': m2,
+        #        'X_trn': X_trn, 'A_trn': A_trn, 'g1_trn': g1_trn, 'jt_trn': jt_trn,
+        #        'X_tst': X_tst, 'A_tst': A_tst, 'g1_tst': g1_tst, 'jt_tst': jt_tst}
         for abbr_cls in self._abbr_clfs:
             y_insp, y_pred, yq_insp, yq_pred, ut = self.subroute_one_gene_clf(
                 abbr_cls, X_A_trn, y_trn, X_Aq_trn, X_A_tst, y_tst, X_Aq_tst)
@@ -735,7 +734,7 @@ class RevisedManfEmpirical(DataSetup):
             elegant_print('nb_iter={}, repetitive'.format(
                 self._nb_iter), logger)
             split_idx = manual_repetitive(self._nb_iter, y, self._gen_iter)
-            res_aux = []
+            res_ans = []  # res_aux = []
             for k, idx in enumerate(split_idx):
                 elegant_print('Iteration {}-th starts.'.format(
                     k + 1), logger)
