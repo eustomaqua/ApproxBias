@@ -118,6 +118,8 @@ class PartH_efficient:
 
     def count_sing_part2(self, y, y_hat,  # y_qtb,
                          non_sa, pos_label=1):
+        # if pos_label not in y.tolist() + y_hat.tolist():
+        #     pdb.set_trace()
         _, _, gones_Cm, gzero_Cm = marginalised_pd_mat(
             y, y_hat, pos_label, non_sa)
         cmp_fair = []

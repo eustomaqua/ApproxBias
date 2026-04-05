@@ -571,7 +571,7 @@ def _ver4sub_depict_earlybreak(dfs, tYs, suff, mark='tD.'):
 
     multi_lin_reg_without_distr(
         scat_X, scat_Y, annotY, annot, suff,
-        snspec='sty4' if mark.startswith('tD') else 'sty3bf')
+        snspec='sty4' if mark.startswith('tD') else 'sty3b')  # 'sty3bf')
 
     if mark.startswith('tD'):
         scat_Z = [np.log10(i / scat_X) for i in scat_Y]
@@ -737,24 +737,24 @@ class PlotH_drawing(GraphSetup):  # PlotA_initial):
             if k != 2:  # k not in [2, 3, 4]:
                 continue
             # self.depict_hfm_approximation(df_raw, tag_sa1, fgn + f'set{k}_')
-            self.depict_hfm_subset(df_raw, tag_sa1, fgn + f'set{k}_')
+            self.depict_hfm_subset(df_raw, tag_sa1, fgn[:-6] + f'set{k}_')
 
         df_alt = pd.concat(df_alt, axis=0).reset_index(drop=True)
-        self.depict_hfm_approximation(df_alt, tag_sa1, fgn)
-        '''
-        self.depict_hfm_fairness(df_alt, tag_com, tag_sa1, tag_sa2, fgn,
-                                 tag_jta, tag_jto)
-        
-        columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
-        col_jta = {t2: t1 for t1, t2 in zip(tag_sa1, tag_jta)}
-        col_jto = {t2: t1 for t1, t2 in zip(tag_sa1, tag_jto)}
-        df_tmp = pd.concat([df_alt[tag_sa1],
-                            df_alt[tag_sa2].rename(columns=columns),
-                            df_alt[tag_jta].rename(columns=col_jta),
-                            df_alt[tag_jto].rename(columns=col_jto)], axis=0)
-        del columns, col_jta, col_jto
-        pdb.set_trace()
-        '''
+        # '''
+        # self.depict_hfm_approximation(df_alt, tag_sa1, fgn)
+        # self.depict_hfm_fairness(df_alt, tag_com, tag_sa1, tag_sa2, fgn,
+        #                          tag_jta, tag_jto)
+        #
+        # columns = {t2: t1 for t1, t2 in zip(tag_sa1, tag_sa2)}
+        # col_jta = {t2: t1 for t1, t2 in zip(tag_sa1, tag_jta)}
+        # col_jto = {t2: t1 for t1, t2 in zip(tag_sa1, tag_jto)}
+        # df_tmp = pd.concat([df_alt[tag_sa1],
+        #                     df_alt[tag_sa2].rename(columns=columns),
+        #                     df_alt[tag_jta].rename(columns=col_jta),
+        #                     df_alt[tag_jto].rename(columns=col_jto)], axis=0)
+        # del columns, col_jta, col_jto
+        # pdb.set_trace()
+        # '''
         return
 
     def depict_hfm_subset(self, df_all, tag_sa1, fgn, verbose=False):
@@ -894,12 +894,43 @@ class Ver4_PlotH_gather(PlotH_drawing):
             rdf_norm, id_set, tag_com, tag_sa1, tag_sa2,
             tag_jta, tag_jto, first_incl)
 
+        # pdb.set_trace()
         df_alt = [pd.concat([i, j], axis=0).reset_index(
             drop=True) for i, j in zip(rdf_fair, rdf_norm)]
         fgn = f'{figname}_n_{mk}_'
         self.schedule_mspaint_prime(df_alt, fgn, [
             tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto])
+        return
+
+
+class Ver4_PlotH_gather_prep(PlotH_drawing):
+    def schedule_mspaint(self, raw_dframe, figname=''):
+        xlsx_name, sheet_name = raw_dframe
+        mk, first_incl = 'tst', True
+        tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto = self.obtain_tag_col(tag=mk)
+        curr_set, df_tmp = 2, []
+
+        for prep in ['minmax', 'normalize', 'standard']:  # 'none',
+            # sheet_name = f'{figname}_{prep}'
+            rdf_fair = self.load_raw_dataset(xlsx_name, f'exp8a_{prep}')
+            rdf_norm = self.load_raw_dataset(xlsx_name, f'exp8b_{prep}')
+            nb_set, id_set = self.recap_sub_data(rdf_fair, sa_ir=3, sa_r=4)
+            rdf_fair = self.obtain_whole_bin_more(
+                rdf_fair, id_set, tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto,
+                first_incl)[curr_set]
+            nb_set, id_set = self.recap_sub_data(rdf_norm, sa_ir=11, sa_r=0)
+            rdf_norm = self.obtain_whole_bin_more(
+                rdf_norm, id_set, tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto,
+                first_incl)[curr_set]
+            tmp = pd.concat([rdf_fair, rdf_norm], axis=0).reset_index(drop=True)
+            df_tmp.append(tmp)
+
+        df_tmp = pd.concat(df_tmp, axis=0).reset_index(drop=True)
         # pdb.set_trace()
+        fgn = f'{figname}_n_{mk}_'
+        # self.schedule_mspaint_prime(df_tmp, fgn, [
+        #     tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto])
+        self.depict_hfm_subset(df_tmp, tag_sa1, fgn + f'set{curr_set}_')
         return
 
 

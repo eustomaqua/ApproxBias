@@ -20,7 +20,8 @@ from experiment.df_bin.manf_tab import Table2C_comparison
 
 from experiment.df_bin.rev_manf_anal import (
     Ver2_PlotA_fair_ens, Ver2_PlotA_norm_cls,
-    Ver4_PlotH_fair_ens, Ver4_PlotH_norm_cls, Ver4_PlotH_gather)
+    Ver4_PlotH_fair_ens, Ver4_PlotH_norm_cls, Ver4_PlotH_gather,
+    Ver4_PlotH_gather_prep)
 import pdb
 
 
@@ -277,6 +278,12 @@ class FairManfRevision:
                 rdf_fair, rdf_norm], sheet_name.replace('8gather', '8g'))
             del rdf_fair, rdf_norm
             return
+        elif '8h' in self._trial_type:
+            self._iterator = Ver4_PlotH_gather_prep()
+            self._iterator.schedule_mspaint([
+                xlsx_name, sheet_name], sheet_name.split('_')[0])
+            # pdb.set_trace()
+            return
 
         if self._trial_type.endswith('8a'):
             self._iterator = Ver4_PlotH_fair_ens()
@@ -290,6 +297,10 @@ class FairManfRevision:
         return
 
     def _ver4_internal_old(self, xlsx_name, sheet_name, figname, pre):
+        xlsx_name = xlsx_name.replace('rat99', 'ratio75')
+        sheet_name = sheet_name.replace('minmax', 'min_max')
+        # pdb.set_trace()
+
         if self._trial_type.endswith('expt2a'):
             self._iterator = Replot2A_comparison(
                 self._nb_cv, self._nb_cls, self._m1, self._m2, figname)
@@ -464,4 +475,5 @@ python hfm_bin_draw.py -exp mCV_expt2a -pre min_max -re
 python hfm_bin_draw.py -v ver2 -exp mCV_exp1b -pre min_max
 
 python hfm_bin_draw.py -v ver4 -exp mCV_expt8a|8b|8gather -pre min_max  # 2a|2c|
+python hfm_bin_draw.py -v ver4 -exp mCV_expt8h  # |KF_expt8g -pre *
 """
