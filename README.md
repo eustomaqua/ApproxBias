@@ -30,8 +30,8 @@ We release the code of proposed methods from our following papers here, to help 
 
 Here, we release the code of the proposed methods from our following papers, to help people who are interested in our work reproduce those results.
 
-- \[**P1**\] Does machine bring in extra bias in learning? Approximating fairness in models promptly. [[arXiv]](https://arxiv.org/abs/2405.09251)
-- \[**P2**\] Approximating discrimination within models when faced with several non-binary sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
+- \[**P1**\] Measuring model-induced discrimination via efficient fairness approximation. [[arXiv]](https://arxiv.org/abs/2405.09251)
+- \[**P2**\] Fast discrimination assessment for multiple multi-valued sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
 - Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival poster, [OpenReview](https://openreview.net/pdf?id=ywqVkVQZDj)).
 
 
@@ -54,14 +54,14 @@ If you find this repository useful, you may consider to cite our work.
 ```bibtex
 @article{bian2024does,
   author  = {Bian, Yijun and Luo, Yujie},
-  title   = {Does Machine Bring in Extra Bias in Learning? Approximating Fairness in Models Promptly},
+  title   = {Does machine bring in extra bias in learning? Approximating fairness in models promptly},
   journal = {arXiv preprint arXiv:2405.09251},
   year    = {2024},
 }
 
 @article{bian2024approximating,
   author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
-  title   = {Approximating Discrimination Within Models When Faced With Several Non-Binary Sensitive Attributes},
+  title   = {Approximating discrimination within models when faced with several non-binary sensitive attributes},
   journal = {arXiv preprint arXiv:2408.06099},
   year    = {2024},
 }

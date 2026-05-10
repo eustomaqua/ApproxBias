@@ -2,8 +2,8 @@
 # Usage: to approximate the distance quickly
 #
 # Author: Yj
-# 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
-#    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
+# 1. Does machine bring in extra bias in learning? Approximating fairness
+#    in models promptly [https://arxiv.org/abs/2405.09251 arXiv]
 #
 
 

@@ -3,7 +3,7 @@
 import json
 import csv
 
-from hfm.utils.verifiers import unique_column
+# from hfm.utils.verifiers import unique_column
 from experiment.df_bin.rev_manf_sim import PartH1_earlybreak
 
 

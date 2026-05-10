@@ -2,8 +2,8 @@
 # Usage: to approximate the distance quickly
 #
 # Author: Yj
-# 2. Approximating Discrimination Within Models When Faced With Several
-#    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
+# 2. Approximating discrimination within models when faced with several
+#    non-binary sensitive attributes [https://arxiv.org/abs/2408.06099]
 #
 
 

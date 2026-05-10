@@ -2,10 +2,10 @@
 # Usage: to measure the bias level within one classifier
 #
 # Author: Yj
-# 1. Does Machine Bring in Extra Bias in Learning? Approximating Fairness
-#    in Models Promptly [https://arxiv.org/abs/2405.09251 arXiv]
-# 2. Approximating Discrimination Within Models When Faced With Several
-#    Non-Binary Sensitive Attributes [https://arxiv.org/abs/2408.06099]
+# 1. Does machine bring in extra bias in learning? Approximating fairness
+#    in models promptly [https://arxiv.org/abs/2405.09251 arXiv]
+# 2. Approximating discrimination within models when faced with several
+#    non-binary sensitive attributes [https://arxiv.org/abs/2408.06099]
 #
 
 
