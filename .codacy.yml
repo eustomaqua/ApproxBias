@@ -1,0 +1,4 @@
+exclude_paths:
+  - "docs/conf.py"
+  - "experiment/pkgs_AdaFair.py"
+  - "experiment/pkgs_AdaFair_py36.py"
