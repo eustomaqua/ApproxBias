@@ -48,12 +48,13 @@ def set_belonging(idx_S0, idx_S1, i_anchor, idx_j):
     return False
 
 
-@numba.jit(nopython=True)
+@numba.jit  # (nopython=True)
 def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
                            i, m2):
     i_anchor = idx_y_fx[i]  # anchor's location after projection
     A_anchor = A[i_anchor]
     X_yfx_anchor = X_yfx[i_anchor]
+    tmp = []
 
     # Compute the distance d(anchor,\cdot) for at most m2 nearby
     # data points that meets a!=ai and g()<=g(xi,yi;w)
@@ -74,12 +75,13 @@ def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
 
         num_j += 1
         j -= 1
+        tmp.append(idx_j)
     # Find the minimum among them, recorded as d_min^s
     # del A_anchor
-    return min_js
+    return min_js, tmp
 
 
-@numba.jit(nopython=True)
+@numba.jit  # (nopython=True)
 def sub_accelerator_larger(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
                            i, m2):
     i_anchor = idx_y_fx[i]  # anchor's location after projection
