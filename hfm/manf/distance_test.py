@@ -9,7 +9,7 @@ def dist_vector(ele_i, ele_ic):
     from hfm.manf.dist_internal import (
         dist_Euclidean, dist_Manhattan, dist_Chebyshev, dist_Minkowski,
         avbl_Euclidean, avbl_Manhattan, avbl_Chebyshev, avbl_Minkowski,
-        dist_cos_sim)
+        dist_cos_sim, avbl_cos_sim)  # dist_cos_sim_alt)
 
     vec = ele_i - ele_ic
     my1 = dist_Euclidean(vec)
@@ -32,18 +32,20 @@ def dist_vector(ele_i, ele_ic):
     assert check_equal(ex3[0], my3)  # [0])
     assert check_equal(ex4[0], my4)  # [0])
 
+    alt = avbl_cos_sim(ele_i, ele_ic)  # dist_cos_sim_alt
     ans = dist_cos_sim(ele_i, ele_ic)  # ans, _ =
     assert 0 <= ans <= 1
+    assert check_equal(alt, ans)
     return
 
 
 def dist_direct_part1(Si, Si_c):
     from hfm.manf.dist_internal import Direct_halfway_min
-    t1 = Direct_halfway_min(Si[0], Si_c, 'euclidean')
-    t2 = Direct_halfway_min(Si[0], Si_c, 'manhattan')
-    t3 = Direct_halfway_min(Si[0], Si_c, 'chebyshev')
-    t4 = Direct_halfway_min(Si[0], Si_c, 'minkowski')
-    t5 = Direct_halfway_min(Si[0], Si_c, 'cos_sim')
+    t1 = Direct_halfway_min(Si[0], Si_c, 0)  # 'euclidean')
+    t2 = Direct_halfway_min(Si[0], Si_c, 1)  # 'manhattan')
+    t3 = Direct_halfway_min(Si[0], Si_c, 2)  # 'chebyshev')
+    t4 = Direct_halfway_min(Si[0], Si_c, 3)  # 'minkowski')
+    t5 = Direct_halfway_min(Si[0], Si_c, 4)  # 'cos_sim')
     # t1, t2, t3, t4 = t1[0], t2[0], t3[0], t4[0]
     assert t1 >= 0 and t2 >= 0 and t3 >= 0 and t4 >= 0
     assert 0 <= t5 <= 1
@@ -60,11 +62,11 @@ def dist_direct_part2(X_nA_y, A, indices):
     assert np.equal(indices, ind_alt).all()
 
     idx = indices[1][0]
-    t1 = Direct_mediator(X_nA_y, idx, 'euclidean')
-    t2 = Direct_mediator(X_nA_y, idx, 'manhattan')
-    t3 = Direct_mediator(X_nA_y, idx, 'chebyshev')
-    t4 = Direct_mediator(X_nA_y, idx, 'minkowski')
-    t5 = Direct_mediator(X_nA_y, idx, 'cos_sim')
+    t1 = Direct_mediator(X_nA_y, idx, 0)  # 'euclidean')
+    t2 = Direct_mediator(X_nA_y, idx, 1)  # 'manhattan')
+    t3 = Direct_mediator(X_nA_y, idx, 2)  # 'chebyshev')
+    t4 = Direct_mediator(X_nA_y, idx, 3)  # 'minkowski')
+    t5 = Direct_mediator(X_nA_y, idx, 4)  # 'cos_sim')
     # t1, t2, t3, t4, t5 = t1[0], t2[0], t3[0], t4[0], t5[0]
     assert all([i[0] >= 0 for i in [t1, t2, t3, t4]])
     assert 0 <= t5[0] <= 1
@@ -133,7 +135,7 @@ def dist_direct_part3(X_nA_y, A, indices):
     return
 
 
-def drt_part4_bin(X_nA_y, A_i, idx, m2, vec_w):
+def approx_part4_sub(X_nA_y, A_i, idx, m2, vec_w):
     from hfm.manf.dist_internal import (
         sub_accelerator_smaler, sub_accelerator_larger, projector)
     from hfm.dist_est_bin import sub_accelerator_smaler as smaler
@@ -142,30 +144,100 @@ def drt_part4_bin(X_nA_y, A_i, idx, m2, vec_w):
     proj = [projector(ele, vec_w) for ele in X_nA_y]
     idx_y_fx = np.argsort(proj)
     i = 11
-    alt = (A_i == 1).astype('int')
+    alt = (A_i == 1).astype('bool')  # 'int')
     n1 = smaler(X_nA_y, A_i, ~idx, idx, idx_y_fx, i, m2)
     n2 = larger(X_nA_y, A_i, ~idx, idx, idx_y_fx, i, m2)
     n3 = smaler(X_nA_y, A_i, ~alt, alt, idx_y_fx, i, m2)
     n4 = larger(X_nA_y, A_i, ~alt, alt, idx_y_fx, i, m2)
     assert n1 == n3 and n2 == n4
 
-    t1 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2, 'euclidean')
-    t2 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2, 'manhattan')
-    t3 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2, 'chebyshev')
-    t4 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2, 'minkowski')
-    t5 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2, 'cos_sim')
+    alt = alt.astype('int')  # /idx
+    t1 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2, 0)  # 'euclidean')
+    t2 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2, 1)  # 'manhattan')
+    t3 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2, 2)  # 'chebyshev')
+    t4 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2, 3)  # 'minkowski')
+    t5 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2, 4)  # 'cos_sim')
+    assert (0 <= t5 <= 1) and check_equal(t1, n1)  # (t1 == n1 >=0) and
+    assert t2 >= 0 and t3 >= 0 and t4 >= 0
 
-    if t1[0] != n1[0]:
-        pdb.set_trace()
+    t1 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2, 0)  # 'euclidean')
+    t2 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2, 1)  # 'manhattan')
+    t3 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2, 2)  # 'chebyshev')
+    t4 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2, 3)  # 'minkowski')
+    t5 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2, 4)  # 'cos_sim')
+    assert (0 <= t5 <= 1) and check_equal(t1, n2)
+    assert t2 >= 0 and t3 >= 2 and t4 >= 0
+
+    t1 = sub_accelerator_smaler(X_nA_y, alt, idx_y_fx, i, m2)
+    t6 = sub_accelerator_smaler(X_nA_y, A_i, idx_y_fx, i, m2)
+    assert isinstance(t1, float) and isinstance(t6, float)  # [0]
+    t1 = sub_accelerator_larger(X_nA_y, alt, idx_y_fx, i, m2)
+    t6 = sub_accelerator_larger(X_nA_y, A_i, idx_y_fx, i, m2)
+    assert isinstance(t1, float) and isinstance(t6, float)  # [0]
+    # if t1[0] != n1[0]:
+    return
+
+
+def approx_part4_bin(X_nA_y, A_i, idx, m2, vec_w):
+    from hfm.manf.dist_internal import AcceleCore_bin
+    from hfm.dist_est_bin import AcceleDist_bin as Accele
+
+    n1 = Accele(X_nA_y, A_i, ~idx, idx, m2, vec_w)
+    n2 = Accele(X_nA_y, A_i, ~idx, idx, m2, vec_w)
+    n3 = Accele(X_nA_y, A_i, idx, ~idx, m2, vec_w)
+
+    B_i = (A_i == 1).astype('int')
+    t6 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 0)  # 'euclidean')
+
+    t1 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 0)  # 'euclidean')
+    t2 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 1)  # 'manhattan')
+    t3 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 2)  # 'chebyshev')
+    t4 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 3)  # 'minkowski')
+    t5 = AcceleCore_bin(X_nA_y, B_i, m2, vec_w, 4)  # 'cos_sim')
+
+    assert np.equal(n1[0], n2[0]).all()
+    assert np.equal(n1[0], n3[0]).all()
+    assert np.equal(t1, t6).all()  # [0]
+    assert check_equal(t1, n1[0])  # [0]
+    return
+
+
+def approx_part4_drt(X_nA_y, A_i, idx, m1, m2):
+    from hfm.manf.dist_internal import Direct_bin, Approx_bin
+    from hfm.dist_est_bin import ApproxDist_bin as Approx
+    from hfm.dist_drt import DirectDist_bin as Direct
+
+    n1 = Approx(X_nA_y, A_i, idx, m1, m2)
+    # n2 = Approx(X_nA_y, A_i, idx, m1, m2)
+    # n3 = Approx(X_nA_y, A_i, ~idx, m1, m2)
+    B_i = idx.astype('int')  # (A_i == 1).astype('int')
+    t6 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')  # 0)
+
+    t1 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')  # 0)
+    # t2 = Approx_bin(X_nA_y, B_i, m1, m2, 'manhattan')  # 1)
+    # t3 = Approx_bin(X_nA_y, B_i, m1, m2, 'chebyshev')  # 2)
+    # t4 = Approx_bin(X_nA_y, B_i, m1, m2, 'minkowski')  # 3)
+    # t5 = Approx_bin(X_nA_y, B_i, m1, m2, 'cos_sim')    # 4)
+
+    n2 = Approx(X_nA_y, B_i, idx, m1, m2)
+    n3 = Direct(X_nA_y, idx)
+    n4 = Direct_bin(X_nA_y, B_i, 1, idx_Si=idx, func='euclidean')
+    n5 = Direct_bin(X_nA_y, A_i, 1, idx_Si=idx, func='euclidean')
+
+    assert n1[0] >= n3[0][0] and n2[0] >= n3[0][0]
+    assert check_equal(n3[0], n4[0]) and check_equal(n3[0], n5[0])
+    assert all([i >= j for i, j in zip(t6[0], n4[0])])
+    assert all([i >= j for i, j in zip(t1[0], n4[0])])
+
+    pdb.set_trace()
     return
 
 
 def dist_direct_part4(X_nA_y, A, indices):
     from hfm.manf.dist_internal import (
         weight_generator,  # , weight_gen_many)
-        projector, projector_alt, AcceleCore_bin)
+        projector, projector_alt)
     from hfm.dist_est_bin import weight_generator as weight
-    from hfm.dist_est_bin import AcceleDist_bin as Accele
 
     n_d = X_nA_y.shape[1] - 1
     vec_w = weight_generator(n_d)
@@ -181,23 +253,10 @@ def dist_direct_part4(X_nA_y, A, indices):
 
     m2 = 8
     A_i, idx = A[:, 1], indices[1][0]  # .astype('int')
-    drt_part4_bin(X_nA_y, A_i, idx, m2, vec_w)
-
-    n1 = Accele(X_nA_y, A_i, ~idx, idx, m2, vec_w)
-    n2 = Accele(X_nA_y, A_i, ~idx, idx, m2, vec_w)
-    n3 = Accele(X_nA_y, A_i, idx, ~idx, m2, vec_w)
-
-    t1 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'euclidean')
-    t2 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'manhattan')
-    t3 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'chebyshev')
-    t4 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'minkowski')
-    t5 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'cos_sim')
-
-    t6 = AcceleCore_bin(X_nA_y, A_i, m2, vec_w, 'euclidean')
-    assert np.equal(n1[0], n2[0]).all()
-    assert np.equal(n1[0], n3[0]).all()
-    assert np.equal(t1[0], t6[0]).all()
-    pdb.set_trace()
+    approx_part4_sub(X_nA_y, A_i, idx, m2, vec_w)
+    approx_part4_bin(X_nA_y, A_i, idx, m2, vec_w)
+    m1 = 20
+    approx_part4_drt(X_nA_y, A_i, idx, m1, m2)
     return
 
 

@@ -54,12 +54,11 @@ def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
     i_anchor = idx_y_fx[i]  # anchor's location after projection
     A_anchor = A[i_anchor]
     X_yfx_anchor = X_yfx[i_anchor]
-    tmp = []
 
     # Compute the distance d(anchor,\cdot) for at most m2 nearby
     # data points that meets a!=ai and g()<=g(xi,yi;w)
     j, num_j, min_js = i, 0, np.finfo(np.float32).max
-    j = i - 1  # doesn't have to be compared with the anchor
+    # j = i - 1  # doesn't have to be compared with the anchor
     while num_j < m2:
         if j < 0:
             break
@@ -75,10 +74,9 @@ def sub_accelerator_smaler(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
 
         num_j += 1
         j -= 1
-        tmp.append(idx_j)
     # Find the minimum among them, recorded as d_min^s
     # del A_anchor
-    return min_js, tmp
+    return min_js
 
 
 @numba.jit  # (nopython=True)
@@ -91,7 +89,7 @@ def sub_accelerator_larger(X_yfx, A, idx_S0, idx_S1, idx_y_fx,
     # Compute the distances d(anchor,\cdot) for at most m2 nearby
     # data points that meets a!=ai and g()>=g(xi,yi;w)
     j, num_j, min_jr = i, 0, np.finfo(np.float32).max
-    j = i + 1  # doesn't have to be compared with the anchor
+    # j = i + 1  # doesn't have to be compared with the anchor
     n = len(X_yfx)
     while num_j < m2:
         if j >= n:
@@ -177,7 +175,7 @@ def ApproxDist_bin(X_nA_y, A_j, idx_S1, m1, m2):
 
 @fantasy_timer
 def ApproxDist_bin_revised(X_nA_y, idx_S1, m1, m2):
-    A_j = idx_S1.astype('int')
+    A_j = idx_S1.astype('int')  # ??bug
     idx_S0 = ~idx_S1       # idx_sa = ~non_sa
     n, n_d = X_nA_y.shape
     d_max, d_avg = [], []
