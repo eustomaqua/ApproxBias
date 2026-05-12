@@ -21,6 +21,9 @@ GAP_INF = 2 ** 31 - 1
 GAP_MID = 1e8  # 1e16
 GAP_NAN = 1e-16
 
+# INF64 = np.finfo(np.float32).max
+INF64 = np.float64(1e308)
+
 
 # ---------------------
 # Helper functions
@@ -68,6 +71,22 @@ def check_equal(tmp_a, tmp_b, diff=CONST_DIFF):
         tmp = [abs(tmp_a - i) < diff for i in tmp_b]
     elif flag_a and flag_b:
         tmp = [abs(i - j) < diff for i, j in zip(tmp_a, tmp_b)]
+    return all(tmp)
+
+
+# ---------------------
+# Partial ordering
+
+
+def poset_nolessthan(ga, gb):    # >=
+    tmp = [i >= j or check_equal(
+        i, j) for i, j in zip(ga, gb)]
+    return all(tmp)
+
+
+def poset_nomorethan(ga, gb):    # <=
+    tmp = [i <= j or check_equal(
+        i, j) for i, j in zip(ga, gb)]
     return all(tmp)
 
 

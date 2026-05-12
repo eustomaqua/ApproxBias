@@ -4,10 +4,10 @@ from scipy.spatial import distance
 import numpy as np
 from numba import njit, prange
 # import numba
-import pdb
+# import pdb
 import math
 from hfm.utils.decorators import fantasy_timer
-# from hfm.utils.verifiers import DTY_FLT
+from hfm.utils.verifiers import INF64  # DTY_FLT,
 
 
 # ------------------------------------------
@@ -44,6 +44,12 @@ def avbl_cos_sim(ele_i, ele_ic):
     norm_a = np.linalg.norm(ele_i)
     norm_b = np.linalg.norm(ele_ic)
     ans = np.dot(ele_i, ele_ic) / (norm_a * norm_b)
+    return float(ans)
+
+
+@njit
+def avbl_corr_pearson(X, Y):
+    ans = 1. - np.corrcoef(X, Y)[1, 0]
     return float(ans)
 
 
@@ -93,13 +99,39 @@ def dist_cos_sim(ele_i, ele_ic):
 #     return
 
 
+@njit
+def Pearson_correlation(X, Y):
+    # or np.corrcoef(X, Y)[1, 0]
+    # or np.corrcoef(Y, X)[1, 0]
+
+    # Covariance 协方差
+    Xi_bar = X - X.mean()  # np.array(X) - np.mean(X)
+    Yi_bar = Y - Y.mean()  # np.array(Y) - np.mean(Y)
+    tmp = np.multiply(Xi_bar, Yi_bar)  # =Xi_bar*Yi_bar
+    n = tmp.shape[0]  # n = len(tmp)
+    cov = tmp.sum() / (n - 1.)
+
+    numerator = tmp.sum()     # ↓ denominator
+    denom_X = (Xi_bar * Xi_bar).sum()  # sum(Xi_bar**2)
+    denom_Y = (Yi_bar * Yi_bar).sum()  # sum(Yi_bar**2)
+    denominator = math.sqrt(denom_X) * math.sqrt(denom_Y)
+    denominator = denominator if denominator != 0. else 1.
+    return numerator / denominator, cov
+
+
+@njit
+def dist_corr_pearson(ele_i, ele_ic):
+    ans = Pearson_correlation(ele_i, ele_ic)[0]
+    return float(1. - ans)
+
+
 # ------------------------------------------
 # Distance between sets
 # intermediate
 
 
 name_intermediate = ['euclidean', 'manhattan', 'chebyshev',
-                     'minkowski', 'cos_sim']
+                     'minkowski', 'cos_sim', 'correla', ]
 # Mahalanobis dist, Hamming dist, Jaccard similarity/dist
 
 
@@ -109,6 +141,7 @@ dist_intermediate = {
     'chebyshev': dist_Chebyshev,
     'minkowski': dist_Minkowski,
     'cos_sim': dist_cos_sim,
+    'correla': dist_corr_pearson,
 }
 
 
@@ -138,7 +171,9 @@ def alter_intermediate(ele_i, ele_ic, func_id=0, p=3):
         return dist_Chebyshev(ele_i - ele_ic)
     elif func_id == 3:
         return dist_Minkowski(ele_i - ele_ic, p)
-    return dist_cos_sim(ele_i, ele_ic)
+    elif func_id == 4:
+        return dist_cos_sim(ele_i, ele_ic)
+    return dist_corr_pearson(ele_i, ele_ic)
 
 
 @njit
@@ -230,13 +265,13 @@ def Direct_nonbin(X_nA_y, A_i, priv_val=1, idx_Sjs=None,
 @fantasy_timer
 def Direct_multiver(X_nA_y, A, priv_val=1, indices=None,
                     func='euclidean', p=3):
-    func_id = name_intermediate.index(func)
+    # func_id = name_intermediate.index(func)
     n_a = A.shape[1]
     if indices is None:  # that is, idx_Ai_Sjs
         indices = [
             idx_marginalised(A[:, i], priv_val) for i in range(n_a)]
     half_mid = [Direct_nonbin(X_nA_y, A[
-        :, i], priv_val, indices[i], func_id, p) for i in range(n_a)]
+        :, i], priv_val, indices[i], func, p) for i in range(n_a)]
     half_mid, half_ut = zip(*half_mid)
     half_pl_max, half_pl_avg = zip(*half_mid)
     return max(half_pl_max), sum(half_pl_avg) / n_a, (
@@ -264,8 +299,8 @@ def sub_accelerator_smaler(X_yfx, A, idx_y_fx, i, m2,
 
     # Compute the distance d(anchor,\cdot) for at most m2 nearby
     # data points that meets a!=ai and g()<=g(xi,yi;w)
-    j, num_j, min_js = i - 1, 0, np.finfo(np.float64).max
-    # j = i - 1  # doesn't have to be compared with the anchor
+    num_j, min_js = 0, INF64  # np.finfo(np.float64).max
+    j = i - 1  # doesn't have to be compared with the anchor
     while num_j < m2 and j >= 0:
         # if j < 0:
         #     break
@@ -294,8 +329,8 @@ def sub_accelerator_larger(X_yfx, A, idx_y_fx, i, m2,
 
     # Compute the distance d(anchor,\cdot) for at most m2 nearby
     # data points that meets a!=ai and g()>=g(xi,yi;w)
-    j, num_j, min_jr = i + 1, 0, np.finfo(np.float64).max
-    # j = i + 1  # doesn't have to be compared with the anchor
+    num_j, min_jr = 0, INF64  # np.finfo(np.float64).max
+    j = i + 1  # doesn't have to be compared with the anchor
     n = len(X_yfx)
     while num_j < m2 and j < n:
         # if j >= n:
@@ -352,7 +387,8 @@ def AcceleCore_bin(X_yddot, B_i, m2, vec_w, func=0, p=3):  # 'euclidean'
         # d_min.append(tmp)
         d_min[i] = min(min_js, min_jr)
     # return max(d_min), sum(d_min)
-    return float(d_min.max()), float(d_min.sum())
+    # return float(d_min.max()), float(d_min.sum())
+    return d_min.max(), d_min.sum()
 
 
 @njit
@@ -403,7 +439,8 @@ def Approx_bin_sub(X_nA_y, B_i, m1, m2, func_id, p):
         d_max[k] = tmp[0]
         d_avg[k] = tmp[1]
     # return min(d_max), min(d_avg) / float(n)
-    return float(d_max.min()), float(d_avg.min()) / n
+    # return float(d_max.min()), float(d_avg.min()) / n
+    return d_max.min(), d_avg.min() / n
 
 
 @fantasy_timer
@@ -413,4 +450,5 @@ def Approx_bin(X_nA_y, B_i, m1, m2, func='euclidean', p=3):
     #     if idx_Si is None:
     #         idx_Si = A_i == priv_val
     func_id = name_intermediate.index(func)
-    return Approx_bin_sub(X_nA_y, B_i, m1, m2, func_id, p)
+    tmp = Approx_bin_sub(X_nA_y, B_i, m1, m2, func_id, p)
+    return list(map(float, tmp))

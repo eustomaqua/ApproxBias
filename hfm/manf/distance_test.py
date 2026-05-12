@@ -2,14 +2,15 @@
 
 import numpy as np
 import pdb
-from hfm.utils.verifiers import check_equal
+from hfm.utils.verifiers import check_equal, poset_nolessthan
 
 
 def dist_vector(ele_i, ele_ic):
     from hfm.manf.dist_internal import (
         dist_Euclidean, dist_Manhattan, dist_Chebyshev, dist_Minkowski,
         avbl_Euclidean, avbl_Manhattan, avbl_Chebyshev, avbl_Minkowski,
-        dist_cos_sim, avbl_cos_sim)  # dist_cos_sim_alt)
+        dist_cos_sim, avbl_cos_sim,   # dist_cos_sim_alt)
+        dist_corr_pearson, avbl_corr_pearson)
 
     vec = ele_i - ele_ic
     my1 = dist_Euclidean(vec)
@@ -35,6 +36,11 @@ def dist_vector(ele_i, ele_ic):
     alt = avbl_cos_sim(ele_i, ele_ic)  # dist_cos_sim_alt
     ans = dist_cos_sim(ele_i, ele_ic)  # ans, _ =
     assert 0 <= ans <= 1
+    assert check_equal(alt, ans)
+
+    alt = avbl_corr_pearson(ele_i, ele_ic)
+    ans = dist_corr_pearson(ele_i, ele_ic)
+    assert 0 <= ans <= 2
     assert check_equal(alt, ans)
     return
 
@@ -142,6 +148,9 @@ def approx_part4_sub(X_nA_y, A_i, idx, m2, vec_w):
     from hfm.dist_est_bin import sub_accelerator_larger as larger
 
     proj = [projector(ele, vec_w) for ele in X_nA_y]
+    tt = X_nA_y @ vec_w
+    assert all([check_equal(i, j) for i, j in zip(proj, tt)])
+    # pdb.set_trace()
     idx_y_fx = np.argsort(proj)
     i = 11
     alt = (A_i == 1).astype('bool')  # 'int')
@@ -211,13 +220,13 @@ def approx_part4_drt(X_nA_y, A_i, idx, m1, m2):
     # n2 = Approx(X_nA_y, A_i, idx, m1, m2)
     # n3 = Approx(X_nA_y, A_i, ~idx, m1, m2)
     B_i = idx.astype('int')  # (A_i == 1).astype('int')
-    t6 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')  # 0)
+    t6 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')
 
-    t1 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')  # 0)
-    # t2 = Approx_bin(X_nA_y, B_i, m1, m2, 'manhattan')  # 1)
-    # t3 = Approx_bin(X_nA_y, B_i, m1, m2, 'chebyshev')  # 2)
-    # t4 = Approx_bin(X_nA_y, B_i, m1, m2, 'minkowski')  # 3)
-    # t5 = Approx_bin(X_nA_y, B_i, m1, m2, 'cos_sim')    # 4)
+    t1 = Approx_bin(X_nA_y, B_i, m1, m2, 'euclidean')
+    # t2 = Approx_bin(X_nA_y, B_i, m1, m2, 'manhattan')
+    # t3 = Approx_bin(X_nA_y, B_i, m1, m2, 'chebyshev')
+    # t4 = Approx_bin(X_nA_y, B_i, m1, m2, 'minkowski')
+    # t5 = Approx_bin(X_nA_y, B_i, m1, m2, 'cos_sim')
 
     n2 = Approx(X_nA_y, B_i, idx, m1, m2)
     n3 = Direct(X_nA_y, idx)
@@ -226,10 +235,8 @@ def approx_part4_drt(X_nA_y, A_i, idx, m1, m2):
 
     assert n1[0] >= n3[0][0] and n2[0] >= n3[0][0]
     assert check_equal(n3[0], n4[0]) and check_equal(n3[0], n5[0])
-    assert all([i >= j for i, j in zip(t6[0], n4[0])])
-    assert all([i >= j for i, j in zip(t1[0], n4[0])])
-
-    pdb.set_trace()
+    assert poset_nolessthan(t6[0], n4[0])
+    assert poset_nolessthan(t1[0], n4[0])
     return
 
 
@@ -284,7 +291,220 @@ def test_internal():
     indices = [[A[:, i] == j + 1 for j in range(
         nai)] for i in range(na)]
 
-    # dist_direct_part2(X_nA_y, A, indices)
-    # dist_direct_part3(X_nA_y, A, indices)
+    dist_direct_part2(X_nA_y, A, indices)
+    dist_direct_part3(X_nA_y, A, indices)
     dist_direct_part4(X_nA_y, A, indices)
+    return
+
+
+def dist_approx_part5(X_nA_y, A, indices):
+    from hfm.manf.dist_external import orthogonal_weight
+    from hfm.dist_est_nonbin import orthogonal_weight as weight
+    n_d = X_nA_y.shape[1] - 1
+    tt = orthogonal_weight(n_d, n_e=3)
+    vec_w = orthogonal_weight(n_d, n_e=3)
+    tmp = weight(n_d, n_e=3)
+    assert check_equal([np.dot(tmp[0][0], tmp[0][1]),
+                        np.dot(vec_w[0], vec_w[1]),
+                        np.dot(tt[0], tt[1])], 0.)
+    return
+
+
+def approx_part5_drt(X_nA_y, A_i, idx_Sjs, m1, m2, n_e=3):
+    from hfm.manf.dist_internal import Direct_nonbin
+    from hfm.manf.dist_external import Approx_nonbin
+    from hfm.dist_est_nonbin import ApproxDist_nonbin as Approx
+    from hfm.dist_drt import DirectDist_nonbin as Direct
+
+    n1 = Approx(X_nA_y, A_i, m1, m2, n_e)
+    n2 = Approx(X_nA_y, A_i, m1, m2, n_e)
+    t6 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'euclidean')
+
+    t1 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'euclidean')
+    # t2 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'manhattan')
+    # t3 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'chebyshev')
+    # t4 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'minkowski')
+    # t5 = Approx_nonbin(X_nA_y, A_i, m1, m2, n_e, 'cos_sim')
+
+    alt = [idx_Sjs[0], ~idx_Sjs[0]]
+    n5 = Direct_nonbin(X_nA_y, (A_i == 1).astype('int'), 1, alt, 'euclidean')
+    n3 = Direct(X_nA_y, alt)
+    n4 = Direct(X_nA_y, idx_Sjs)
+    n6 = Direct_nonbin(X_nA_y, A_i, 1, idx_Sjs, 'euclidean')
+
+    assert poset_nolessthan(t1[0], n6[0])
+    assert check_equal(n4[0], n6[0])
+    assert check_equal(n3[0], n5[0])
+    assert poset_nolessthan(n1[0], n4[0])
+    assert poset_nolessthan(n2[0], n4[0])
+    return
+
+
+def approx_part5_app(X_nA_y, A, indices, m1, m2, n_e=3):
+    from hfm.manf.dist_internal import Direct_multiver
+    from hfm.manf.dist_external import Extend_multiver
+    from hfm.dist_est_nonbin import ExtendDist_multiver_mp as Extend
+    from hfm.dist_drt import DirectDist_multiver as Direct
+
+    n1 = Extend(X_nA_y, A, m1, m2, n_e)
+    n2 = Extend(X_nA_y, A, m1, m2, n_e)
+    t6 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'euclidean')
+
+    t1 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'euclidean')
+    # t2 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'manhattan')
+    # t3 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'chebyshev')
+    # t4 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'minkowski')
+    # t5 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'cos_sim')
+
+    n3 = Direct(X_nA_y, indices)
+    n4 = Direct(X_nA_y, indices)
+    n5 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
+    n6 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
+    # pdb.set_trace()
+
+    assert poset_nolessthan(n1[0][:2], n3[0][:2])
+    assert poset_nolessthan(n2[0][:2], n4[0][:2])
+    assert check_equal(n3[0][:2], n5[0][:2])
+    assert check_equal(n4[0][:2], n6[0][:2])
+    assert poset_nolessthan(t6[0], n5[0][:2])
+    assert poset_nolessthan(t1[0], n6[0][:2])
+    return
+
+
+def approx_part5_sub(X_nA_y, A_i, idx_Sjs, m2, vec_w):
+    from hfm.manf.dist_external import (
+        cvg_accelerator_smaler, cvg_accelerator_larger)
+    # from hfm.manf.dist_internal import projector
+    # from hfm.manf.dist_internal import sub_accelerator_smaler as smaler
+    # from hfm.manf.dist_internal import sub_accelerator_larger as larger
+    from hfm.dist_est_nonbin import sub_accelerator_smaler as smaler
+    from hfm.dist_est_nonbin import sub_accelerator_larger as larger
+
+    proj = X_nA_y @ vec_w
+    idx_y_fx = np.argsort(proj)
+    i = 11
+    alt = (A_i == 1).astype('int')
+    n3 = smaler(X_nA_y, A_i, idx_y_fx, i, m2)
+    n4 = larger(X_nA_y, A_i, idx_y_fx, i, m2)
+    n1 = smaler(X_nA_y, alt, idx_y_fx, i, m2)  # , 0)
+    n2 = larger(X_nA_y, alt, idx_y_fx, i, m2)  # , 0)
+    assert isinstance(n3, float) and isinstance(n4, float)
+
+    t1 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 0)
+    # t2 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 1)
+    # t3 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 2)
+    # t4 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 3)
+    # t5 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 4)
+    # t6 = cvg_accelerator_smaler(X_nA_y, proj, alt, idx_y_fx, i, 5)
+    assert check_equal(n1, t1[0]) or n1 >= t1[0]
+    # assert check_equal(t1[1], [i[1] for i in [t2, t3, t4, t5, t6]])
+
+    t1 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 0)
+    # t2 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 1)
+    # t3 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 2)
+    # t4 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 3)
+    # t5 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 4)
+    # t6 = cvg_accelerator_larger(X_nA_y, proj, alt, idx_y_fx, i, 5)
+    assert check_equal(n2, t1[0]) or n2 >= t1[0]
+
+    t7 = cvg_accelerator_smaler(X_nA_y, proj, A_i, idx_y_fx, i, 0)
+    assert check_equal(n3, t7[0]) or n3 >= t7[0]
+    t7 = cvg_accelerator_larger(X_nA_y, proj, A_i, idx_y_fx, i, 0)
+    assert check_equal(n3, t7[0]) or n3 >= t7[0]
+    return
+
+
+def conver_part6_drt(X_nA_y, A_i, idx_Sjs, n_e=3):
+    from hfm.manf.dist_internal import Direct_nonbin
+    from hfm.manf.dist_external import StratES_nonbin, StratRA_nonbin
+    from hfm.dist_cvg_nonbin import ApproxDist_nonbin as Approx
+    from hfm.dist_drt import DirectDist_nonbin as Direct
+
+    n1 = Approx(X_nA_y, A_i, n_e)
+    n2 = Approx(X_nA_y, A_i, n_e)
+
+    # alt = [idx_Sjs[0], ~idx_Sjs[0]]
+    # n5 = Direct_nonbin(X_nA_y, (A_i == 1).astype('int'), 1, alt, 'euclidean')
+    # n3 = Direct(X_nA_y, alt)
+    n4 = Direct(X_nA_y, idx_Sjs)
+    n6 = Direct_nonbin(X_nA_y, A_i, 1, idx_Sjs, 'euclidean')
+    assert check_equal(n4[0], n6[0])
+    assert poset_nolessthan(n1[0], n4[0])
+    assert poset_nolessthan(n2[0], n4[0])
+
+    t7 = StratES_nonbin(X_nA_y, A_i, n_e, 'euclidean')
+    t1 = StratES_nonbin(X_nA_y, A_i, n_e, 'euclidean')
+    # t2 = StratES_nonbin(X_nA_y, A_i, n_e, 'manhattan')
+    # t3 = StratES_nonbin(X_nA_y, A_i, n_e, 'chebyshev')
+    # t4 = StratES_nonbin(X_nA_y, A_i, n_e, 'minkowski')
+    # t5 = StratES_nonbin(X_nA_y, A_i, n_e, 'cos_sim')
+    # t6 = StratES_nonbin(X_nA_y, A_i, n_e, 'correla')
+    assert check_equal(t1[0], n6[0])
+
+    m1, m2 = 20, 8
+    t7 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'euclidean')
+    t1 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'euclidean')
+    # t2 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'manhattan')
+    # t3 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'chebyshev')
+    # t4 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'minkowski')
+    # t5 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'cos_sim')
+    # t6 = StratRA_nonbin(X_nA_y, A_i, m1, m2, n_e, 'correla')
+    assert poset_nolessthan(t1[0], n6[0])
+
+    assert isinstance(t7[-1], float)  # pdb.set_trace()
+    return
+
+
+def conver_part6_app(X_nA_y, A, indices, m1, m2, n_e):
+    from hfm.manf.dist_external import EffExact_multiver
+    from hfm.manf.dist_internal import Direct_multiver
+    from hfm.dist_drt import DirectDist_multiver as Direct
+    from hfm.dist_cvg_nonbin import EffExact as Extend
+
+    from hfm.dist_cvg_nonbin import StratVacant as SV1
+    from hfm.dist_cvg_nonbin import StratEarlyStop as SES
+    from hfm.dist_cvg_nonbin import StratRearrange as SRA
+    n1 = Extend(X_nA_y, A, SV1, m1, m2, n_e)
+    # t7 = EffExact_multiver(X_nA_y, A, 'Vacant', m1, m2, n_e)
+
+    t1 = EffExact_multiver(X_nA_y, A, 'Vacant', m1, m2, n_e, 'euclidean')
+    n4 = Direct(X_nA_y, indices)
+    n6 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
+    assert check_equal(n4[0][:2], n6[0][:2])
+    assert poset_nolessthan(t1[0][:2], n6[0][:2])
+    assert poset_nolessthan(n1[0][:2], n4[0][:2])
+
+    n2 = Extend(X_nA_y, A, SES, m1, m2, n_e)
+    t2 = EffExact_multiver(X_nA_y, A, 'StratES', m1, m2, n_e, 'euclidean')
+    assert check_equal(t2[0][:2], n6[0][:2])
+    assert check_equal(n2[0][:2], n6[0][:2])
+    n3 = Extend(X_nA_y, A, SRA, m1, m2, n_e)
+    t3 = EffExact_multiver(X_nA_y, A, 'StratRA', m1, m2, n_e, 'euclidean')
+    assert poset_nolessthan(t3[0][:2], n6[0][:2])
+    assert poset_nolessthan(n3[0][:2], n6[0][:2])
+    return
+
+
+def test_external():
+    n, nd = 324, 17
+    nc = na = nai = 2
+    nai = 3
+    X = np.random.rand(n, nd) * 10
+    y = np.random.randint(nc, size=n)  # binary classification
+    A = np.random.randint(nai, size=(n, na)) + 1
+    X_nA_y = np.concatenate([y.reshape(-1, 1), X], axis=1)
+    indices = [[A[:, i] == j + 1 for j in range(
+        nai)] for i in range(na)]
+
+    dist_approx_part5(X_nA_y, y, indices)
+    m1, m2, n_e = 20, 8, 3
+    approx_part5_drt(X_nA_y, A[:, 1], indices[1], m1, m2, n_e)
+    approx_part5_app(X_nA_y, A, indices, m1, m2, n_e)
+
+    from hfm.manf.dist_internal import weight_generator
+    vec_w = weight_generator(n_d=nd)
+    # approx_part5_sub(X_nA_y, A[:, 1], indices[1], m2, vec_w)
+
+    conver_part6_drt(X_nA_y, A[:, 1], indices[1], n_e)
+    conver_part6_app(X_nA_y, A, indices, m1, m2, n_e)
     return

@@ -26,6 +26,7 @@ def default_parameters():
     parser.add_argument(
         '--omit', action='store_false', help='--omitted')
     parser.add_argument('-rev', '--revision', action='store_true')
+    parser.add_argument('-cvg', '--converge', type=str, default='')
 
     parser.add_argument('-m1', '--m1-chosen', type=int, default=25)
     parser.add_argument('-m2', '--m2-chosen', type=int, default=11)
@@ -75,6 +76,16 @@ data_type = args.dataset
 
 kwargs = {}
 kwargs['prep'] = args.data_preprocessing
+
+
+if args.converge:
+    kwargs['m1'] = args.m1_chosen
+    kwargs['m2'] = args.m2_chosen
+    kwargs['n_e'] = args.n_e_chosen
+    kwargs['m2_fixed'] = args.fix
+    kwargs['ratio'] = .97
+
+    sys.exit()
 
 
 if args.revision:
@@ -223,4 +234,9 @@ python hfm_nonbin_exec.py -rev -exp rept_exhp5a -dat * -nk 2 -m1 20
 python hfm_nonbin_exec.py -rev -exp rept_exhp5b -dat * -nk 2 -m2 8
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9h -pre min_max -dat adult -nk 5 --nb-cls 7 -rep # -mp 0
 python hfm_nonbin_exec.py -rev -exp mCV_rexp9i -pre min_max -dat ricci -nk 2 --nb-cls 3 -rep -mp 0
+"""
+
+
+# 4converage
+"""
 """
