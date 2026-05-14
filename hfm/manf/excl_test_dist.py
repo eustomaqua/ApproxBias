@@ -5,6 +5,10 @@ import pdb
 from hfm.utils.verifiers import check_equal, poset_nolessthan
 
 
+# -------------------------------------
+# dist_internal.py
+
+
 def dist_vector(ele_i, ele_ic):
     from hfm.manf.dist_internal import (
         dist_Euclidean, dist_Manhattan, dist_Chebyshev, dist_Minkowski,
@@ -297,6 +301,10 @@ def test_internal():
     return
 
 
+# -------------------------------------
+# dist_external.py
+
+
 def dist_approx_part5(X_nA_y, A, indices):
     from hfm.manf.dist_external import orthogonal_weight
     from hfm.dist_est_nonbin import orthogonal_weight as weight
@@ -508,3 +516,7 @@ def test_external():
     conver_part6_drt(X_nA_y, A[:, 1], indices[1], n_e)
     conver_part6_app(X_nA_y, A, indices, m1, m2, n_e)
     return
+
+
+# -------------------------------------
+# distance_test.py

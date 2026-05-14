@@ -10,6 +10,7 @@ import sys
 from experiment.df_nonbin.mext_sim import (
     ManfExtEmpirical, ManfExtPrime_Empirical)
 from experiment.df_nonbin.rev_mext_sim import Rev_ManfExtPrime_Empir
+from experiment.df_zip.mcvg_sim import ManfCvgPrime  # ManfCvgEmpir,
 
 
 def default_parameters():
@@ -26,7 +27,9 @@ def default_parameters():
     parser.add_argument(
         '--omit', action='store_false', help='--omitted')
     parser.add_argument('-rev', '--revision', action='store_true')
+
     parser.add_argument('-cvg', '--converge', type=str, default='')
+    parser.add_argument('-np', '--n_p_chosen', type=int, default=3)
 
     parser.add_argument('-m1', '--m1-chosen', type=int, default=25)
     parser.add_argument('-m2', '--m2-chosen', type=int, default=11)
@@ -82,9 +85,14 @@ if args.converge:
     kwargs['m1'] = args.m1_chosen
     kwargs['m2'] = args.m2_chosen
     kwargs['n_e'] = args.n_e_chosen
+    kwargs['n_p'] = args.n_p_chosen
     kwargs['m2_fixed'] = args.fix
     kwargs['ratio'] = .97
 
+    kwargs['nb_cv'] = args.nb_iter
+    kwargs['screen'] = args.screen
+    kwargs['logged'] = args.logged
+    case = ManfCvgPrime(trial_type, data_type, **kwargs)
     sys.exit()
 
 
@@ -239,4 +247,5 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9i -pre min_max -dat ricci -nk 2 --n
 
 # 4converage
 """
+python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV -dat ricci -nk 2|1
 """
