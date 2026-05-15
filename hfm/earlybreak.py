@@ -9,8 +9,10 @@
 
 import numpy as np
 import numba
+from numba import njit
 from hfm.dist_drt import DistDirect_Euclidean
 from hfm.utils.decorators import fantasy_timer
+from hfm.utils.verifiers import INF64
 
 
 # ==========================================
@@ -24,7 +26,7 @@ from hfm.utils.decorators import fantasy_timer
 def NaiveHDD(A, B):
     cmax = 0
     for ele_x in A:
-        cmin = float(np.finfo(np.float32).max)
+        cmin = INF64  # float(np.finfo(np.float32).max)
         for ele_y in B:
             d = DistDirect_Euclidean(ele_x, ele_y)
             if d < cmin:
@@ -39,23 +41,39 @@ def NaiveHDD(A, B):
 # Algorithm 3. RANDOMIZE
 # Finds a random order of a given point set
 
+# def HDD_randomize(S):
+#     m = len(S)
+#     ind = list(range(m))
+#     for p in range(m):
+#         q = np.random.choice(ind)
+#         if q == p:
+#             continue
+#         tmp = ind[p]
+#         ind[p] = ind[q]
+#         ind[q] = tmp
+#     return ind
+
+@njit
 def HDD_randomize(S):
     m = len(S)
-    ind = list(range(m))
+    ind = np.arange(m)
     for p in range(m):
-        q = np.random.choice(ind)
+        # 在 [0,m) 中随机选一个 q
+        q = np.random.randint(0, m)
         if q == p:
             continue
+        # 交换 ind[p], ind[q]
         tmp = ind[p]
         ind[p] = ind[q]
         ind[q] = tmp
-    return ind
+    return ind  # list(ind)
 
 
 # Algorithm 2. EARLYBREAK
 # Computes the directed HDD using the Early Break technique and
 # the Random Sampling
 
+@njit
 def HDD_earlybreak(A, B):
     cmax = 0
     Er_ind = HDD_randomize(A)
@@ -64,7 +82,7 @@ def HDD_earlybreak(A, B):
     Br = B[Br_ind]
 
     for ele_x in Er:
-        cmin = float(np.finfo(np.float32).max)
+        cmin = INF64  # float(np.finfo(np.float32).max)
         for ele_y in Br:
             d = DistDirect_Euclidean(ele_x, ele_y)
             if d < cmin:

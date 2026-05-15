@@ -5,12 +5,12 @@ from numba import njit, prange
 import math
 import pdb
 from hfm.utils.decorators import fantasy_timer
-from hfm.utils.verifiers import CONST_ZERO, INF64  # DTY_FLT,
+from hfm.utils.verifiers import CONST_ZERO, INF64, DTY_FLT
 
 from hfm.manf.dist_internal import (
     name_intermediate, alter_intermediate,  # projector,
-    sub_accelerator_smaler, sub_accelerator_larger,
-    AcceleCore_bin,)
+    # sub_accelerator_smaler, sub_accelerator_larger,
+    AcceleCore_bin, _sub_accelerator_dir)
 
 
 # ------------------------------------------
@@ -24,7 +24,7 @@ def AcceleCore_nonbin(X_nA_y, A_j, m2, vec_w, func=0, p=3):
     idx_y_fx = np.argsort(proj)
     n = X_nA_y.shape[0]  # number of instances
 
-    d_min = np.empty(n)  # d_min = []
+    d_min = np.empty(n, dtype=DTY_FLT)  # d_min = []
     for i in range(n):
         # Set the anchor data point (xi,yi) in this round
         min_js = sub_accelerator_smaler(
@@ -39,30 +39,30 @@ def AcceleCore_nonbin(X_nA_y, A_j, m2, vec_w, func=0, p=3):
     return d_min  # 4convergence
 
 
-@njit
-def _sub_accelerator_dir(X_yfx, A, idx_y_fx, pos, m2,
-                         func, p, direction):
-    i_anch = idx_y_fx[pos]  # anchor's location after projection
-    A_anchor = A[i_anch]
-    X_yfx_anch = X_yfx[i_anch]
-    n = X_yfx.shape[0]
-    # Compute the distance d(anchor,\cdot) for at most m2 nearby
-    # data points that meets a!=ai and g()?g(xi,yi;w)
-    num_j, min_js_jr = 0, INF64  # count,best
-    j = pos + direction  # doesn't have to be compared with anchor
-    while (num_j < m2) and (0 <= j < n):
-        idx_j = idx_y_fx[j]
-        if A_anchor == A[idx_j]:  # set_belonging
-            j += direction
-            continue
-
-        curr = alter_intermediate(X_yfx_anch, X_yfx[idx_j], func, p)
-        # Find the minimum among them, recorded as d_min
-        if curr < min_js_jr:
-            min_js_jr = curr
-        num_j += 1
-        j += direction
-    return min_js_jr
+# @njit
+# def _sub_accelerator_dir(X_yfx, A, idx_y_fx, pos, m2,
+#                          func, p, direction):
+#     i_anch = idx_y_fx[pos]  # anchor's location after projection
+#     A_anchor = A[i_anch]
+#     X_yfx_anch = X_yfx[i_anch]
+#     n = X_yfx.shape[0]
+#     # Compute the distance d(anchor,\cdot) for at most m2 nearby
+#     # data points that meets a!=ai and g()?g(xi,yi;w)
+#     num_j, min_js_jr = 0, INF64  # count,best
+#     j = pos + direction  # doesn't have to be compared with anchor
+#     while (num_j < m2) and (0 <= j < n):
+#         idx_j = idx_y_fx[j]
+#         if A_anchor == A[idx_j]:  # set_belonging
+#             j += direction
+#             continue
+#
+#         curr = alter_intermediate(X_yfx_anch, X_yfx[idx_j], func, p)
+#         # Find the minimum among them, recorded as d_min
+#         if curr < min_js_jr:
+#             min_js_jr = curr
+#         num_j += 1
+#         j += direction
+#     return min_js_jr
 
 
 @njit
@@ -73,7 +73,7 @@ def AcceleCoreBack(X_nA_y, A_j, m2, vec_w, func=0, p=3):
     n = X_nA_y.shape[0]
 
     # dt_min = np.full(n, np.inf, dtype=DTY_FLT)
-    dt_min = np.empty(n)
+    dt_min = np.empty(n, dtype=DTY_FLT)
     for pos in range(n):
         i = idx_y_fx[pos]  # original/initial sample id
         # before pos<>i # dt_min[pos] = d_min[i]
@@ -148,8 +148,8 @@ def orthogonal_weight(n_d, n_e=3):
 @njit(parallel=True)
 def Approx_nonbin_sub(X_nA_y, A_j, m1, m2, n_e, func_id, p):
     n, n_d = X_nA_y.shape  # n_d-1: number of non-sen-att(s)
-    d_max = np.empty(m1)
-    d_avg = np.empty(m1)
+    d_max = np.empty(m1, dtype=DTY_FLT)
+    d_avg = np.empty(m1, dtype=DTY_FLT)
     # d_max, d_avg = [], []
     for k in prange(m1):
         # Take two orthogonal vectors $w_0$ and $w_1$ where each $w_k
@@ -160,8 +160,8 @@ def Approx_nonbin_sub(X_nA_y, A_j, m1, m2, n_e, func_id, p):
         # tmp = [AcceleCore_bin(X_nA_y, A_j, m2, W[i]) for i in range(n_e)]
         # #  tmp, _ = zip(*tmp)
         # t_max, t_avg = zip(*tmp)
-        t_max = np.full(n_e, np.inf)  # np.empty(n_e)
-        t_avg = np.full(n_e, np.inf)  # np.empty(n_e)
+        t_max = np.empty(n_e, dtype=DTY_FLT)  # np.full(n_e, np.inf)
+        t_avg = np.empty(n_e, dtype=DTY_FLT)  # np.full(n_e, np.inf)
         for j in range(n_e):
             mx, sm = AcceleCore_bin(X_nA_y, A_j, m2, W[j], func_id, p)
             t_max[j] = mx  # tmp[0]
@@ -255,12 +255,12 @@ def _cvg_accelerator_dir(X_yfx, proj, Ai, idx_y_fx, i, func, p,
             continue
 
         # tmp = (proj[idx_j] - g_anchor) * direction
-        tmp = g_anchor - proj[
-            idx_j] if direction < 0 else proj[idx_j] - g_anchor
-        # if direction < 0:
-        #     tmp = g_anchor - proj[idx_j]
-        # else:
-        #     tmp = proj[idx_j] - g_anchor
+        # tmp = g_anchor - proj[
+        #     idx_j] if direction < 0 else proj[idx_j] - g_anchor
+        if direction < 0:
+            tmp = g_anchor - proj[idx_j]
+        else:
+            tmp = proj[idx_j] - g_anchor
 
         if abs(tmp) >= min_j_sr:
             break
@@ -335,7 +335,7 @@ def _StratES_subproc(X_nA_y, A_j, vec_w, func, p):
     idx_y_fx = np.argsort(proj)
     n = X_nA_y.shape[0]  # number of instances
 
-    d_min = np.empty(n)  # []
+    d_min = np.empty(n, dtype=DTY_FLT)  # []
     for i in prange(n):
         # Set the anchor data point (xi,yi) in this round
         # min_js, _ = cvg_accelerator_smaler(
@@ -365,8 +365,8 @@ def _StratES_core(X_nA_y, A_j, n_e, func_id, p):
     # t_max, t_avg = zip(*tmp)
     # return min(t_max), min(t_avg) / float(n)
 
-    t_max = np.empty(n_e)
-    t_avg = np.empty(n_e)
+    t_max = np.empty(n_e, dtype=DTY_FLT)
+    t_avg = np.empty(n_e, dtype=DTY_FLT)
     for k in range(n_e):
         mx, sm = _StratES_subproc(X_nA_y, A_j, W[k], func_id, p)
         t_max[k] = mx
@@ -385,7 +385,7 @@ def StratES_nonbin(X_nA_y, A_j, n_e=2, func='euclidean', p=3):
 def reduce_min_axis0(arr):
     # def np_min_2d(arr, axis=0):
     m, n = arr.shape
-    out = np.empty(n)
+    out = np.empty(n, dtype=DTY_FLT)
     for j in range(n):
         # mn = arr[0, j]
         # for i in range(1, m):
@@ -399,7 +399,7 @@ def reduce_min_axis0(arr):
 @njit(parallel=True)
 def _StratRA_core(X_nA_y, A_j, m1, m2, n_e, func, p):
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
-    dt_min = np.empty((m1, n))  # []
+    dt_min = np.empty((m1, n), dtype=DTY_FLT)  # []
     for v in prange(m1):
         # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
         W = orthogonal_weight(n_d, n_e)
@@ -408,7 +408,7 @@ def _StratRA_core(X_nA_y, A_j, m1, m2, n_e, func, p):
         # tmp = list(zip(*tmp))  # (n_e,n) --> (n,n_e)
         # dt_min.append([min(i) for i in tmp])
 
-        tmp = np.empty((n_e, n))
+        tmp = np.empty((n_e, n), dtype=DTY_FLT)
         for k in range(n_e):
             tmp[k] = AcceleCoreBack(X_nA_y, A_j, m2, W[k], func, p)
         # dt_min[v] = np.min(tmp, axis=0)  # tmp.min(axis=0)

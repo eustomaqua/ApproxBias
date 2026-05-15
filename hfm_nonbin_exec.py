@@ -7,6 +7,7 @@
 
 import argparse
 import sys
+import pdb
 from experiment.df_nonbin.mext_sim import (
     ManfExtEmpirical, ManfExtPrime_Empirical)
 from experiment.df_nonbin.rev_mext_sim import Rev_ManfExtPrime_Empir
@@ -90,9 +91,13 @@ if args.converge:
     kwargs['ratio'] = .97
 
     kwargs['nb_cv'] = args.nb_iter
+    if trial_type[-5:] in ('cvg1c',):
+        kwargs['rep'] = args.rep  # _iter  # True
+        kwargs['gen'] = args.gen  # _iter  # False
     kwargs['screen'] = args.screen
     kwargs['logged'] = args.logged
     case = ManfCvgPrime(trial_type, data_type, **kwargs)
+    case.trial_one_process()
     sys.exit()
 
 
@@ -247,5 +252,6 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9i -pre min_max -dat ricci -nk 2 --n
 
 # 4converage
 """
-python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV -dat ricci -nk 2|1
+python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 1
+python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 2 -rep
 """

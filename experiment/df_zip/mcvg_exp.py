@@ -57,36 +57,135 @@ class DistPerformance:
         self._omit = omitted  # pass
         self._priv_val = priv_val
 
-    def subproc_core_alt(self, X_yfx, A_j, idx_Sjs, m1, m2, n_e,
-                         n_p=3, func='euclidean', priv_val=1):
-
-        return
+    # def subproc_core_alt(self, X_yfx, A_j, idx_Sjs, m1, m2, n_e,
+    #                      n_p=3, func='euclidean', priv_val=1):
+    #     non_sa = idx_Sjs[0]
+    #     B_j = (A_j == priv_val).astype(DTY_INT)
+    #     t1 = Direct_bin(X_yfx, B_j, priv_val, non_sa, func, n_p)
+    #     t2 = Direct_nonbin(X_yfx, B_j, priv_val, [non_sa, ~non_sa], func, n_p)
+    #     t3 = Direct_nonbin(X_yfx, A_j, priv_val, [non_sa, ~non_sa], func, n_p)
+    #     t4 = Direct_bin(X_yfx, A_j, priv_val, non_sa, func, n_p)
+    #     t5 = Direct_nonbin(X_yfx, A_j, priv_val, idx_Sjs, func, n_p)
+    #     pdb.set_trace()
+    #     return
+    #
+    # def subproc_core_sup(self, X_yfx, A, indices, m1, m2, n_e,
+    #                      n_p=3, func='euclidean', priv_val=1):
+    #     # alt = Direct_multiver(X_yfx, A, priv_val, [
+    #     #     [idx[0], ~idx[0]] for idx in indices], func, n_p)
+    #     tmp = Direct_multiver(X_yfx, A, priv_val, indices, func, n_p)
+    #     pdb.set_trace()
+    #     return
 
 
 class cvgExp1C_take(DistPerformance):
-    def schedule_content(self, X, A, y_fx, g1m_indices, m1, m2, n_e, n_p):
+    def schedule_content(self, X, A, y_fx, g1m_indices, m1, m2, n_e, n_p,
+                         func='euclidean'):
         X_yfx = np.concatenate([
             y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+        n_a = len(g1m_indices)     # A.shape[1]
+        # priv_val = set(self._priv_val).pop()
+        # res_wh = []
+        # res_sa = {0: [], 1: []}
+        # res_tim = {'wh': [], 0: [], 1: []}
+        res_tmp = {'wh': {'max': [], 'avg': [], 'tim': []},
+                   0: {'max': [], 'avg': [], 'tim': []},
+                   1: {'max': [], 'avg': [], 'tim': []}}
 
-        func = 'euclidean'
-        non_sa = g1m_indices[0][0]  # idx_Sjs[0]  # .astype(DTY_INT)
-        (Ds, Ds_avg), t_Ds = Direct_bin(X_yfx, A_j, priv_val, non_sa, func, n_p)
-        t1 = Direct_nonbin(X_yfx, non_sa.astype(DTY_INT), priv_val, [non_sa, ~non_sa], func, n_p)
-        t2 = Direct_nonbin(X_yfx, A_j, priv_val, idx_Sjs, func, n_p)
-        # Approx_bin()
-        pdb.set_trace()
-        return
+        non_sa = g1m_indices[0][0]
+        (Ds, Ds_avg, half_tmp), t_Ds = Direct_multiver(
+            X_yfx, A, self._priv_val, g1m_indices, func, n_p)
+        # half_tmp = list(zip(*half_tmp))
+        # res_wh.extend([Ds, Ds_avg, t_Ds])
+        res_tmp['wh']['max'].append(Ds)
+        res_tmp['wh']['avg'].append(Ds_avg)
+        res_tmp['wh']['tim'].append(t_Ds)
+        for i in range(n_a):
+            # res_sa[i].extend(half_tmp[i])
+            res_tmp[i]['max'].append(half_tmp[0][i])
+            res_tmp[i]['avg'].append(half_tmp[1][i])
+            res_tmp[i]['tim'].append(half_tmp[2][i])
+        if n_a == 1:
+            # res_sa[1].extend([''] * 3)
+            res_tmp[1]['max'].append('')
+            res_tmp[1]['avg'].append('')
+            res_tmp[1]['tim'].append('')
+
+        (Ds, half_tmp), t_Ds = EffHD_multivar(X_yfx, g1m_indices)
+        res_tmp['wh']['max'].append(Ds)
+        res_tmp['wh']['tim'].append(t_Ds)
+        for i in range(n_a):
+            res_tmp[i]['max'].append(half_tmp[0][i])
+            res_tmp[i]['tim'].append(half_tmp[1][i])
+        if n_a == 1:
+            res_tmp[1]['max'].append('')
+            res_tmp[1]['tim'].append('')
+
+        for Strat in ['Vacant', 'StratES', 'StratRA']:
+            (Ds, Ds_avg, half_tmp), t_Ds = EffExact_multiver(
+                X_yfx, A, Strat, m1, m2, n_e, func, n_p)
+            # half_tmp = list(zip(*half_tmp))
+            res_tmp['wh']['max'].append(Ds)
+            res_tmp['wh']['avg'].append(Ds_avg)
+            res_tmp['wh']['tim'].append(t_Ds)
+            for i in range(n_a):
+                res_tmp[i]['max'].append(half_tmp[0][i])
+                res_tmp[i]['avg'].append(half_tmp[1][i])
+                res_tmp[i]['tim'].append(half_tmp[2][i])
+            if n_a == 1:
+                res_tmp[1]['max'].append('')
+                res_tmp[1]['avg'].append('')
+                res_tmp[1]['tim'].append('')
+
+        res_curr = {  # (3+2+3*3)*3 =(5+9)*3 =14*3=42
+            'max': res_tmp['wh']['max'] + res_tmp[0]['max'] + res_tmp[1]['max'],
+            'avg': res_tmp['wh']['avg'] + res_tmp[0]['avg'] + res_tmp[1]['avg'],
+            'tim': res_tmp['wh']['tim'] + res_tmp[0]['tim'] + res_tmp[1]['tim']}
+        # if func in ['cos_sim', 'correla']:
+        #     pdb.set_trace()
+        return res_curr['tim'] + res_curr['max'] + res_curr['avg']
+
+    def prepare_trial(self):
+        csv_row_1 = unique_column(10 + 42)
+        csv_r2c = ['tim'] + [''] * 14 + ['d^max'] + [''] * 14 + ['d^avg'] + [''] * 11
+        csv_r3c = ['wh'] + [''] * 4 + ['sa#1'] + [''] * 4 + ['sa#2'] + [''] * 4 + [
+            'wh'] + [''] * 4 + ['sa#1'] + [''] * 4 + ['sa#2'] + [''] * 4 + [
+            'wh'] + [''] * 3 + ['sa#1'] + [''] * 3 + ['sa#2'] + [''] * 3
+        csv_r4c = ['Direct_multiver', 'EarlyBreak', 'ExtendDist',
+                   'ExactDist(StratES)', 'ExactDist(StratRA)'] + [
+            'Direct_nonbin', 'EarlyBreak', 'Approx_nonbin', 'StratES', 'StratRA'
+        ] * 2 + ['Direct_multiver', 'EarlyBreak', 'ExtendDist',
+                 'ExactDist(StratES)', 'ExactDist(StratRA)'] + [
+            'Direct_nonbin', 'EarlyBreak', 'Approx_nonbin', 'StratES', 'StratRA'
+        ] * 2 + ['Direct_multiver', 'ExtendDist', 'ExactDist(StratES)',
+                 'ExactDist(StratRA)'] + [
+            'Direct_nonbin', 'Approx_nonbin', 'StratES', 'StratRA'] * 2
+        csv_r2c[-1] = '[END]'
+        csv_r3c[-1] = '[END]'
+        return csv_row_1, csv_r2c, csv_r3c, csv_r4c
+
+
+# class cvgExp1D_take(DistPerformance):
+#     def schedule_content(self, X, A, y_fx, g1m_indices, m1, m2, n_e, n_p,
+#                          func='euclidean'):
+#         X_yfx = np.concatenate([
+#             y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
+#         n_a = len(g1m_indices)
+#         # priv_val = set(self._priv_val).pop()
+#
+#         pdb.set_trace()
+#         return
 
 
 class cvgExp1A_anal(DistPerformance):
     _m2_set = list(range(2, 14, 1))  # not 23, len=12
 
-    def schedule_content(self, X, A, y_fx, g1m_indices, m1, n_e, n_p):
+    def schedule_content(self, X, A, y_fx, g1m_indices, m1, n_e, n_p, func):
         X_yfx = np.concatenate([
             y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         n_l, n_a = len(self._m2_set), len(g1m_indices)
 
-        self.subproc_core_alt(X_yfx, A[:, 0], g1m_indices[0], m1, 4, n_e, n_p, 'euclidean', self._priv_val[0])
+        self.subproc_core_alt(X_yfx, A[:, 0], g1m_indices[0], m1, 4, n_e, n_p, func, self._priv_val)
         return
 
     # def subproc_core_alt(self, X_yfx, A_j, non_sa, m1, n_e, n_l,
@@ -97,7 +196,7 @@ class cvgExp1A_anal(DistPerformance):
 class cvgExp1B_anal(DistPerformance):
     _m1_set = list(range(3, 34, 2))  # not 50, len=16
 
-    def schedule_content(self, X, A, y_fx, g1m_indices, m2, n_e, n_p):
+    def schedule_content(self, X, A, y_fx, g1m_indices, m2, n_e, n_p, func):
         X_y_fx = np.concatenate([
             y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         n_l, n_a = len(self._m1_set), len(g1m_indices)
