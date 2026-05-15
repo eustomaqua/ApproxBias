@@ -9,8 +9,8 @@ def test_case():
     logger = None
     kw = dict(prep='min_max', nb_cv=1)  # 2)
     # kw['prep'] = 'none'
-    trial_type = 'mCV_may12_cvg1c'  # 1c|d
-    data_type = 'german'            # 'ricci'
+    trial_type = 'mCV_may12_cvg1a'  # 1c|d
+    data_type = 'ricci'             # 'german'
 
     # cs = ManfCvgEmpir(trial_type, data_type, **kw)
     cs = ManfCvgPrime(trial_type, data_type, **kw)

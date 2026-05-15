@@ -87,13 +87,14 @@ if args.converge:
     kwargs['m2'] = args.m2_chosen
     kwargs['n_e'] = args.n_e_chosen
     kwargs['n_p'] = args.n_p_chosen
-    kwargs['m2_fixed'] = args.fix
     kwargs['ratio'] = .97
 
     kwargs['nb_cv'] = args.nb_iter
-    if trial_type[-5:] in ('cvg1c',):
-        kwargs['rep'] = args.rep  # _iter  # True
-        kwargs['gen'] = args.gen  # _iter  # False
+    if trial_type[-5:] in ('cvg1c', 'cvg1a', 'cvg1b'):
+        kwargs['rep'] = args.rep   # _iter  # True
+        kwargs['gen'] = args.gen   # _iter  # False
+    if trial_type[-5:] in ('cvg1a', 'cvg1b'):
+        kwargs['m2_fixed'] = True  # args.fix
     kwargs['screen'] = args.screen
     kwargs['logged'] = args.logged
     case = ManfCvgPrime(trial_type, data_type, **kwargs)
@@ -254,4 +255,6 @@ python hfm_nonbin_exec.py -rev -exp mCV_rexp9i -pre min_max -dat ricci -nk 2 --n
 """
 python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 1
 python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 2 -rep
+python hfm_nonbin_exec.py -cvg may12 .. -exp mCV_cvg1a -nk 2 -rep -m1 20
+python hfm_nonbin_exec.py -cvg may12 .. -exp mCV_cvg1b -nk 2 -rep -m2 8
 """

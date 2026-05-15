@@ -31,13 +31,12 @@ from experiment.df_zip.mcvg_exp import (
 from hfm.utils.verifiers import DTY_INT, DTY_FLT
 from hfm.manf.dist_internal import (
     # Direct_nonbin, Approx_bin,
-    name_intermediate, Direct_multiver)
+    name_intermediate, Direct_multiver, curr_intermediate)
 from hfm.manf.dist_external import (
     # Approx_nonbin, StratES_nonbin, StratRA_nonbin,)
     EffExact_multiver)
 from hfm.earlybreak import EffHD_multivar  # EffHD_bin
-
-curr_intermediate = name_intermediate[-2:] + name_intermediate[:-2]
+# curr_intermediate = name_intermediate[-2:] + name_intermediate[:-2]
 
 
 # =====================================
@@ -89,8 +88,10 @@ class ManfCvgEmpir(DataSetup):
         formatted = '_'.join([
             trial_type, self._prep.replace('_', ''), nk, self._log_document,
             'r{}'.format(int(self._ratio * 100)), 'pms', ])
-        if trial_type[-5:] in ('cvg1c', 'cvg1d'):
+        if trial_type[-5:] in ('cvg1c', 'cvg1d',):
             formatted += f'_ne{self._n_e}p{self._n_p}'
+        formatted += f'_ma{self._m1}' * trial_type.endswith(
+            '1a') + f'_mb{self._m2}' * trial_type.endswith('1b')
         self._log_document = formatted + ('_rep' * rep + '_gen' * gen)
         return
 
@@ -181,6 +182,13 @@ class ManfCvgEmpir(DataSetup):
                 csv_w.writerow([''] * 8 + [func, k] + res_data[k][fi])
                 for k in range(1, nk):
                     csv_w.writerow([''] * 8 + ['', k] + res_data[k][fi])
+        elif self._trial_type[-5:] in ('cvg1a', 'cvg1b'):
+            # curr_ms = res_aux[-2]
+            for fi, func in enumerate(curr_intermediate):
+                k = 0
+                csv_w.writerow([''] * 8 + [func, k] + res_data[k][fi])
+                for k in range(1, nk):
+                    csv_w.writerow([''] * 8 + ['', k] + res_data[k][fi])
         # pdb.set_trace()
         return
 
@@ -199,8 +207,10 @@ class ManfCvgEmpir(DataSetup):
                 res_iter.append(tmp)  # [func] + tmp)
         elif self._trial_type[-5:] in ('cvg1a', 'cvg1b'):
             curr_m = self._m1 if self._trial_type.endswith('a') else self._m2
-            res_iter = self._iterator.schedule_content(
-                X, A, y, g1m_indices, curr_m, self._n_e, self._n_p)
+            for func in curr_intermediate:
+                tmp = self._iterator.schedule_content(
+                    X, A, y, g1m_indices, curr_m, self._n_e, self._n_p, func)
+                res_iter.append(tmp)
         return res_iter
 
     def coding_per_iteration_cv_split(
@@ -311,6 +321,10 @@ class ManfCvgEmpir(DataSetup):
                     len(sens_att), self._nb_cv,  # self._nb_iter,self._prep,
                     self._m1, self._m2, self._n_e, self._n_p, '', ''],
                    sens_att, priv_val, marginalised_grp, ]
+        if self._trial_type.endswith('cvg1a'):
+            res_aux.extend([self._iterator._m2_set, ['m2=?']])
+        elif self._trial_type.endswith('cvg1b'):
+            res_aux.extend([self._iterator._m1_set, ['m1=?']])
         return (marginalised_grp, marginal_indices, new_attr,
                 belongs_priv, ptb_with_joint), res_aux
 

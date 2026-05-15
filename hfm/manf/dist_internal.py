@@ -136,6 +136,9 @@ name_intermediate = ['euclidean', 'manhattan', 'chebyshev',
                      'minkowski', 'cos_sim', 'correla', ]
 # Mahalanobis dist, Hamming dist, Jaccard similarity/dist
 
+STRATEGIES = ['Approx', 'StratES', 'StratRA']  # 'Vacant'
+curr_intermediate = name_intermediate[-2:] + name_intermediate[:-2]
+
 
 dist_intermediate = {
     'euclidean': dist_Euclidean,

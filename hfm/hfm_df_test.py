@@ -4,6 +4,7 @@
 #
 
 
+import pdb
 import numpy as np
 from hfm.hfm_df import bias_degree_bin, bias_degree_nonbin
 
@@ -47,6 +48,12 @@ def test_hausdorff():
 
     assert check_equal(ans, res)
     assert ans == res
+
+    # from hfm.earlybreak import HDD_randomize_alter
+    # C = np.random.rand(11, 4)
+    # alt = [HDD_randomize(C) for _ in range(2)]
+    # tmp = [HDD_randomize_alter(C) for i in range(2)]
+    # pdb.set_trace()
     return
 
 
