@@ -36,7 +36,7 @@ from experiment.df_nonbin.rev_mext_plt_cor import (
 from experiment.df_nonbin.rev_mext_plt_cor import HPEA_m1fix, HPEB_m2fix
 
 from experiment.df_zip.mcvg_plt import (  # DistPerf_draw
-    cvgPlt1C_take, cvgPlt1A_anal, cvgPlt1B_anal, cvgPlt1_anal_gather)
+    cvgPlt1C_take, cvgPlt1_anal_gather)  # cvgPlt1A_anal,cvgPlt1B_anal,
 
 
 # ===============================
@@ -451,10 +451,10 @@ class Rev_ManfExtDrawing(object):
 
         if trial_type.endswith('cvg1c'):
             self._iterator = cvgPlt1C_take(self._nb_iter, **kws)
-        elif trial_type.endswith('cvg1a'):
-            self._iterator = cvgPlt1A_anal(self._nb_iter, **kws)
-        elif trial_type.endswith('cvg1b'):
-            self._iterator = cvgPlt1B_anal(self._nb_iter, **kws)
+        # elif trial_type.endswith('cvg1a'):
+        #     self._iterator = cvgPlt1A_anal(self._nb_iter, **kws)
+        # elif trial_type.endswith('cvg1b'):
+        #     self._iterator = cvgPlt1B_anal(self._nb_iter, **kws)
 
         df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(df, pre)

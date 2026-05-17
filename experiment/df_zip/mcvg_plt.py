@@ -13,8 +13,9 @@ from experiment.df_nonbin.rev_mext_plt_cor import (
     _hfm_dict_tim, _hfm_dict_val, _hfm_dict_avg, _hfm_dict_prev)
 
 from pyfair.granite.draw_addtl import (
-    hyper_params_lin_reg, multi_lin_reg_without_distr)
-from experiment.df_zip.cont_draw import hyper_pms_lin_reg_gather
+    multi_lin_reg_without_distr, hyper_params_lin_reg)
+from experiment.df_zip.cont_draw import (
+    hyper_pms_lin_reg_gather, multi_lin_reg_wo_distr_gather)
 
 
 class GraphSetup(GraphSetupVer2):
@@ -126,11 +127,11 @@ class DistPerf_draw(GraphSetup):
         tag_arr = [tag_arr[i] for i in picked_m]
         return tag[:1], tag_app, tag[1 + n_l: 2 + n_l], tag_arr
 
-    def sub_plt_tim(self):
-        return
-
-    def sub_plt_val(self):
-        return
+    # def sub_plt_tim(self):
+    #     return
+    #
+    # def sub_plt_val(self):
+    #     return
 
     def quick_rmk(self, rmk='tim', interm=False):
         if interm:
@@ -191,22 +192,23 @@ class cvgPlt1_anal_gather(DistPerf_draw):
         del mb_n_l, mb_max, mb_avg, mb_tim, mb_pick, mb_picked_set
         raw_df = {'ma': raw_df_mA, 'mb': raw_df_mB}
 
-        pos = 2
-        fgn = f'{self._figname}_{pre}_pos{pos}_multivar'
-        self.present_multivar_gather(
-            n_l, tag_tim, picked_m, picked_set, fgn, raw_df, id_set, pos, 'tim')
-        self.present_multivar_gather(
-            n_l, tag_d_max, picked_m, picked_set, fgn, raw_df, id_set, pos, 'dmax')
-        self.present_multivar_gather(
-            n_l, tag_d_avg, picked_m, picked_set, fgn, raw_df, id_set, pos, 'davg')
-
-        fgn = fgn.replace('multivar', 'sasing')  # 'sa_non')
-        self.present_sa_sing_gather(
-            n_l, tag_tim, picked_m, picked_set, fgn, raw_df, id_set, pos, 'tim')
-        self.present_sa_sing_gather(
-            n_l, tag_d_max, picked_m, picked_set, fgn, raw_df, id_set, pos, 'dmax')
-        self.present_sa_sing_gather(
-            n_l, tag_d_avg, picked_m, picked_set, fgn, raw_df, id_set, pos, 'davg')
+        for pos in range(2, 6):  # pos = 2
+            fgn = f'{self._figname}_{pre}_pos{pos}_multivar'
+            # '' '
+            # self.present_multivar_gather(
+            #     n_l, tag_tim, picked_m, picked_set, fgn, raw_df, id_set, pos, 'tim')
+            # self.present_multivar_gather(
+            #     n_l, tag_d_max, picked_m, picked_set, fgn, raw_df, id_set, pos, 'dmax')
+            # self.present_multivar_gather(
+            #     n_l, tag_d_avg, picked_m, picked_set, fgn, raw_df, id_set, pos, 'davg')
+            # '' '
+            fgn = fgn.replace('multivar', 'sa')  # 'sasing','sa_non')
+            self.present_sa_sing_gather(
+                n_l, tag_tim, picked_m, picked_set, fgn, raw_df, id_set, pos, 'tim')
+            self.present_sa_sing_gather(
+                n_l, tag_d_max, picked_m, picked_set, fgn, raw_df, id_set, pos, 'dmax')
+            self.present_sa_sing_gather(
+                n_l, tag_d_avg, picked_m, picked_set, fgn, raw_df, id_set, pos, 'davg')
         return
 
     # def present_multivar_gather(self, ma_tags, ma_picked, mb_tags, mb_picked,
@@ -286,7 +288,7 @@ class cvgPlt1_anal_gather(DistPerf_draw):
 
         if not sa_bin:
             return
-        fgn = fgn.replace('sasing', 'sa_non')
+        fgn = fgn.replace('sa', 'sa_non')  # 'sasing'
         df_ma = self.obtn_sa_nonbin(
             dframe['ma'], id_set, pos, tag_sa['ma_sa1'], tag_sa['ma_sa2'])
         df_mb = self.obtn_sa_nonbin(
@@ -318,50 +320,52 @@ class cvgPlt1_anal_gather(DistPerf_draw):
         return
 
 
-class cvgPlt1A_anal(DistPerf_draw):
-    _m2_set = list(range(2, 14, 1))  # len=12
-
-    def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        n_l = len(self._m2_set)
-        tag_d_max, tag_d_avg, tag_tim, picked_m = self.prepare_graph(n_l)
-        ms_set = [r'$m_2$={}'.format(self._m2_set[i]) for i in picked_m]
-        nb_set, id_set, _, _, _ = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=6, nc_sens=0)
-
-        # tag = self.incise_graph(tag_tim[0], n_l, picked_m)
-        # tag = tag[0] + tag[1] + tag[2] + tag[3]
-        # df_multivar = self.obtn_sa_multivar(raw_dframe, id_set, 2, tag, [])
-        # fgn = f'{self._figname}_{pre}'
-        # kw = dict(snspec='sty5b', corr=False)
-        # tX = df_multivar[tag[0]].values.astype(DTY_FLT)
-        # antX, antY, antAP = self.quick_rmk('tim', False)
-        # annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
-        #     antY), '${} = {}$'.format(antY, antX)]
-        # pdb.set_trace()
-        # hyper_params_lin_reg(tX, df_multivar[tag[1:6]].values.astype(DTY_FLT).T,
-        #                      ms_set, picked_m, annots, fgn, **kw)
-        return
-
-    # def prepare_graph(self):
-    #     csv_row_1 = unique_column(10 + 78 * 3)
-    #     return
-
-
-class cvgPlt1B_anal(DistPerf_draw):
-    _m1_set = list(range(3, 34, 2))  # len=16
-
-    def schedule_mspaint(self, raw_dframe, pre='minmax'):
-        n_l = len(self._m1_set)
-        tag_d_max, tag_d_avg, tag_tim, picked_m = self.prepare_graph(n_l)
-        ms_set = [r'$m_1$={}'.format(self._m1_set[i]) for i in picked_m]
-        nb_set, id_set, _, _, _ = self.recap_sub_data(
-            raw_dframe, nb_row=4, nc_norm=6, nc_sens=0)
-        pdb.set_trace()
-        return
-
-    # def prepare_graph(self):
-    #     csv_row_1 = unique_column(10 + 102 * 3)
-    #     return
+# '' '
+# class cvgPlt1A_anal(DistPerf_draw):
+#     _m2_set = list(range(2, 14, 1))  # len=12
+#
+#     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+#         n_l = len(self._m2_set)
+#         tag_d_max, tag_d_avg, tag_tim, picked_m = self.prepare_graph(n_l)
+#         ms_set = [r'$m_2$={}'.format(self._m2_set[i]) for i in picked_m]
+#         nb_set, id_set, _, _, _ = self.recap_sub_data(
+#             raw_dframe, nb_row=4, nc_norm=6, nc_sens=0)
+#
+#         # tag = self.incise_graph(tag_tim[0], n_l, picked_m)
+#         # tag = tag[0] + tag[1] + tag[2] + tag[3]
+#         # df_multivar = self.obtn_sa_multivar(raw_dframe, id_set, 2, tag, [])
+#         # fgn = f'{self._figname}_{pre}'
+#         # kw = dict(snspec='sty5b', corr=False)
+#         # tX = df_multivar[tag[0]].values.astype(DTY_FLT)
+#         # antX, antY, antAP = self.quick_rmk('tim', False)
+#         # annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
+#         #     antY), '${} = {}$'.format(antY, antX)]
+#         # pdb.set_trace()
+#         # hyper_params_lin_reg(tX, df_multivar[tag[1:6]].values.astype(DTY_FLT).T,
+#         #                      ms_set, picked_m, annots, fgn, **kw)
+#         return
+#
+#     # def prepare_graph(self):
+#     #     csv_row_1 = unique_column(10 + 78 * 3)
+#     #     return
+#
+#
+# class cvgPlt1B_anal(DistPerf_draw):
+#     _m1_set = list(range(3, 34, 2))  # len=16
+#
+#     def schedule_mspaint(self, raw_dframe, pre='minmax'):
+#         n_l = len(self._m1_set)
+#         tag_d_max, tag_d_avg, tag_tim, picked_m = self.prepare_graph(n_l)
+#         ms_set = [r'$m_1$={}'.format(self._m1_set[i]) for i in picked_m]
+#         nb_set, id_set, _, _, _ = self.recap_sub_data(
+#             raw_dframe, nb_row=4, nc_norm=6, nc_sens=0)
+#         pdb.set_trace()
+#         return
+#
+#     # def prepare_graph(self):
+#     #     csv_row_1 = unique_column(10 + 102 * 3)
+#     #     return
+# '' '
 
 
 class cvgPlt1C_take(DistPerf_draw):
@@ -372,9 +376,74 @@ class cvgPlt1C_take(DistPerf_draw):
         df_raw = self.obtn_sa_multivar(raw_dframe, id_set, 2, tag_sa1, tag_sa2)
         df_tmp = self.obtn_sa_multivar(raw_dframe, id_set, 2, tag_wh, [])
         fgn = self._figname + f'_{pre}'
-        self.sub_plt_tim(df_tmp, tag_wh[:5], self._figname + '_multivar', 't_D')
-        self.sub_plt_tim(df_raw, tag_sa1[:5], self._figname + '_sa1', 't_D')
-        pdb.set_trace()
+        # self.sub_plt_tim(df_tmp, tag_wh[:5], self._figname + '_multivar', 't_D')
+        # self.sub_plt_tim(df_raw, tag_sa1[:5], self._figname + '_sa1', 't_D')
+
+        tag_tim, tag_d_max, tag_d_avg = tag_sa1[:5], tag_sa1[5:10], tag_sa1[10:]
+        annots_sub1 = [r'$\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}} = \mathbf{D}_{\cdot,\mathbf{a}}$']
+        annots_sub2 = [r'$\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^\text{avg} = \mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}$']
+        annots_sub3 = [r'$T_{ \mathbf{D}_{\cdot,\mathbf{a}}(S,a_i) }$ (sec)',
+                       r'$T_{ \hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S,a_i) }$ (sec)',
+                       r'$T_{ \hat{\mathbf{D}}_{\cdot,\mathbf{a}} }= T_{ \mathbf{D}_{\cdot,\mathbf{a}} }$']
+        fgn = f'{self._figname}_{pre}_strat'
+        # multi_lin_reg_wo_distr_gather(
+        #     [df_raw[tag_d_max[0]].values.astype(DTY_FLT),
+        #      df_raw[tag_d_avg[0]].values.astype(DTY_FLT),
+        #      df_raw[tag_tim[0]].values.astype(DTY_FLT), ],
+        #     [df_raw[tag_d_max[1:]].values.astype(DTY_FLT).T,
+        #      df_raw[tag_d_avg[1:]].values.astype(DTY_FLT).T,
+        #      df_raw[tag_tim[1:]].values.astype(DTY_FLT).T, ],
+        #     [['EarlyBreak', 'ApproxDist', 'StratES', 'StratRA'],
+        #      ['ApproxDist', 'StratES', 'StratRA'],
+        #      [r'$T_{EarlyBreak}$', r'$T_{ApproxDist}$',
+        #       r'$T_{StratES}$', r'$T_{StartRA}$']],
+        #     [annots_sub1, annots_sub2, annots_sub3], fgn,
+        #     snspec=['sty3b', 'sty3c', 'sty4'])
+
+        multi_lin_reg_wo_distr_gather(
+            [df_raw[tag_d_max[0]].values.astype(DTY_FLT),
+             df_raw[tag_d_avg[0]].values.astype(DTY_FLT),
+             df_raw[tag_tim[0]].values.astype(DTY_FLT),
+             df_raw[tag_tim[0]].values.astype(DTY_FLT), ],
+            [df_raw[tag_d_max[1:]].values.astype(DTY_FLT).T,
+             df_raw[tag_d_avg[1:]].values.astype(DTY_FLT).T,
+             df_raw[tag_tim[1:3]].values.astype(DTY_FLT).T,
+             df_raw[tag_tim[2:]].values.astype(DTY_FLT).T, ],
+            [['EarlyBreak', 'ApproxDist', 'StratES', 'StratRA'],
+             ['ApproxDist', 'StratES', 'StratRA'],
+             [r'$T_{EarlyBreak}$', r'$T_{ApproxDist}$'],
+             [r'$T_{ApproxDist}$', r'$T_{StratES}$', r'$T_{StartRA}$'], ],
+            [annots_sub1, annots_sub2, annots_sub3, annots_sub3], fgn,
+            snspec=['sty3b', 'sty3c', 'sty4', 'sty4e'], strt=0)
+        # pdb.set_trace()
+        tag_tim, tag_d_max, tag_d_avg = tag_wh[:5], tag_wh[5:10], tag_wh[10:]
+        multi_lin_reg_wo_distr_gather(
+            [df_tmp[tag_d_max[0]].values.astype(DTY_FLT),
+             df_tmp[tag_d_avg[0]].values.astype(DTY_FLT),
+             df_tmp[tag_tim[0]].values.astype(DTY_FLT),
+             df_tmp[tag_tim[0]].values.astype(DTY_FLT), ],
+            [df_tmp[tag_d_max[1:]].values.astype(DTY_FLT).T,
+             df_tmp[tag_d_avg[1:]].values.astype(DTY_FLT).T,
+             df_tmp[tag_tim[1:3]].values.astype(DTY_FLT).T,
+             df_tmp[tag_tim[2:]].values.astype(DTY_FLT).T, ],
+            # [['EarlyBreak$^{multi}$', 'ExtendDist',
+            #   'ExactDist (StratES)', 'ExactDist (StratRA)'],
+            #  ['ExtendDist', 'ExactDist(StratES)', 'ExactDist(StratRA)'],
+            #  [r'$T_{EarlyBreak^{multi}}$', r'$T_{ExtendDist}$'],
+            #  [r'$T_{ExtendDist}$',
+            #   r'$T_{ExactDist(StratES)}$', r'$T_{ExactDist(StartRA)}$'], ],
+            [['EarlyBreak$^{multi}$', 'ExtendDist',
+              'Exact (StratES)', 'Exact (StratRA)'],
+             ['ExtendDist', 'Exact(StratES)', 'Exact(StratRA)'],
+             [r'$T_{EarlyBreak^{multi}}$', r'$T_{ExtendDist}$'],
+             [r'$T_{ExtendDist}$',
+              r'$T_{Exact(StratES)}$', r'$T_{Exact(StartRA)}$'], ],
+            [annots_sub1, annots_sub2, annots_sub3, annots_sub3], fgn + '_multivar',
+            snspec=['sty3b', 'sty3c', 'sty4', 'sty4e'], strt=0)
         return
 
     def prepare_graph(self):
