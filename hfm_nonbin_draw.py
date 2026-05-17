@@ -8,6 +8,7 @@
 import argparse
 import time
 import sys
+import pdb
 
 from hfm.utils.decorators import elegant_dated, fantasy_durat
 from hfm.utils.recorders import elegant_print
@@ -32,8 +33,10 @@ from experiment.df_nonbin.rev_mext_plt import (
 )   # ConvFig_5I_exact, ConvFig_5Isimpl)
 from experiment.df_nonbin.rev_mext_plt_cor import (
     ConvFig_5H_exact, ConvFig_5I_exact, ConvFig_5Isimpl)
-from experiment.df_nonbin.rev_mext_plt_cor import (
-    HPEA_m1fix, HPEB_m2fix)
+from experiment.df_nonbin.rev_mext_plt_cor import HPEA_m1fix, HPEB_m2fix
+
+from experiment.df_zip.mcvg_plt import (  # DistPerf_draw
+    cvgPlt1C_take, cvgPlt1A_anal, cvgPlt1B_anal, cvgPlt1_anal_gather)
 
 
 # ===============================
@@ -198,7 +201,7 @@ class ManfExtDrawing(object):
 
 
 class Rev_ManfExtDrawing(object):
-    def __init__(self, trial_type, nb_iter=5, m1=25, m2=11, n_e=2,
+    def __init__(self, trial_type, nb_iter=5, m1=25, m2=11, n_e=2, n_p=3,
                  ratio=.97, prep='min_max', gen=False, rep=True,
                  nb_cls=7, mp_cores=3, m2_fixed=False, omitted=True,
                  prefix='', screen=True, logged=False):
@@ -210,6 +213,7 @@ class Rev_ManfExtDrawing(object):
         self._m2_fixed = m2_fixed
         self.preparing_iterator(trial_type, nb_iter, m1, m2, n_e, prep,
                                 gen, rep, nb_cls, screen, logged)
+        self._n_p = n_p
 
     def preparing_iterator(self, trial_type, nb_iter, m1, m2, n_e, prep,
                            gen, rep, nb_cls, screen=True, logged=False):
@@ -407,6 +411,55 @@ class Rev_ManfExtDrawing(object):
         self._iterator.schedule_mspaint(df, self._prep.replace('_', ''))
         return
 
+    # 4convergence
+
+    def trial_one_process_cvg(self, logger=None):
+        since = time.time()
+        elegant_print("[BEGAN {}]".format(elegant_dated(since)), logger)
+        # START
+
+        pre = self._prep.replace('_', '')
+        fgn = self._trial_type.split('_')[-1]
+        self.subproc_cvg1(self._trial_type, pre, fgn)
+
+        # END
+        tim_elapsed = time.time() - since
+        elegant_print([
+            "Duration /TimeCost: {}".format(fantasy_durat(tim_elapsed)),
+            "[ENDED {}]".format(elegant_dated(time.time()))], logger)
+        return
+
+    def subproc_cvg1(self, trial_type, pre, fgn):
+        xlsx_name = '{}_nk{}_r{}_pms'.format(
+            trial_type[:-1], self._nb_iter, int(self._ratio * 100))
+        # if trial_type.endswith('cvg1c'):
+        xlsx_name += f'_ne{self._n_e}p{self._n_p}'
+        # xlsx_name += f'_ma{self._m1}' * trial_type.endswith(
+        #     'cvg1a') + f'_mb{self._m2}' * trial_type.endswith('cvg1b')
+        xlsx_name += ('_rep' * self._rep_iter + '_gen' * self._gen_iter)
+        sheet_name = 'exp{}_{}'.format(trial_type[-2:], pre)
+
+        kws = dict(m1=self._m1, m2=self._m2, n_e=self._n_e,
+                   n_p=self._n_p, figname=fgn)
+        # self._iterator = DistPerf_draw(self._nb_iter, **kws)
+        if trial_type.endswith('cvg1g'):
+            self._iterator = cvgPlt1_anal_gather(self._nb_iter, **kws)
+            df_a = self._iterator.load_raw_dataset(xlsx_name, f'exp1a_{pre}')
+            df_b = self._iterator.load_raw_dataset(xlsx_name, f'exp1b_{pre}')
+            self._iterator.schedule_mspaint(df_a, df_b, pre)
+            return
+
+        if trial_type.endswith('cvg1c'):
+            self._iterator = cvgPlt1C_take(self._nb_iter, **kws)
+        elif trial_type.endswith('cvg1a'):
+            self._iterator = cvgPlt1A_anal(self._nb_iter, **kws)
+        elif trial_type.endswith('cvg1b'):
+            self._iterator = cvgPlt1B_anal(self._nb_iter, **kws)
+
+        df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        self._iterator.schedule_mspaint(df, pre)
+        return
+
 
 # -------------------------------
 #
@@ -426,6 +479,9 @@ def default_parameters():
         choices=["none", "standard", "min_max", "normalize"])
     parser.add_argument('--omit', action='store_false', help='--omitted')
     parser.add_argument('-rev', '--revision-plt', action='store_true')
+
+    parser.add_argument('-cvg', '--converge', type=str, default='')
+    parser.add_argument('-np', '--n_p_chosen', type=int, default=3)
 
     parser.add_argument('-m1', '--m1-chosen', type=int, default=25)
     parser.add_argument('-m2', '--m2-chosen', type=int, default=11)
@@ -472,6 +528,29 @@ trial_type = args.expt_id
 # prep = args.data_preprocessing
 screen = args.screen
 logged = args.logged
+
+
+if args.converge:
+    kwargs = dict(prep=args.data_preprocessing,
+                  screen=screen, logged=logged)
+    kwargs['m1'] = args.m1_chosen
+    kwargs['m2'] = args.m2_chosen
+    kwargs['n_e'] = args.n_e_chosen
+    kwargs['n_p'] = args.n_p_chosen
+    kwargs['ratio'] = .97
+
+    kwargs['nb_iter'] = args.nb_iter  # nb_cv
+    if trial_type[-5:] in ('cvg1a', 'cvg1b', 'cvg1g'):
+        kwargs['m2_fixed'] = True
+    if trial_type.endswith('cvg1g'):
+        kwargs['m1'] = 20
+        kwargs['m2'] = 8
+    if 'cvg1' in trial_type:
+        kwargs['rep'] = args.rep
+        kwargs['gen'] = args.gen
+    case = Rev_ManfExtDrawing(trial_type, **kwargs)
+    case.trial_one_process_cvg()
+    sys.exit()
 
 
 kwargs = {}
@@ -564,4 +643,11 @@ python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp3e -pre min_max
 
 python hfm_nonbin_draw.py -rev -ratio .97 -exp mCV_rexp9i
 python hfm_nonbin_draw.py -rev -ratio .97 -exp rept_exhp5a|b -pre min_max
+"""
+
+"""
+python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1c -pre min_max
+python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1a -m1 20 -pre min_max
+python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1b -m2 8  -pre min_max
+python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1g -pre min_max
 """

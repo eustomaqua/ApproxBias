@@ -59,6 +59,10 @@ def dist_direct_part1(Si, Si_c):
     # t1, t2, t3, t4 = t1[0], t2[0], t3[0], t4[0]
     assert t1 >= 0 and t2 >= 0 and t3 >= 0 and t4 >= 0
     assert 0 <= t5 <= 1
+
+    from hfm.dist_drt import DistDirect_halfway_min as halfway_min
+    my = halfway_min(Si[0], Si_c)
+    assert check_equal(my, t1)  # pdb.set_trace()
     return
 
 
@@ -99,11 +103,17 @@ def dist_direct_part2(X_nA_y, A, indices):
     assert np.equal(t3[0], m3[0]).all()
     assert np.equal(t4[0], m4[0]).all()
     assert np.equal(t5[0], m5[0]).all()
+
+    from hfm.dist_drt import DirectDist_bin as my_bin
+    my = my_bin(X_nA_y, indices[1][0])
+    assert check_equal(t1[0], my[0]) and check_equal(m1[0], my[0])
     return
 
 
 def dist_direct_part3(X_nA_y, A, indices):
-    from hfm.manf.dist_internal import Direct_nonbin, Direct_multiver
+    from hfm.manf.dist_internal import Direct_nonbin, Direct_multivar
+    from hfm.dist_drt import DirectDist_nonbin as my_nonbin
+    from hfm.dist_drt import DirectDist_multiver as my_multivar
     priv = 1
 
     t1 = Direct_nonbin(X_nA_y, A[:, 1], priv, func='euclidean')
@@ -118,23 +128,26 @@ def dist_direct_part3(X_nA_y, A, indices):
     m4 = Direct_nonbin(X_nA_y, A[:, 1], priv, indices[1], 'minkowski')
     m5 = Direct_nonbin(X_nA_y, A[:, 1], priv, indices[1], 'cos_sim')
 
+    my = my_nonbin(X_nA_y, indices[1])
+    pdb.set_trace()
+
     assert np.equal(t1[0], m1[0]).all()
     assert np.equal(t2[0], m2[0]).all()
     assert np.equal(t3[0], m3[0]).all()
     assert np.equal(t4[0], m4[0]).all()
     assert np.equal(t5[0], m5[0]).all()
 
-    t1 = Direct_multiver(X_nA_y, A, priv, func='euclidean')
-    t2 = Direct_multiver(X_nA_y, A, priv, func='manhattan')
-    t3 = Direct_multiver(X_nA_y, A, priv, func='chebyshev')
-    t4 = Direct_multiver(X_nA_y, A, priv, func='minkowski')
-    t5 = Direct_multiver(X_nA_y, A, priv, func='cos_sim')
+    t1 = Direct_multivar(X_nA_y, A, priv, func='euclidean')
+    t2 = Direct_multivar(X_nA_y, A, priv, func='manhattan')
+    t3 = Direct_multivar(X_nA_y, A, priv, func='chebyshev')
+    t4 = Direct_multivar(X_nA_y, A, priv, func='minkowski')
+    t5 = Direct_multivar(X_nA_y, A, priv, func='cos_sim')
 
-    m1 = Direct_multiver(X_nA_y, A, priv, indices, 'euclidean')
-    m2 = Direct_multiver(X_nA_y, A, priv, indices, 'manhattan')
-    m3 = Direct_multiver(X_nA_y, A, priv, indices, 'chebyshev')
-    m4 = Direct_multiver(X_nA_y, A, priv, indices, 'minkowski')
-    m5 = Direct_multiver(X_nA_y, A, priv, indices, 'cos_sim')
+    m1 = Direct_multivar(X_nA_y, A, priv, indices, 'euclidean')
+    m2 = Direct_multivar(X_nA_y, A, priv, indices, 'manhattan')
+    m3 = Direct_multivar(X_nA_y, A, priv, indices, 'chebyshev')
+    m4 = Direct_multivar(X_nA_y, A, priv, indices, 'minkowski')
+    m5 = Direct_multivar(X_nA_y, A, priv, indices, 'cos_sim')
 
     # tn faster
     assert np.equal(t1[0][:2], m1[0][:2]).all()

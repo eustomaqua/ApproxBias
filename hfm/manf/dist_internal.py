@@ -44,7 +44,7 @@ def avbl_cos_sim(ele_i, ele_ic):
     norm_a = np.linalg.norm(ele_i)
     norm_b = np.linalg.norm(ele_ic)
     ans = np.dot(ele_i, ele_ic) / (norm_a * norm_b)
-    return float(ans)
+    return float(1. - ans)
 
 
 @njit
@@ -301,7 +301,7 @@ def Direct_nonbin(X_nA_y, A_i, priv_val=1, idx_Sjs=None,
 
 
 @fantasy_timer
-def Direct_multiver(X_nA_y, A, priv_val=1, indices=None,
+def Direct_multivar(X_nA_y, A, priv_val=1, indices=None,
                     func='euclidean', p=3):
     # func_id = name_intermediate.index(func)
     n_a = A.shape[1]

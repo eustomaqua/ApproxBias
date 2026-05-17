@@ -198,7 +198,7 @@ def Approx_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
 
 
 @fantasy_timer
-def Extend_multiver(X_nA_y, A, m1, m2, n_e=3, func='euclidean', p=3):
+def Extend_multivar(X_nA_y, A, m1, m2, n_e=3, func='euclidean', p=3):
     _, n_a = A.shape  # n= #instances, n_a: number of sen-att
     func_id = name_intermediate.index(func)
 
@@ -440,7 +440,7 @@ def StratRA_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
 
 
 @fantasy_timer
-def EffExact_multiver(X_nA_y, A, Strat, m1=10, m2=4, n_e=3,
+def EffExact_multivar(X_nA_y, A, Strat, m1=10, m2=4, n_e=3,
                       func='euclidean', p=3):
     _, n_a = A.shape  # n #inst, n_a #sen-att
     if Strat.endswith('ES'):

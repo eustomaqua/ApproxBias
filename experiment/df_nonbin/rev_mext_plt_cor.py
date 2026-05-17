@@ -1511,14 +1511,15 @@ class ConvFig_5I_exact(ConvFig_5H_exact):
         pms = {'rotate': 34, 'cmap_name': 'Blues', 'figsize': 'L-ET'}  # 'extra'}
         if not verbose:
             del pms['figsize']
+        pms['cmap_name'] = 'blue'   # after?AssessBias
         analogous_confusion_extended(mat_B, mat_D, key_B, key_C, f'{fgn}_dt_bin', **pms)
         # analogous_confusion_extended(df_bin[tb[6:12]].values.astype(DTY_FLT).T, mat_D, key_A, key_C, f'{fgn}_oo_bin', **pms)
-        pms['cmap_name'] = 'Greens'
+        pms['cmap_name'] = 'green'  # 'Greens'
         analogous_confusion_extended(mat_A, mat_E, key_B, key_C, f'{fgn}_dt_nonbin', **pms)
         # analogous_confusion_extended(df_nonbin[tb[6:12]].values.astype(DTY_FLT).T, mat_E, key_A, key_C, f'{fgn}_oo_nonbin', **pms)
         # pdb.set_trace()  # tb[6:12] --> tb[7:13] no longer needed
 
-        pms['cmap_name'] = 'OrRd'
+        pms['cmap_name'] = 'red'    # 'OrRd'
         df = self.obtn_fulfil_ricci(dframe, id_set, tb, tag_sa1, tag_sa2)
         df = pd.concat(df, axis=0).reset_index(drop=True)
         key_E = tag_sa2[6:][:1] + tag_sa2[6:][3:4] + tag_sa2[6 + 4:][:3]

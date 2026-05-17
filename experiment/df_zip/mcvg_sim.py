@@ -286,8 +286,8 @@ class ManfCvgEmpir(DataSetup):
                        "self._m1 = {}".format(self._m1)], logger)
         tmp = processed_dat['original'][self._dataset.label_name]
         elegant_print([
-            "\t BINARY? Y= {}".format(set(y.values)),
-            "\t ori.label= {}".format(set(tmp.values)),
+            "\t BINARY? Y= {}".format(set(y.values.tolist())),
+            "\t ori.label= {}".format(set(tmp.values.tolist())),
             ""], logger)
         for tt in range(A.shape[1]):
             tmp = set(A.values[:, tt])
@@ -504,9 +504,10 @@ class ManfCvgPrime(ManfCvgEmpir):
                        "self._m1 = {}".format(self._m1)], logger)
         tmp = processed_dat['original'][self._dataset.label_name]
         elegant_print([
-            "\t BINARY? Y= {}".format(set(y.values)),
-            "\t ori.label= {}".format(set(tmp.values)),
+            "\t BINARY? Y= {}".format(set(y.values.tolist())),
+            "\t ori.label= {}".format(set(tmp.values.tolist())),
             ""], logger)
+        # pdb.set_trace()
         del tmp
         elegant_print(["\t X_A .shape {}".format(X_A.shape),
                        "\t X_Aq.shape {}".format(X_Aq.shape),

@@ -127,7 +127,7 @@ def EffHD_nonbin(X_nA_y, idx_Sjs, func='euclidean', p=3):
 
 
 @fantasy_timer
-def EffHD_multiver(X_nA_y, idx_Ai_Sj, func='euclidean', p=3):
+def EffHD_multivar(X_nA_y, idx_Ai_Sj, func='euclidean', p=3):
     half_mid = [EffHD_nonbin(
         X_nA_y, idx_Sjs, func, p) for idx_Sjs in idx_Ai_Sj]
     half_mid, half_ut = zip(*half_mid)
@@ -156,7 +156,7 @@ def Naive_nonbin(X_nA_y, idx_Sjs, func='euclidean', p=3):
 
 
 @fantasy_timer
-def Naive_multiver(X_nA_y, idx_Ai_Sj, func='euclidean', p=3):
+def Naive_multivar(X_nA_y, idx_Ai_Sj, func='euclidean', p=3):
     half_mid = [Naive_nonbin(
         X_nA_y, idx_Sjs, func, p) for idx_Sjs in idx_Ai_Sj]
     half_mid, half_ut = zip(*half_mid)
