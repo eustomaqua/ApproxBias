@@ -438,6 +438,8 @@ class Rev_ManfExtDrawing(object):
         #     'cvg1a') + f'_mb{self._m2}' * trial_type.endswith('cvg1b')
         xlsx_name += ('_rep' * self._rep_iter + '_gen' * self._gen_iter)
         sheet_name = 'exp{}_{}'.format(trial_type[-2:], pre)
+        xlsx_name = f'(py311) {xlsx_name}'
+        # xlsx_name = f'(py38) {xlsx_name}'
 
         kws = dict(m1=self._m1, m2=self._m2, n_e=self._n_e,
                    n_p=self._n_p, figname=fgn)

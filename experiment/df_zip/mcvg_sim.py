@@ -424,7 +424,7 @@ class ManfCvgPrime(ManfCvgEmpir):
         elegant_print("No solo-execution, repeatition? {}".format(
             'Yes' if self._rep_iter else 'No'), logger)  # 'non-'
         if self._rep_iter:
-            elegant_print(f"Repetitive {self._nb_cv} time", logger)
+            elegant_print(f"Repetitive {self._nb_cv} times", logger)
             split_idx = manual_repetitive(self._nb_cv, y, self._gen_iter)
             res_data = []
             for k, idx in enumerate(split_idx):

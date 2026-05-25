@@ -227,8 +227,11 @@ class cvgPlt1_anal_gather(DistPerf_draw):
         tX_b = df_mb[tag_mb[0]].values.astype(DTY_FLT)
         tt = 5 + 1
         antX, antY, _, antZ = self.quick_rmk(rmk, interm=False)  # ,antAP
-        annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
-            antY), '${}$'.format(antZ)]  # '${} = {}$'.format(antY, antX)]
+        if rmk == 'tim':
+            annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
+                antY), '${}$'.format(antZ)]  # '${} = {}$'.format(antY, antX)]
+        else:
+            annots = ['${}$'.format(antX), '${}$'.format(antY), '${}$'.format(antZ)]
         strt = 8 if rmk == 'tim' else (4 if rmk.endswith('avg') else 0)
         hyper_pms_lin_reg_gather([tX_a, tX_a, tX_b, tX_b], [
             df_ma[tag_ma[1:tt]].values.astype(DTY_FLT).T,
@@ -270,8 +273,11 @@ class cvgPlt1_anal_gather(DistPerf_draw):
         tX_b = df_mb[tag_sa['mb_sa1'][0]].values.astype(DTY_FLT)
         tt = 5 + 1
         antX, antY, antY_diff, antZ = self.quick_rmk(rmk, interm=True)
-        annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
-            antY), '${}$'.format(antZ)]  # '${} = {}$'.format(antY, antX)]
+        if rmk == 'tim':
+            annots = ['${}$ (sec)'.format(antX), '${}$ (sec)'.format(
+                antY), '${}$'.format(antZ)]  # '${} = {}$'.format(antY, antX)]
+        else:
+            annots = ['${}$'.format(antX), '${}$'.format(antY), '${}$'.format(antZ)]
         strt = 8 if rmk == 'tim' else (4 if rmk.endswith('avg') else 0)
         curr_Ys = [df_ma[tag_sa['ma_sa1'][1:tt]].values.astype(DTY_FLT).T,
                    df_ma[tag_sa['ma_sa1'][-5:]].values.astype(DTY_FLT).T,
