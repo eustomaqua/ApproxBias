@@ -22,9 +22,7 @@ GAP_MID = 1e8  # 1e16
 GAP_NAN = 1e-16
 
 # INF64 = np.finfo(np.float32).max
-INF64 = np.float64(1e308)
-EPS64 = 1e-12  # np.float64(1e-12)
-# INF64 = np.float64(np.inf)
+INF64 = np.finfo(np.float64).max
 
 
 # ---------------------

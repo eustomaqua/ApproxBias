@@ -1,51 +1,61 @@
 # coding: utf-8
 
 
-from typing import Optional
+from typing import Optional, Tuple
 import math
 import numpy as np
 from numba import njit, prange
-import pdb
-from hfm.utils.verifiers import INF64, EPS64  # ,CONST_ZERO
+# import pdb
+
+# from hfm.utils.verifiers import INF64, EPS64 #,CONST_ZERO
 from hfm.utils.decorators import fantasy_timer
-from hfm.manf.renew_drt import (  # CONST_INF,
-    ArrayLike, PType, IndexLike, DTY_FLT, DTY_INT,
-    _as_float_p, dual_norm_vec, _lp_distance_rows,
-    _aggregate_dmin, dual_normalize)
+# from hfm.manf.renew_drt import (  # CONST_INF,
+#     ArrayLike, PType, IndexLike, DTY_FLT, DTY_INT,
+#     _as_float_p, dual_norm_vec, _lp_distance_rows,
+#     _aggregate_dmin, dual_normalize)
+
+
+from hfm.manf.renew_core import INF64, EPS64, DTY_FLT, DTY_INT
+from hfm.manf.renew_core import ArrayLike, PType, IndexLike
+from hfm.manf.renew_core import (
+    _as_float_p, _lp_distance_rows, _aggregate_dmin,
+    dual_normalize, orthogonal_weight, _determine_m2,
+    hfmOUTCOME)  # ,dual_norm_vec)
 
 
 # ------------------------------------------
 # StratES
 
 
-@njit(cache=True)
-def orthogonal_weight(n_d, n_e=3):
-    for _ in range(n_d):
-        B = np.random.rand(n_d, n_d)
-        tmp = np.linalg.det(B)
-        if abs(tmp) > EPS64:
-            break  # 数值稳定判断
-    # 2. Gram-Schmidt (向量化版本)
-    A_T = B.T
-    eta = np.zeros((n_e, n_d))
-    # 第一个向量归一化
-    v = A_T[0]
-    eta[0] = v / np.linalg.norm(v)
-    # 后续向量
-    for i in range(1, n_e):
-        v = A_T[i].copy()
-        # 投影部分向量化: proj=(eta[:i] @v)
-        proj = eta[:i] @ v
-        v = v - proj @ eta[:i]
-        # 归一化
-        v = v / np.linalg.norm(v)
-        eta[i] = v
-    return eta
+# @njit(cache=True)
+# def orthogonal_weight(n_d, n_e=3):
+#     for _ in range(n_d):
+#         B = np.random.rand(n_d, n_d)
+#         tmp = np.linalg.det(B)
+#         if abs(tmp) > EPS64:
+#             break  # 数值稳定判断
+#     # 2. Gram-Schmidt (向量化版本)
+#     A_T = B.T
+#     eta = np.zeros((n_e, n_d))
+#     # 第一个向量归一化
+#     v = A_T[0]
+#     eta[0] = v / np.linalg.norm(v)
+#     # 后续向量
+#     for i in range(1, n_e):
+#         v = A_T[i].copy()
+#         # 投影部分向量化: proj=(eta[:i] @v)
+#         proj = eta[:i] @ v
+#         v = v - proj @ eta[:i]
+#         # 归一化
+#         v = v / np.linalg.norm(v)
+#         eta[i] = v
+#     return eta
 
 
 @njit(cache=True, parallel=True)
 def _StratES_subproc_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                          vec_w: np.ndarray):
+                          vec_w: np.ndarray
+                          ) -> Tuple[np.ndarray, np.ndarray]:
     proj = X_nA_y @ vec_w
     order = np.argsort(proj)
     n = X_nA_y.shape[0]  # number of instances
@@ -93,7 +103,8 @@ def _StratES_subproc_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 
 @njit(cache=True, parallel=True)
 def _StratES_subproc_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                          vec_w: np.ndarray):
+                          vec_w: np.ndarray
+                          ) -> Tuple[np.ndarray, np.ndarray]:
     proj = X_nA_y @ vec_w
     order = np.argsort(proj)
     n = X_nA_y.shape[0]  # number of instances
@@ -134,7 +145,8 @@ def _StratES_subproc_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 
 
 @fantasy_timer
-def StratES_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0):
+def StratES_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0
+                   ) -> hfmOUTCOME:
     p = _as_float_p(p)
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
     W = orthogonal_weight(n_d, n_e=1)
@@ -260,7 +272,8 @@ def AcceleCoreBack_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 
 
 @njit(cache=True)
-def _build_prev_next_outlier(Ai_ord: np.ndarray, n_grp: int):
+def _build_prev_next_outlier(Ai_ord: np.ndarray, n_grp: int
+                             )-> Tuple[np.ndarray, np.ndarray]:
     n = Ai_ord.shape[0]
     prev_not = np.empty((n_grp, n), dtype=DTY_INT)
     next_not = np.empty((n_grp, n), dtype=DTY_INT)
@@ -322,14 +335,14 @@ def AcceleCoreBack_ver3(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 @njit(cache=True)
 def AcceleCoreBack_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                         vec_w: np.ndarray, m2: int, n_grp: int,
-                        ):  # best_all: np.ndarray, row: int) -> None:
+                        best_all: np.ndarray, row: int) -> None:
     proj = X_nA_y @ vec_w
     order = np.argsort(proj)
     n = X_nA_y.shape[0]
 
     Ai_ord = A_i[order]
     prev_not, next_not = _build_prev_next_outlier(Ai_ord, n_grp)
-    local = np.empty(n, dtype=DTY_FLT)
+    # local = np.empty(n, dtype=DTY_FLT)
     # # for i in range(n):
     # #     local[i] = INF64
     for pos in range(n):
@@ -357,14 +370,14 @@ def AcceleCoreBack_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
             count += 1
             jp = next_not[ak, jp]
 
-        # best_all[row, k] = best
-        local[k] = best
-    return local
+        best_all[row, k] = best
+    #     local[k] = best
+    # return local
 
 
-@njit(cache=True, parallel=True)
+@njit(parallel=True, cache=True)
 def _StratRA_core(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                  m1: int, m2: int, n_e: int, n_grp: int):
+                  m1: int, m2: int, n_e: int, n_grp: int) -> hfmOUTCOME:
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
     # dt_min = np.empty((m1, n), dtype=DTY_FLT)
     # for v in prange(m1):
@@ -407,8 +420,9 @@ def _StratRA_core(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
         k = t % n_e
         vec_w = W_all[v, k]  # W[k]
         # pdb.set_trace()
-        best_all[t] = AcceleCoreBack_ver4(X_nA_y, A_i, p, vec_w, m2, n_grp)
-        # AcceleCoreBack_ver4(X_nA_y, A_i, p, vec_w, m2, n_grp, best_all, t)
+        # best_all[t] = AcceleCoreBack_ver4(X_nA_y, A_i, p, vec_w, m2, n_grp)
+        AcceleCoreBack_ver4(X_nA_y, A_i, p, vec_w, m2, n_grp, best_all, t)
+
     fin = np.empty(n, dtype=DTY_FLT)
     for i in range(n):
         best = best_all[0, i]  # INF64
@@ -417,16 +431,21 @@ def _StratRA_core(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
             if val < best:
                 best = val
         fin[i] = best
+    # fin = _reduce_min_axis0(best_all)
     return _aggregate_dmin(fin)
 
 
 @fantasy_timer
 def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
-                   *, m1: int = 25, m2: Optional[int] = None, n_e: int = 2):
+                   # m1: int = 25, m2: Optional[int] = None,
+                   # n_e: int = 3) -> hfmOUTCOME:  # *,
+                   m1: int = 20, m2: int = 8, n_e: int = 2) -> hfmOUTCOME:
     p = _as_float_p(p)
     if m2 is None:
         m2 = math.ceil(2.0 * math.log10(X_nA_y.shape[0]))
         m2 = max(1, int(m2))
+    # m2 = _determine_m2(X_nA_y.shape[0], m2)
+
     # # if m1 <= 0:
     # #     raise ValueError("m1 must be positive.")
     # # if m2 <= 0:
@@ -444,6 +463,7 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
     # if n_groups < 2:
     #     raise ValueError("At least two sensitive groups are required.")
     return _StratRA_core(X_nA_y, A_code, p, m1, m2, n_e, n_grp)
+    # return _StratRA_core(X_nA_y, A_i, p, m1, m2, n_e)  # , n_grp)
 
 
 # ------------------------------------------

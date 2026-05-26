@@ -31,7 +31,8 @@ from scipy.spatial import cKDTree, distance
 #
 # prange = range
 
-from hfm.utils.verifiers import INF64, EPS64
+from hfm.manf.renew_core import INF64, EPS64
+# from hfm.utils.verifiers import INF64, EPS64
 from hfm.utils.decorators import fantasy_timer
 import pdb
 ArrayLike = Union[np.ndarray, Iterable[float]]
