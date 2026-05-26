@@ -11,6 +11,7 @@ from hfm.manf.dist_internal import (
     name_intermediate, alter_intermediate,  # projector,
     # sub_accelerator_smaler, sub_accelerator_larger,
     AcceleCore_bin, _sub_accelerator_dir)
+# from hfm.manf.parm_hfm import dual_normalize
 
 
 # ------------------------------------------
@@ -355,30 +356,40 @@ def _StratES_subproc(X_nA_y, A_j, vec_w, func, p):
     return d_min.max(), d_min.sum()
 
 
-@njit
-def _StratES_core(X_nA_y, A_j, n_e, func_id, p):
-    n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
-    W = orthogonal_weight(n_d, n_e)
-    # tmp = [_StratES_subproc(
-    #     X_nA_y, A_j, W[k], func_id, p) for k in range(n_e)]
-    # # tmp, _ = zip(*tmp)
-    # t_max, t_avg = zip(*tmp)
-    # return min(t_max), min(t_avg) / float(n)
-
-    t_max = np.empty(n_e, dtype=DTY_FLT)
-    t_avg = np.empty(n_e, dtype=DTY_FLT)
-    for k in range(n_e):
-        mx, sm = _StratES_subproc(X_nA_y, A_j, W[k], func_id, p)
-        t_max[k] = mx
-        t_avg[k] = sm
-    return t_max.min(), t_avg.min() / n
+# @njit
+# def _StratES_core(X_nA_y, A_j, n_e, func_id, p):
+#     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
+#     W = orthogonal_weight(n_d, n_e)
+#     # tmp = [_StratES_subproc(
+#     #     X_nA_y, A_j, W[k], func_id, p) for k in range(n_e)]
+#     # # tmp, _ = zip(*tmp)
+#     # t_max, t_avg = zip(*tmp)
+#     # return min(t_max), min(t_avg) / float(n)
+#
+#     t_max = np.empty(n_e, dtype=DTY_FLT)
+#     t_avg = np.empty(n_e, dtype=DTY_FLT)
+#     for k in range(n_e):
+#         mx, sm = _StratES_subproc(X_nA_y, A_j, W[k], func_id, p)
+#         t_max[k] = mx
+#         t_avg[k] = sm
+#     return t_max.min(), t_avg.min() / n
+#
+#
+# @fantasy_timer
+# def StratES_nonbin(X_nA_y, A_j, n_e=2, func='euclidean', p=3):
+#     func_id = name_intermediate.index(func)
+#     tmp = _StratES_core(X_nA_y, A_j, n_e, func_id, p)
+#     return list(map(float, tmp))
 
 
 @fantasy_timer
 def StratES_nonbin(X_nA_y, A_j, n_e=2, func='euclidean', p=3):
     func_id = name_intermediate.index(func)
-    tmp = _StratES_core(X_nA_y, A_j, n_e, func_id, p)
-    return list(map(float, tmp))
+    n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
+    W = orthogonal_weight(n_d, n_e)
+    # vec_w = dual_normalize(W[0], p)
+    t_max, t_avg = _StratES_subproc(X_nA_y, A_j, W[0], func_id, p)
+    return float(t_max), float(t_avg) / n
 
 
 @njit
