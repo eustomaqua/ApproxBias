@@ -47,6 +47,9 @@ curr_d = ['cos_sim', 'correla',   # 'minkowski (p=3)'
           'euclidean', 'manhattan', 'chebyshev', 'minkowski']
 ele_i, ele_ic = X_nA_y[:2]
 
+n_e = 2
+m1, m2 = 8, 20  # m2, m1
+
 
 def dist():
     from hfm.manf.dist_internal import alter_intermediate
@@ -295,6 +298,15 @@ def together(curr, ind):
     nb_v4_es = [re_StratES(X_nA_y, curr, p) for p in curr_p][1:]
     nb_v4_ra = [re_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
 
+    # from hfm.manf.renew_cvg import StratES_nonbin_alt2 as alt2_StratES
+    # from hfm.manf.renew_cvg import StratES_nonbin_alt as alt_StratES
+    # tmp_es_v4 = [alt_StratES(X_nA_y, curr, p) for p in curr_p][1:]
+    # tmp_es_v5 = [alt2_StratES(X_nA_y, curr, p) for p in curr_p][1:]
+    # from hfm.manf.renew_cvg import StratRA_nonbin_alt2 as alt2_StratRA
+    # from hfm.manf.renew_cvg import StratRA_nonbin_alt as alt_StratRA
+    # tmp_ra_v6 = [alt_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
+    # tmp_ra_v7 = [alt2_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
+    # tmp_ra_v8 = [re_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
     pdb.set_trace()
     return
 

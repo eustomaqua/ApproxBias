@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 import math
 import numpy as np
 from numba import njit, prange
-# import pdb
+import pdb
 
 # from hfm.utils.verifiers import INF64, EPS64 #,CONST_ZERO
 from hfm.utils.decorators import fantasy_timer
@@ -52,53 +52,53 @@ from hfm.manf.renew_core import (
 #     return eta
 
 
-@njit(cache=True, parallel=True)
-def _StratES_subproc_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                          vec_w: np.ndarray
-                          ) -> Tuple[np.ndarray, np.ndarray]:
-    proj = X_nA_y @ vec_w
-    order = np.argsort(proj)
-    n = X_nA_y.shape[0]  # number of instances
-
-    d_min = np.empty(n, dtype=DTY_FLT)
-    scanned = np.zeros(n, dtype=DTY_INT)  # 'int')
-    for pos in prange(n):
-        # Set the anchor data point (xi,yi) in this round
-        k = order[pos]
-        ak = A_i[k]   # ak = Ai_ord[pos]
-        gk = proj[k]  # gk = proj_ord[pos]
-
-        best = INF64
-        left, righ = pos - 1, pos + 1
-        gap_left = gk - proj[order[left]] if left >= 0 else INF64
-        gap_righ = proj[order[righ]] - gk if righ < n else INF64
-        while gap_left < best or gap_righ < best:
-            # # If the smallest possible projected gap is already no
-            # # better than current best, then no unscanned point can
-            # # improve the answer.
-            # if gap_left >= best and gap_righ >= best:
-            #     break
-
-            # Move pointer now; same-group points can still certify
-            # that all further points on this side are even farther
-            # in projection.
-            if gap_left <= gap_righ:
-                j = order[left]
-                left -= 1
-                gap_left = gk - proj[order[left]] if left >= 0 else INF64
-            else:
-                j = order[righ]
-                righ += 1
-                gap_righ = proj[order[righ]] - gk if righ < n else INF64
-
-            if A_i[j] == ak:
-                continue
-            curr = _lp_distance_rows(X_nA_y, k, j, p)
-            scanned[k] += 1
-            if curr < best:
-                best = curr
-        d_min[k] = best
-    return d_min, scanned
+# @njit(cache=True, parallel=True)
+# def _StratES_subproc_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                           vec_w: np.ndarray
+#                           ) -> Tuple[np.ndarray, np.ndarray]:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]  # number of instances
+#
+#     d_min = np.empty(n, dtype=DTY_FLT)
+#     scanned = np.zeros(n, dtype=DTY_INT)  # 'int')
+#     for pos in prange(n):
+#         # Set the anchor data point (xi,yi) in this round
+#         k = order[pos]
+#         ak = A_i[k]   # ak = Ai_ord[pos]
+#         gk = proj[k]  # gk = proj_ord[pos]
+#
+#         best = INF64
+#         left, righ = pos - 1, pos + 1
+#         gap_left = gk - proj[order[left]] if left >= 0 else INF64
+#         gap_righ = proj[order[righ]] - gk if righ < n else INF64
+#         while gap_left < best or gap_righ < best:
+#             # # If the smallest possible projected gap is already no
+#             # # better than current best, then no unscanned point can
+#             # # improve the answer.
+#             # if gap_left >= best and gap_righ >= best:
+#             #     break
+#
+#             # Move pointer now; same-group points can still certify
+#             # that all further points on this side are even farther
+#             # in projection.
+#             if gap_left <= gap_righ:
+#                 j = order[left]
+#                 left -= 1
+#                 gap_left = gk - proj[order[left]] if left >= 0 else INF64
+#             else:
+#                 j = order[righ]
+#                 righ += 1
+#                 gap_righ = proj[order[righ]] - gk if righ < n else INF64
+#
+#             if A_i[j] == ak:
+#                 continue
+#             curr = _lp_distance_rows(X_nA_y, k, j, p)
+#             scanned[k] += 1
+#             if curr < best:
+#                 best = curr
+#         d_min[k] = best
+#     return d_min, scanned
 
 
 @njit(cache=True, parallel=True)
@@ -144,18 +144,149 @@ def _StratES_subproc_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
     return d_min, scanned
 
 
+# @fantasy_timer
+# def StratES_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0
+#                    ) -> hfmOUTCOME:
+#     p = _as_float_p(p)
+#     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
+#     W = orthogonal_weight(n_d, n_e=1)
+#     vec_w = dual_normalize(W[0], p)
+#     # d_min, _ = _StratES_subproc_ver1(X_nA_y, A_i, p, vec_w)
+#     # d_min, _ = _StratES_subproc_ver2(X_nA_y, A_i, p, W[0])
+#     d_min, _ = _StratES_subproc_ver2(X_nA_y, A_i, p, vec_w)
+#     t_max, t_avg = _aggregate_dmin(d_min)
+#     return t_max, t_avg
+
+
+# @njit(parallel=True, cache=True)
+# def _StratES_subproc_ver3(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                           vec_w: np.ndarray) -> np.ndarray:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]  # number of instances
+#     Ai_ord = A_i[order]
+#     proj_ord = proj[order]
+#
+#     d_min = np.empty(n, dtype=DTY_FLT)
+#     for pos in prange(n):
+#         # Set the anchor data point (xi, yi) in this round
+#         k = order[pos]
+#         ak, gk = Ai_ord[pos], proj_ord[pos]  # A_i[k], proj[k]
+#         min_js = min_jr = INF64
+#
+#         for jp in range(pos - 1, -1, -1):
+#             if Ai_ord[jp] != ak:                 # A_i[order[jp]]
+#                 if gk - proj_ord[jp] >= min_js:  # proj[order[jp]]
+#                     break
+#                 j = order[jp]
+#                 curr = _lp_distance_rows(X_nA_y, k, j, p)
+#                 if curr < min_js:
+#                     min_js = curr
+#
+#         for jp in range(pos + 1, n, 1):
+#             if Ai_ord[jp] != ak:                 # A_i[order[jp]]
+#                 if proj_ord[jp] - gk >= min_jr:  # proj[order[jp]]
+#                     break
+#                 j = order[jp]
+#                 curr = _lp_distance_rows(X_nA_y, k, j, p)
+#                 if curr < min_jr:
+#                     min_jr = curr
+#         d_min[k] = min(min_js, min_jr)
+#     return d_min
+
+
+# @njit(parallel=True, cache=True)
+# def _StratES_subproc_ver5(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                           vec_w: np.ndarray) -> np.ndarray:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]  # number of instances
+#     Ai_ord = A_i[order]
+#     proj_ord = proj[order]
+#
+#     d_min = np.empty(n, dtype=DTY_FLT)
+#     for pos in prange(n):
+#         # Set the anchor data point (xi, yi) in this round
+#         k = order[pos]
+#         ak, gk = Ai_ord[pos], proj_ord[pos]  # A_i[k], proj[k]
+#         min_js = min_jr = INF64
+#
+#         for jp in range(pos - 1, -1, -1):
+#             # if Ai_ord[jp] != ak:           # A_i[order[jp]]
+#             if Ai_ord[jp] == ak:
+#                 continue
+#             if gk - proj_ord[jp] >= min_js:  # proj[order[jp]]
+#                 break
+#             curr = _lp_distance_rows(X_nA_y, k, order[jp], p)
+#             if curr < min_js:
+#                 min_js = curr
+#
+#         for jp in range(pos + 1, n, 1):
+#             # if Ai_ord[jp] != ak:           # A_i[order[jp]]
+#             if Ai_ord[jp] == ak:
+#                 continue
+#             if proj_ord[jp] - gk >= min_jr:  # proj[order[jp]]
+#                 break
+#             curr = _lp_distance_rows(X_nA_y, k, order[jp], p)
+#             if curr < min_jr:
+#                 min_jr = curr
+#         d_min[k] = min(min_js, min_jr)
+#     return d_min
+
+
+@njit(parallel=True, cache=True)
+def _StratES_subproc_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+                          vec_w: np.ndarray) -> np.ndarray:
+    proj = X_nA_y @ vec_w
+    order = np.argsort(proj)
+    n = X_nA_y.shape[0]  # number of instances
+    Ai_ord = A_i[order]
+    proj_ord = proj[order]
+
+    d_min = np.empty(n, dtype=DTY_FLT)
+    for pos in prange(n):
+        # Set the anchor data point (xi, yi) in this round
+        k = order[pos]
+        ak, gk = Ai_ord[pos], proj_ord[pos]  # A_i[k], proj[k]
+        min_js = min_jr = INF64
+
+        for jp in range(pos - 1, -1, -1):
+            if Ai_ord[jp] == ak:
+                continue
+            # if Ai_ord[jp] != ak:           # A_i[order[jp]]
+            if gk - proj_ord[jp] >= min_js:  # proj[order[jp]]
+                break
+            j = order[jp]
+            curr = _lp_distance_rows(X_nA_y, k, j, p)
+            if curr < min_js:
+                min_js = curr
+
+        for jp in range(pos + 1, n, 1):
+            if Ai_ord[jp] == ak:
+                continue
+            # if Ai_ord[jp] != ak:           # A_i[order[jp]]
+            if proj_ord[jp] - gk >= min_jr:  # proj[order[jp]]
+                break
+            j = order[jp]
+            curr = _lp_distance_rows(X_nA_y, k, j, p)
+            if curr < min_jr:
+                min_jr = curr
+        # d_min[k] = min(min_js, min_jr)
+        d_min[pos] = min(min_js, min_jr)
+    return d_min
+
+
 @fantasy_timer
 def StratES_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0
-                   ) -> hfmOUTCOME:
+                   )->hfmOUTCOME:
     p = _as_float_p(p)
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
     W = orthogonal_weight(n_d, n_e=1)
     vec_w = dual_normalize(W[0], p)
-    # d_min, _ = _StratES_subproc_ver1(X_nA_y, A_i, p, vec_w)
-    # d_min, _ = _StratES_subproc_ver2(X_nA_y, A_i, p, W[0])
-    d_min, _ = _StratES_subproc_ver2(X_nA_y, A_i, p, vec_w)
-    t_max, t_avg = _aggregate_dmin(d_min)
-    return t_max, t_avg
+    # d_min = _StratES_subproc_ver3(X_nA_y, A_i, p, vec_w)
+    d_min = _StratES_subproc_ver4(X_nA_y, A_i, p, vec_w)
+    # d_min = _StratES_subproc_ver5(X_nA_y, A_i, p, vec_w)
+    return _aggregate_dmin(d_min)
 
 
 # ------------------------------------------
@@ -179,45 +310,45 @@ def _reduce_min_axis0(arr):
     return out
 
 
-@njit(cache=True)
-def AcceleCoreBack_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                        vec_w: np.ndarray, m2: int) -> np.ndarray:
-    proj = X_nA_y @ vec_w
-    order = np.argsort(proj)
-    n = X_nA_y.shape[0]  # number of instances
-
-    dt_min = np.empty(n, dtype=DTY_FLT)
-    for pos in range(n):
-        k = order[pos]
-        ak = A_i[k]
-        best = INF64
-
-        # smaller /left side
-        count = 0
-        jp = pos - 1
-        while jp >= 0 and count < m2:
-            j = order[jp]
-            if A_i[j] != ak:
-                curr = _lp_distance_rows(X_nA_y, k, j, p)
-                if curr < best:
-                    best = curr
-                count += 1
-            jp -= 1
-
-        # larger /right side
-        count = 0
-        jp = pos + 1
-        while jp < n and count < m2:
-            j = order[jp]
-            if A_i[j] != ak:
-                curr = _lp_distance_rows(X_nA_y, k, j, p)
-                if curr < best:
-                    best = curr
-                count += 1
-            jp += 1
-
-        dt_min[k] = best
-    return dt_min
+# @njit(cache=True)
+# def AcceleCoreBack_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                         vec_w: np.ndarray, m2: int) -> np.ndarray:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]  # number of instances
+#
+#     dt_min = np.empty(n, dtype=DTY_FLT)
+#     for pos in range(n):
+#         k = order[pos]
+#         ak = A_i[k]
+#         best = INF64
+#
+#         # smaller /left side
+#         count = 0
+#         jp = pos - 1
+#         while jp >= 0 and count < m2:
+#             j = order[jp]
+#             if A_i[j] != ak:
+#                 curr = _lp_distance_rows(X_nA_y, k, j, p)
+#                 if curr < best:
+#                     best = curr
+#                 count += 1
+#             jp -= 1
+#
+#         # larger /right side
+#         count = 0
+#         jp = pos + 1
+#         while jp < n and count < m2:
+#             j = order[jp]
+#             if A_i[j] != ak:
+#                 curr = _lp_distance_rows(X_nA_y, k, j, p)
+#                 if curr < best:
+#                     best = curr
+#                 count += 1
+#             jp += 1
+#
+#         dt_min[k] = best
+#     return dt_min
 
 
 @njit(cache=True)
@@ -238,7 +369,7 @@ def AcceleCoreBack_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
         # Start from the global best found by previous projections.
         # This does NOT create early stopping because we still scan
         # the fixed m2 candidates. It only avoids unnecessary assignments.
-        best = best_all[k]
+        best = INF64  # best = best_all[k]
 
         count = 0
         jp = pos - 1
@@ -291,45 +422,45 @@ def _build_prev_next_outlier(Ai_ord: np.ndarray, n_grp: int
     return prev_not, next_not
 
 
-@njit(cache=True)  # ,parallel=True)
-def AcceleCoreBack_ver3(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-                        vec_w: np.ndarray, m2: int,
-                        best_all: np.ndarray, n_grp: int) -> None:
-    proj = X_nA_y @ vec_w
-    order = np.argsort(proj)
-    n = X_nA_y.shape[0]
-
-    Ai_ord = A_i[order]
-    prev_not, next_not = _build_prev_next_outlier(Ai_ord, n_grp)
-    for pos in range(n):
-        k = order[pos]
-        ak = Ai_ord[pos]
-        best = best_all[k]
-
-        # left side: jump directly to cross-group candidates
-        count = 0
-        jp = prev_not[ak, pos]
-        while jp >= 0 and count < m2:
-            j = order[jp]
-            curr = _lp_distance_rows(X_nA_y, k, j, p)
-            if curr < best:
-                best = curr
-            count += 1
-            jp = prev_not[ak, jp]
-
-        # right side: jump directly to cross-group candidates
-        count = 0
-        jp = next_not[ak, pos]
-        while jp < n and count < m2:
-            j = order[jp]
-            curr = _lp_distance_rows(X_nA_y, k, j, p)
-            if curr < best:
-                best = curr
-            count += 1
-            jp = next_not[ak, jp]
-
-        if best < best_all[k]:
-            best_all[k] = best
+# @njit(cache=True)  # ,parallel=True)
+# def AcceleCoreBack_ver3(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                         vec_w: np.ndarray, m2: int,
+#                         best_all: np.ndarray, n_grp: int) -> None:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]
+#
+#     Ai_ord = A_i[order]
+#     prev_not, next_not = _build_prev_next_outlier(Ai_ord, n_grp)
+#     for pos in range(n):
+#         k = order[pos]
+#         ak = Ai_ord[pos]
+#         best = best_all[k]
+#
+#         # left side: jump directly to cross-group candidates
+#         count = 0
+#         jp = prev_not[ak, pos]
+#         while jp >= 0 and count < m2:
+#             j = order[jp]
+#             curr = _lp_distance_rows(X_nA_y, k, j, p)
+#             if curr < best:
+#                 best = curr
+#             count += 1
+#             jp = prev_not[ak, jp]
+#
+#         # right side: jump directly to cross-group candidates
+#         count = 0
+#         jp = next_not[ak, pos]
+#         while jp < n and count < m2:
+#             j = order[jp]
+#             curr = _lp_distance_rows(X_nA_y, k, j, p)
+#             if curr < best:
+#                 best = curr
+#             count += 1
+#             jp = next_not[ak, jp]
+#
+#         if best < best_all[k]:
+#             best_all[k] = best
 
 
 @njit(cache=True)
@@ -441,10 +572,10 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                    # n_e: int = 3) -> hfmOUTCOME:  # *,
                    m1: int = 20, m2: int = 8, n_e: int = 2) -> hfmOUTCOME:
     p = _as_float_p(p)
-    if m2 is None:
-        m2 = math.ceil(2.0 * math.log10(X_nA_y.shape[0]))
-        m2 = max(1, int(m2))
-    # m2 = _determine_m2(X_nA_y.shape[0], m2)
+    # if m2 is None:
+    #     m2 = math.ceil(2.0 * math.log10(X_nA_y.shape[0]))
+    #     m2 = max(1, int(m2))
+    # # m2 = _determine_m2(X_nA_y.shape[0], m2)
 
     # # if m1 <= 0:
     # #     raise ValueError("m1 must be positive.")
@@ -464,6 +595,145 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
     #     raise ValueError("At least two sensitive groups are required.")
     return _StratRA_core(X_nA_y, A_code, p, m1, m2, n_e, n_grp)
     # return _StratRA_core(X_nA_y, A_i, p, m1, m2, n_e)  # , n_grp)
+
+
+# @njit(parallel=True, cache=True)
+# def _StratRA_core_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                       m1: int, m2: int, n_e: int) -> hfmOUTCOME:
+#     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
+#     dt_min = np.empty((m1, n), dtype=DTY_FLT)
+#     for v in prange(m1):
+#         # Take two orthogonal vectors $w_k\in[-1,+1]^{1+n_x}$
+#         W = orthogonal_weight(n_d, n_e)
+#
+#         tmp = np.empty((n_e, n), dtype=DTY_FLT)
+#         # tmp = np.full((n_e, n), INF64, dtype=DTY_FLT)
+#         for k in range(n_e):
+#             AcceleCoreBack_ver2(X_nA_y, A_i, p, W[k], m2, tmp[k])
+#             # tmp[k] = AcceleCoreBack_ver1(X_nA_y, A_i, p, W[k], m2)
+#         dt_min[v] = _reduce_min_axis0(tmp)
+#     fin = _reduce_min_axis0(dt_min)
+#     return _aggregate_dmin(fin)
+#
+#
+# @fantasy_timer
+# def StratRA_nonbin_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
+#                        m1: int = 20, m2: int = 8, n_e: int = 2)->hfmOUTCOME:
+#     p = _as_float_p(p)
+#     return _StratRA_core_alt(X_nA_y, A_i, p, m1, m2, n_e)
+#
+#
+# # @njit(parallel=True, cache=True)
+# # def _StratRA_core_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+# #                        m1: int, m2: int, n_e: int, n_grp: int)->hfmOUTCOME:
+# #     n, n_d = X_nA_y.shape
+# #     W_all = np.empty((m1, n_e, n_d), dtype=DTY_FLT)
+# #     for v in range(m1):
+# #         W_all[v] = orthogonal_weight(n_d, n_e)
+# #     total = m1 * n_e
+# #     dt_min = np.empty((total, n), dtype=DTY_FLT)
+# #     for t in prange(total):
+# #         v = t // n_e
+# #         k = t % n_e
+# #         vec_w = W_all[v, k]
+# #         AcceleCoreBack_ver2(X_nA_y, A_i, p, vec_w, m2, dt_min[t])
+# #
+# #     # fin = np.empty(n, dtype=DTY_FLT)
+# #     # for i in range(n):
+# #     #     best = dt_min[0, i]
+# #     #     for t in range(1, total):
+# #     #         val = dt_min[t, i]
+# #     #         if val < best:
+# #     #             best = val
+# #     #     fin[i] = best
+# #     fin = _reduce_min_axis0(dt_min)
+# #     return _aggregate_dmin(fin)
+# #
+# #
+# # @fantasy_timer
+# # def StratRA_nonbin_alt2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
+# #                         m1: int=20, m2: int=8, n_e: int = 2)->hfmOUTCOME:
+# #     p = _as_float_p(p)
+# #     # B_i = np.asarray(A_i)  # .reshape(-1)
+# #     _, A_code = np.unique(A_i, return_inverse=True)  # B_i,
+# #     A_code = A_code.astype(DTY_INT)
+# #     n_grp = int(A_code.max()) + 1
+# #     return _StratRA_core_alt(X_nA_y, A_code, p, m1, m2, n_e, n_grp)
+
+
+# @njit
+# def _build_outlier_alt(A_i: np.ndarray  # , n_grp: int
+#                        )-> Tuple[np.ndarray, np.ndarray]:
+#     n = A_i.shape[0]  # Ai_ord.shape[0]
+#     prev_not = np.empty(n, dtype=DTY_INT)
+#     next_not = np.empty(n, dtype=DTY_INT)
+#     for pos in range(n):
+#         ak = A_i[pos]
+#         last = pos - 1
+#         while last >= 0 and A_i[last] == ak:
+#             last -= 1
+#         prev_not[pos] = last
+#         nxt = pos + 1
+#         while nxt < n and A_i[nxt] == ak:
+#             nxt += 1
+#         next_not[pos] = nxt
+#     return prev_not, next_not
+#
+#
+# @njit
+# def AcceleCoreBack_ver5(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                         vec_w: np.ndarray, m2: int,  # n_grp: int,
+#                         best_all: np.ndarray, row: int) -> None:
+#     proj = X_nA_y @ vec_w
+#     order = np.argsort(proj)
+#     n = X_nA_y.shape[0]
+#     Ai_ord = A_i[order]
+#     prev_not, next_not = _build_outlier_alt(Ai_ord)
+#     # pdb.set_trace()
+#     for pos in range(n):
+#         k = order[pos]
+#         ak = Ai_ord[pos]
+#         best = INF64
+#         # count = 0
+#         # jp = prev_not[pos]
+#         # while jp >= 0 and count < m2:
+#         #     j = order[jp]
+#         #     curr = _lp_distance_rows(X_nA_y, k, j, p)
+#         #     if curr < best:
+#         #         best = curr
+#         #     count += 1
+#         #     jp = prev_not[jp]
+#         # count = 0
+#         # jp = next_not[pos]
+#         # while jp < n and count < m2:
+#         #     j = order[jp]
+#         #     curr = _lp_distance_rows(X_nA_y, k, j, p)
+#         #     if curr < best:
+#         #         best = curr
+#         #     count += 1
+#         #     jp = next_not[jp]
+#         best_all[row, k] = best
+# # @njit(parallel=True)
+# def _StratRA_core_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                       m1: int, m2: int, n_e: int)->hfmOUTCOME:
+#     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
+#     W_all = np.empty((m1, n_e, n_d), dtype=DTY_FLT)
+#     for v in range(m1):
+#         W_all[v] = orthogonal_weight(n_d, n_e)
+#     total = m1 * n_e
+#     dt_min = np.empty((total, n), dtype=DTY_FLT)
+#     for t in range(total):
+#         v = t // n_e
+#         k = t % n_e
+#         vec_w = W_all[v, k]
+#         AcceleCoreBack_ver5(X_nA_y, A_i, p, vec_w, m2, dt_min, t)
+#     fin = _reduce_min_axis0(dt_min)
+#     return _aggregate_dmin(fin)
+# @fantasy_timer
+# def StratRA_nonbin_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
+#                        m1: int = 20, m2: int = 8, n_e: int = 2)->hfmOUTCOME:
+#     p = _as_float_p(p)
+#     return _StratRA_core_alt(X_nA_y, A_i, p, m1, m2, n_e)
 
 
 # ------------------------------------------
