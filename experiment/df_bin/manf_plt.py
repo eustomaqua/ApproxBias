@@ -1657,9 +1657,11 @@ class Replot2A_comparison(RePlot2_comparison):
         Mat_A = df_raw[tmp_f_vm[:5]].values.astype(DTY_FLT)
         Mat_B = df_raw[col_Ys].values.astype(DTY_FLT)
         suff_3 = self._figname + '{}_{}_each_confusion'.format(pre, fig)
-        analogous_confusion_extended(
+        analogous_confusion_extended(  # 南瓜橙 pumpkin
             Mat_A.T, Mat_B.T, key_A, self._picked_keys,
-            figname=suff_3, cmap_name='Oranges', rotate=0)  # 'PuBu',Yl/OrRd
+            # figname=suff_3,cmap_name='Oranges',rotate=0)  #'PuBu',Yl/OrRd
+            figname=suff_3, cmap_name='#D35400', rotate=0,  # D34501 FF4500
+            figsize='L-WS')  # 'orange' #E6550D FD8D3C A63603 #F98E1C D94C05
         return
 
 

@@ -320,9 +320,12 @@ class PlotA_drawing(PlotA_initial):
                 df_tmp = _internal(ps, pc)
                 # radar_chart(df_tmp, currX, labels, anotY,
                 #             figname=f'{fgn}_s{ps}c{pc}_radar', clockwise=True)
-                tabular_chart(df_tmp, currX, labels[:4] + ['GEI'] + labels[5:],
-                              anotY, figname=f'{fgn}_s{ps}c{pc}', data=nm_set[ps],
-                              algo=nm_clf[pc], cumulate=True)
+                tabular_chart(
+                    df_tmp, currX, labels[:4] + ['GEI'] + labels[5:],
+                    anotY, figname=f'{fgn}_s{ps}c{pc}',
+                    # data=nm_set[ps], algo=nm_clf[pc],
+                    data=nm_clf[pc], algo=nm_set[ps],
+                    cumulate=True)
             # pdb.set_trace()
         return
 
@@ -930,7 +933,8 @@ class Ver4_PlotH_gather_prep(PlotH_drawing):
         fgn = f'{figname}_n_{mk}_'
         # self.schedule_mspaint_prime(df_tmp, fgn, [
         #     tag_com, tag_sa1, tag_sa2, tag_jta, tag_jto])
-        self.depict_hfm_subset(df_tmp, tag_sa1, fgn + f'set{curr_set}_')
+        self.depict_hfm_subset(df_tmp, tag_sa1, fgn + f'set{curr_set}_',
+                               verbose=False)  # verbose=True)
         return
 
 

@@ -22,7 +22,7 @@ from experiment.df_bin.rev_manf_anal import (
     Ver2_PlotA_fair_ens, Ver2_PlotA_norm_cls,
     Ver4_PlotH_fair_ens, Ver4_PlotH_norm_cls, Ver4_PlotH_gather,
     Ver4_PlotH_gather_prep)
-# import pdb
+import pdb
 
 
 # ===============================
@@ -141,6 +141,17 @@ class ManfDrawing(object):
         if self._trial_type.endswith('expt2c'):
             self._iterator.schedule_spreadsheet(raw_dframe=raw_df)
 
+            pre = self._prep
+            for t in [0, 1, 2, 3, 7]:
+                os.remove(f'exp2b_{pre}_n_pc1_tst_mat{t}_s.pdf')
+                os.remove(f'exp2c_{pre}_n_pc1_tst_mat{t}_s.pdf')
+                os.remove(f'exp2c_{pre}_n_pc2_tst_mat{t}_b4.pdf')
+            pre = pre.replace('_', '')
+            os.remove(f'exp2a_{pre}_tst_lc2_mat0.pdf')
+            del pre
+        # pdb.set_trace()
+        return
+
 
 class Replot_ManfDrawing(ManfDrawing):
     def trial_one_process(self):
@@ -254,6 +265,15 @@ class FairManfRevision:
             xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(raw_df, sheet_name)
         del xlsx_name, sheet_name, raw_df, self._iterator
+
+        if self._trial_type.endswith('exp1b'):
+            pre = self._prep.replace('_', '')
+            for t in [0, 1, 2, 6, 10]:  # [2, 3, 4]:
+                os.remove(f'exp1b_{pre}_tab_s2c{t}.pdf')
+                os.remove(f'exp1b_{pre}_tab_s3c{t}.pdf')
+                os.remove(f'exp1b_{pre}_tab_s4c{t}.pdf')
+            del pre  # os.remove()
+        # pdb.set_trace()
         return
 
     def revision_ver4(self):
@@ -277,6 +297,8 @@ class FairManfRevision:
                 # xlsx_name, sheet_name
                 rdf_fair, rdf_norm], sheet_name.replace('8gather', '8g'))
             del rdf_fair, rdf_norm
+            os.remove(f'exp8g_{pre}_set2_eb06_scatp.pdf')
+            os.remove(f'exp8g_{pre}_set2_eb06_tim.pdf')
             return
         elif '8h' in self._trial_type:
             self._iterator = Ver4_PlotH_gather_prep()
