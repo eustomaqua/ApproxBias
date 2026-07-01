@@ -48,7 +48,7 @@ Distance between sets
   - Given a specific distance metric :math:`\mathbf{d}(\cdot,\cdot)` (e.g. the standard Euclidean metric) on the feature space, the distance between these two subsets (that is, :math:`S_1` and :math:`\bar{S}_1`) is
 
   .. math::
-     \begin{align}
+     \begin{aligned}
      \mathbf{D}_\cdot(S_1,\bar{S}_1) \triangleq 
      \max\Big\{
      & \max_{(\mathbf{x,a},y)\in S_1} 
@@ -59,7 +59,7 @@ Distance between sets
      (\mathbf{x},\ddot{y}), (\mathbf{x}',\ddot{y}')
      \big)
      \Big\}
-     \end{align}
+     \end{aligned}
 
   - Notice that it becomes :math:`\mathbf{D}(S_1,\bar{S}_1)` using :math:`y`, and :math:`\mathbf{D}_f(S_1,\bar{S}_1)` when using :math:`\hat{y}` for classifiers.
 
@@ -102,7 +102,7 @@ Distance between sets
   - The distance above can be extended to: i) *maximal distance measure for one sen-att*, and ii) *average distance measure for one sen-att*
 
   .. math::
-     \begin{align}
+     \begin{aligned}
      \mathbf{D}_{\cdot,\mathbf{a}}(S,a_i) &= 
      \max_{1\leqslant j\leqslant n_{a_i}}\Big\{
      \max_{(\mathbf{x,a},y)\in S_j} 
@@ -116,7 +116,7 @@ Distance between sets
      \mathbf{d}\big(
      (\mathbf{x},\ddot{y}), (\mathbf{x}',\ddot{y}')
      \big) }_\text{to find the nearest point in $\bar{S}_j$}
-     \end{align}
+     \end{aligned}
 
   - Notice that :math:`\bar{S}_j=S\setminus S_j`, and :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)= \mathbf{D}_\cdot(S_1,\bar{S}_1)` when :math:`\mathcal{A}_i=\{0,1\}`.
 
@@ -126,14 +126,14 @@ Distance between sets
   - The generalised distance measures include: i) *maximal distance measure for sen-att-s*, and ii) *average distance measure for sen-att-s*
 
   .. math::
-     \begin{align}
+     \begin{aligned}
      \mathbf{D}_{\cdot,\mathbf{a}}(S) &=
      \max_{1\leqslant i\leqslant n_a}
      \mathbf{D}_{\cdot,\mathbf{a}}(S,a_i) \\
      \mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S) &=
      \frac{1}{n_a} \sum_{i=1}^{n_a}
      \mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)
-     \end{align}
+     \end{aligned}
 
 
 
@@ -148,18 +148,18 @@ For one bi-valued sen-att [#P1]_, we remark :math:`\mathbf{D}(S_1,\bar{S}_1)` re
 For multi-valued sen-att-s [#P2]_, we remark that :math:`\mathbf{D}_{\mathbf{a}}(S), \mathbf{D}_{\mathbf{a}}^\text{avg}(S)` reflect the biases from the data and :math:`\mathbf{D}_{f,\mathbf{a}}(S), \mathbf{D}_{f,\mathbf{a}}^\text{avg}(S)` reflect the biases in the learning algorithm. Then the following value could be used to reflect the fairness degree of this classifier, that is,
 
 .. math::
-  \begin{align}
+  \begin{aligned}
   \mathbf{df}(f) &= \log\left(
   \frac{ \mathbf{D}_{f,\mathbf{a}}(S) }{ \mathbf{D}_{\mathbf{a}}(S) }
   \right) \\
   \mathbf{df}^\text{avg}(f) &= \log\left(
   \frac{ \mathbf{D}_{f,\mathbf{a}}^\text{avg}(S) }{ \mathbf{D}_{\mathbf{a}}^\text{avg}(S) }
   \right)
-  \end{align}
+  \end{aligned}
 
 Up to now, we got a *harmonic fairness measure via manifolds (HFM)*, with three optional versions (that is, previous, maximal, and average HFM).
 
-.. [#P1] Does machine bring in extra bias in learning? Approximating fairness in models promptly https://arxiv.org/pdf/2405.09251
+.. [#P1] Measuring model-induced discrimination via efficient fairness approximation https://arxiv.org/pdf/2405.09251
 .. [#P2] Approximating discrimination within models when faced with several non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
 .. [#P3] Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning (M3L)*, Vancouver, Dec 2024. (Non-archival `poster <https://eustomadew.github.io/posters/2024_m3l_fairmanf.pdf>`_, `OpenReview <https://openreview.net/pdf?id=ywqVkVQZDj>`_)
 

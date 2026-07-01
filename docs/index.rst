@@ -19,7 +19,7 @@ ApproxBias documentation
 
 Welcome to the ApproxBias's documentation. This is to help you reproduce our work from
 
-#. Does machine bring in extra bias in learning? Approximating fairness in models promptly `[arXiv 2405.09251] <https://arxiv.org/abs/2405.09251>`_
+#. Measuring model-induced discrimination via efficient fairness approximation `[arXiv 2405.09251] <https://arxiv.org/abs/2405.09251>`_
 #. Approximating discrimination within models when faced with several non-binary sensitive attributes `[arXiv 2408.06099] <https://arxiv.org/abs/2408.06099>`_
 
 We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
@@ -51,10 +51,10 @@ SHORTCUTS
    posts/quickstart.rst
    posts/methodology.rst
    posts/reproduction.rst
+   posts/documentation.rst
 
 ..    posts/evaluation.rst
 
-..    posts/documentation.rst
 .. static/methodology.rst
 
 

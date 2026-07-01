@@ -25,7 +25,7 @@ from hfm.manf.renew_core import (
 # Approx_bin
 
 
-@njit(inline='always', cache=True)
+@njit(inline='always', cache=True, fastmath=True)
 def _sub_accelerator_dir(X_yddot: np.ndarray, Ai_order: IndexLike,
                          p: PType, order: np.ndarray, pos: int,
                          m2: int, direction: int) -> float:
@@ -66,7 +66,7 @@ def _sub_accelerator_dir(X_yddot: np.ndarray, Ai_order: IndexLike,
 #     return float(ans)
 
 
-@njit(cache=True)
+@njit(cache=True, fastmath=True)
 def AcceleCore_bin(X_yddot: np.ndarray, B_i: IndexLike, p: PType,
                    vec_w: np.ndarray, m2: int) -> hfmOUTCOME:
     # Project data points onto a one-dimensional space
@@ -152,7 +152,7 @@ def Approx_bin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 # Approx_nonbin
 
 
-@njit(parallel=True)  # cache=True)
+@njit(parallel=True, cache=True)
 def _Approx_nonbin_sub(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                        m1: int, m2: int, n_e: int) -> hfmOUTCOME:
     n, n_d = X_nA_y.shape  # n_d-1: number of non-sen-att(s)

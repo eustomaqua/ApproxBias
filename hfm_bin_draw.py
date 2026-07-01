@@ -146,8 +146,8 @@ class ManfDrawing(object):
                 os.remove(f'exp2b_{pre}_n_pc1_tst_mat{t}_s.pdf')
                 os.remove(f'exp2c_{pre}_n_pc1_tst_mat{t}_s.pdf')
                 os.remove(f'exp2c_{pre}_n_pc2_tst_mat{t}_b4.pdf')
-            pre = pre.replace('_', '')
-            os.remove(f'exp2a_{pre}_tst_lc2_mat0.pdf')
+            # pre = pre.replace('_', '')
+            # os.remove(f'exp2a_{pre}_tst_lc2_mat0.pdf')
             del pre
         # pdb.set_trace()
         return

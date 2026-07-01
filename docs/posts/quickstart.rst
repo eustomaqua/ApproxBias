@@ -8,8 +8,8 @@ Getting started
 
 We provide the evaluation of extra discrimination introduced in the learning procedure for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from [P1]_, and two others come from [P2]_.
 
-.. [P1] Does machine bring in extra bias in learning? Approximating fairness in models promptly https://arxiv.org/pdf/2405.09251
-.. [P2] Approximating discrimination within models when faced with several non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
+.. [P1] Measuring model-induced discrimination via efficient fairness approximation (https://arxiv.org/pdf/2405.09251 preprint, accepted by TNNLS)
+.. [P2] Approximating discrimination within models when faced with several non-binary sensitive attributes (https://arxiv.org/pdf/2408.06099 preprint)
 
 
 .. This is a short tutorial covering all the aforementioned cases and methods; Note to check your configuration please before running the example. 
@@ -97,6 +97,7 @@ Here are examples of three aforementioned cases respectively.
 
 **Case 1**, *bi-valued*
 
+.. [ P1]_
 .. """""""""""""""""
 
 .. code-block:: python
@@ -120,6 +121,7 @@ Here are examples of three aforementioned cases respectively.
 
 **Case 2**, *multi-valued*
 
+.. [ P2]_
 .. """"""""""""""""""""
 
 .. code-block:: python
@@ -144,6 +146,7 @@ Here are examples of three aforementioned cases respectively.
 
 **Case 3**, *more than one*
 
+.. [ P2]_
 .. """""""""""""""""""""
 
 .. code-block:: python
@@ -173,6 +176,25 @@ You're welcome to adjust the parameters (except ``priv_val``, which depends on t
 .. If you would like to observe the time 
 .. You can easily observe the time that each operation would consume, just use the `_` that we omitted earlier.
 
+
+**Cases 1&2**, alternatively,
+
+.. code-block:: python
+  :linenos:
+
+  from hfm.manf import Direct_bin, Approx_bin
+  (D, _), _ = Direct_bin(X_nA_y, sa_idx[k][0], priv_val=1)
+  hat_D, _ = Approx_bin(X_nA_y, A[:, k], m1=m1, m2=m2)
+
+.. code-block:: python
+  :linenos:
+
+  from hfm.manf import Direct_nonbin, Approx_nonbin
+  from hfm.manf import StratES_nonbin, StratRA_nonbin
+  D, _ = Direct_nonbin(X_nA_y, A[:, k], priv_val=1)
+  hat_D, _ = Approx_nonbin(X_nA_y, A[:, k], m1=m1, m2=m2, ne=2)
+  hat_D, _ = StratES_nonbin(X_nA_y, A[:, k])
+  hat_D, _ = StratRA_nonbin(X_nA_y, A[:, k], m1=m1, m2=m2, ne=2)
 
 
 .. .. tip: :

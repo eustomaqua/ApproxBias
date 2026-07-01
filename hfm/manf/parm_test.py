@@ -75,6 +75,12 @@ def dist():
     vec_w = weight_generator(nd + 1)
     assert check_equal(np.abs(vec_w).sum(), 1.0)
     # pdb.set_trace()
+
+    # from hfm.manf.renew_core import orthogonal_weight_prime
+    # Wp = orthogonal_weight_prime(1 + nd, 1)
+    # assert check_equal(1., (W[0] ** 2).sum().tolist())
+    # assert check_equal(1., (Wp[0] ** 2).sum().tolist())
+    # pdb.set_trace()
     return
 
 
@@ -240,7 +246,6 @@ def app_nonbin():
         assert poset_nolessthan(n4[0], n2[0])
     assert r7[0] >= r1[0][0][0] and poset_nolessthan(r10[0], r1[0][0])
     return
-    return
 
 
 def together(curr, ind):
@@ -298,6 +303,10 @@ def together(curr, ind):
     nb_v4_es = [re_StratES(X_nA_y, curr, p) for p in curr_p][1:]
     nb_v4_ra = [re_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
 
+    # assert nb_v4_d1[0][-1] > nb_v4_a1[0][-1]
+    # assert poset_nolessthan([nb_v4_d2[0][-1]] * 3, [
+    #     nb_v4_a2[0][-1], nb_v4_es[0][-1], nb_v4_ra[0][-1], ])
+
     # from hfm.manf.renew_cvg import StratES_nonbin_alt2 as alt2_StratES
     # from hfm.manf.renew_cvg import StratES_nonbin_alt as alt_StratES
     # tmp_es_v4 = [alt_StratES(X_nA_y, curr, p) for p in curr_p][1:]
@@ -308,6 +317,20 @@ def together(curr, ind):
     # tmp_ra_v7 = [alt2_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
     # tmp_ra_v8 = [re_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
     pdb.set_trace()
+
+    assert nb_v3_dt1[0][-1] > nb_v3_ap1[0][-1]
+    assert poset_nolessthan([nb_v3_dt2[0][-1]] * 3, [
+        nb_v3_ap2[0][-1], nb_v3_es[0][-1], nb_v3_ra[0][-1], ])
+
+    assert na_v1_drt[-1] > nb_v3_dt1[0][-1] > nb_v4_d1[0][-1]
+    assert na_v1_app[-1] > nb_v3_ap1[0][-1] > nb_v4_a1[0][-1]
+    assert nb_v1_drt[-1] > nb_v3_dt2[0][-1] > nb_v4_d2[0][-1]
+    assert nb_v1_app[-1] > nb_v3_ap2[0][-1] > nb_v4_a2[0][-1]
+    assert nb_v2_cvg_es[-1] > nb_v3_es[0][-1] > nb_v4_es[0][-1]
+    assert nb_v2_cvg_ra[-1] > nb_v3_ra[0][-1] > nb_v4_ra[0][-1]
+
+    assert nb_v1_eff_1[-1] > nb_v32_ef1[0][-1] > nb_v4_ef1[0][-1]
+    assert nb_v1_eff_2[-1] > nb_v32_ef2[0][-1] > nb_v4_ef2[0][-1]
     return
 
 

@@ -135,7 +135,7 @@ def _aggregate_dmin(d_min: np.ndarray) -> Tuple[float, float]:
     return float(np.max(d_min)), float(np.mean(d_min))
 
 
-@njit(inline='always', cache=True)
+@njit(inline='always', cache=True, fastmath=True)
 def _lp_distance_rows(X: np.ndarray, i: int, j: int, p: float) -> float:
     """Lp distance between rows X[i] and X[j], numba-compatible."""
     d = X.shape[1]
@@ -150,6 +150,7 @@ def _lp_distance_rows(X: np.ndarray, i: int, j: int, p: float) -> float:
             t = X[i, k] - X[j, k]
             s += t * t
         return math.sqrt(s)
+        # return s  # 平方距离，不sqrt
     if math.isinf(p):
         mx = 0.0
         for k in range(d):
@@ -161,10 +162,18 @@ def _lp_distance_rows(X: np.ndarray, i: int, j: int, p: float) -> float:
     for k in range(d):
         s += abs(X[i, k] - X[j, k])**p
     return s ** (1.0 / p)
+    # return s     # p次方和，不开1/p次根
 
 
 # ------------------------------------------
 # Approximation algorithm(s)
+
+
+# @njit(cache=True, fastmath=True)
+# def orthogonal_weight_prime(n_d, n_e=3) -> np.ndarray:
+#     B = np.random.rand(n_d, n_d)
+#     Q, _ = np.linalg.qr(B)
+#     return np.ascontiguousarray(Q[:, :n_e].T)
 
 
 @njit(cache=True)

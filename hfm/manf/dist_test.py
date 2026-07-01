@@ -129,7 +129,7 @@ def dist_direct_part3(X_nA_y, A, indices):
     m5 = Direct_nonbin(X_nA_y, A[:, 1], priv, indices[1], 'cos_sim')
 
     my = my_nonbin(X_nA_y, indices[1])
-    pdb.set_trace()
+    # pdb.set_trace()
 
     assert np.equal(t1[0], m1[0]).all()
     assert np.equal(t2[0], m2[0]).all()
@@ -362,16 +362,16 @@ def approx_part5_drt(X_nA_y, A_i, idx_Sjs, m1, m2, n_e=3):
 
 
 def approx_part5_app(X_nA_y, A, indices, m1, m2, n_e=3):
-    from hfm.manf.dist_internal import Direct_multiver
-    from hfm.manf.dist_external import Extend_multiver
+    from hfm.manf.dist_internal import Direct_multivar  # er
+    from hfm.manf.dist_external import Extend_multivar  # er
     from hfm.dist_est_nonbin import ExtendDist_multiver_mp as Extend
     from hfm.dist_drt import DirectDist_multiver as Direct
 
     n1 = Extend(X_nA_y, A, m1, m2, n_e)
     n2 = Extend(X_nA_y, A, m1, m2, n_e)
-    t6 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'euclidean')
+    t6 = Extend_multivar(X_nA_y, A, m1, m2, n_e, 'euclidean')
 
-    t1 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'euclidean')
+    t1 = Extend_multivar(X_nA_y, A, m1, m2, n_e, 'euclidean')
     # t2 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'manhattan')
     # t3 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'chebyshev')
     # t4 = Extend_multiver(X_nA_y, A, m1, m2, n_e, 'minkowski')
@@ -379,8 +379,8 @@ def approx_part5_app(X_nA_y, A, indices, m1, m2, n_e=3):
 
     n3 = Direct(X_nA_y, indices)
     n4 = Direct(X_nA_y, indices)
-    n5 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
-    n6 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
+    n5 = Direct_multivar(X_nA_y, A, 1, indices, 'euclidean')
+    n6 = Direct_multivar(X_nA_y, A, 1, indices, 'euclidean')
     # pdb.set_trace()
 
     assert poset_nolessthan(n1[0][:2], n3[0][:2])
@@ -477,8 +477,8 @@ def conver_part6_drt(X_nA_y, A_i, idx_Sjs, n_e=3):
 
 
 def conver_part6_app(X_nA_y, A, indices, m1, m2, n_e):
-    from hfm.manf.dist_external import EffExact_multiver
-    from hfm.manf.dist_internal import Direct_multiver
+    from hfm.manf.dist_external import EffExact_multivar  # er
+    from hfm.manf.dist_internal import Direct_multivar    # er
     from hfm.dist_drt import DirectDist_multiver as Direct
     from hfm.dist_cvg_nonbin import EffExact as Extend
 
@@ -488,19 +488,19 @@ def conver_part6_app(X_nA_y, A, indices, m1, m2, n_e):
     n1 = Extend(X_nA_y, A, SV1, m1, m2, n_e)
     # t7 = EffExact_multiver(X_nA_y, A, 'Vacant', m1, m2, n_e)
 
-    t1 = EffExact_multiver(X_nA_y, A, 'Vacant', m1, m2, n_e, 'euclidean')
+    t1 = EffExact_multivar(X_nA_y, A, 'Vacant', m1, m2, n_e, 'euclidean')
     n4 = Direct(X_nA_y, indices)
-    n6 = Direct_multiver(X_nA_y, A, 1, indices, 'euclidean')
+    n6 = Direct_multivar(X_nA_y, A, 1, indices, 'euclidean')
     assert check_equal(n4[0][:2], n6[0][:2])
     assert poset_nolessthan(t1[0][:2], n6[0][:2])
     assert poset_nolessthan(n1[0][:2], n4[0][:2])
 
     n2 = Extend(X_nA_y, A, SES, m1, m2, n_e)
-    t2 = EffExact_multiver(X_nA_y, A, 'StratES', m1, m2, n_e, 'euclidean')
+    t2 = EffExact_multivar(X_nA_y, A, 'StratES', m1, m2, n_e, 'euclidean')
     assert check_equal(t2[0][:2], n6[0][:2])
     assert check_equal(n2[0][:2], n6[0][:2])
     n3 = Extend(X_nA_y, A, SRA, m1, m2, n_e)
-    t3 = EffExact_multiver(X_nA_y, A, 'StratRA', m1, m2, n_e, 'euclidean')
+    t3 = EffExact_multivar(X_nA_y, A, 'StratRA', m1, m2, n_e, 'euclidean')
     assert poset_nolessthan(t3[0][:2], n6[0][:2])
     assert poset_nolessthan(n3[0][:2], n6[0][:2])
     return

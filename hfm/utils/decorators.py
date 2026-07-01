@@ -23,6 +23,7 @@ def elegant_timer(text):
 
 
 def fantasy_timer(func):
+    # @functools.wraps(func)
     def wrapper(*args, **kw):
         since = time.time()
         ans = func(*args, **kw)

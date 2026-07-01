@@ -234,7 +234,7 @@ def _StratES_subproc_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 #     return d_min
 
 
-@njit(parallel=True, cache=True)
+@njit(parallel=True, cache=True, fastmath=True)
 def _StratES_subproc_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                           vec_w: np.ndarray) -> np.ndarray:
     proj = X_nA_y @ vec_w
@@ -463,7 +463,7 @@ def _build_prev_next_outlier(Ai_ord: np.ndarray, n_grp: int
 #             best_all[k] = best
 
 
-@njit(cache=True)
+@njit(cache=True, fastmath=True)
 def AcceleCoreBack_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                         vec_w: np.ndarray, m2: int, n_grp: int,
                         best_all: np.ndarray, row: int) -> None:
@@ -506,7 +506,7 @@ def AcceleCoreBack_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
     # return local
 
 
-@njit(parallel=True, cache=True)
+@njit(parallel=True, cache=True, fastmath=True)
 def _StratRA_core(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                   m1: int, m2: int, n_e: int, n_grp: int) -> hfmOUTCOME:
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
