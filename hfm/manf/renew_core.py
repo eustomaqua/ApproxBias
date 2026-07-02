@@ -9,6 +9,7 @@ import numpy as np
 from numba import njit
 
 
+# INF64 = np.float32(1e308)
 INF64 = np.float64(1e308)
 EPS64 = 1e-12  # np.float64(1e-12)
 # INF64 = np.float64(np.inf)
@@ -169,11 +170,11 @@ def _lp_distance_rows(X: np.ndarray, i: int, j: int, p: float) -> float:
 # Approximation algorithm(s)
 
 
-# @njit(cache=True, fastmath=True)
-# def orthogonal_weight_prime(n_d, n_e=3) -> np.ndarray:
-#     B = np.random.rand(n_d, n_d)
-#     Q, _ = np.linalg.qr(B)
-#     return np.ascontiguousarray(Q[:, :n_e].T)
+@njit(cache=True, fastmath=True)
+def orthogonal_weight_prime(n_d, n_e=3) -> np.ndarray:
+    B = np.random.rand(n_d, n_d)
+    Q, _ = np.linalg.qr(B)
+    return np.ascontiguousarray(Q[:, :n_e].T)
 
 
 @njit(cache=True)

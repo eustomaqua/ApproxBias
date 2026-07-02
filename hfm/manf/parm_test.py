@@ -47,8 +47,8 @@ curr_d = ['cos_sim', 'correla',   # 'minkowski (p=3)'
           'euclidean', 'manhattan', 'chebyshev', 'minkowski']
 ele_i, ele_ic = X_nA_y[:2]
 
-n_e = 2
-m1, m2 = 8, 20  # m2, m1
+# n_e = 2
+# m1, m2 = 8, 20  # m2, m1
 
 
 def dist():
@@ -350,3 +350,34 @@ def test_drt():
     # w2 = dual_normalize(w0, 3)
     # pdb.set_trace()
     return
+
+
+# ---------------
+# restart
+
+
+# def test_renew():
+#     from hfm.manf.renew_app import _Approx_bin_sub
+#     Xp = np.ascontiguousarray(X_nA_y, dtype=np.float64)
+#     Ap = np.asarray(A_i)
+#     # 先运行一次，让 Numba 编译  # 再看并行诊断
+#     _Approx_bin_sub(Xp, Ap, 2.0, 25, 11)
+#     _Approx_bin_sub.recompile()
+#     _Approx_bin_sub.parallel_diagnostics(level=4)
+#     pdb.set_trace()
+#     return
+
+# from numba import set_num_threads
+# import time
+# # 先预热，避免把编译时间算进去
+# _Approx_bin_sub(X, A, 2.0, 25, 11)
+# set_num_threads(1)
+# t0 = time.perf_counter()
+# _Approx_bin_sub(X, A, 2.0, 25, 11)
+# t1 = time.perf_counter()
+# set_num_threads(4)
+# t2 = time.perf_counter()
+# _Approx_bin_sub(X, A, 2.0, 25, 11)
+# t3 = time.perf_counter()
+# print("1 thread:", t1 - t0)
+# print("4 threads:", t3 - t2)

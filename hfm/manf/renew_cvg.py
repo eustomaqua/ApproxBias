@@ -309,6 +309,19 @@ def _reduce_min_axis0(arr):
     #             out[j] = v
     return out
 
+# @njit(parallel=True, cache=True)
+# def _reduce_min_axis0(arr):
+#     m, n = arr.shape
+#     out = np.empty(n, dtype=DTY_FLT)
+#     for j in prange(n):
+#         best = arr[0, j]
+#         for i in range(1, m):
+#             val = arr[i, j]
+#             if val < best:
+#                 best = val
+#         out[i] = best
+#     return out
+
 
 # @njit(cache=True)
 # def AcceleCoreBack_ver1(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,

@@ -69,6 +69,7 @@ def _sub_accelerator_dir(X_yddot: np.ndarray, Ai_order: IndexLike,
 @njit(cache=True, fastmath=True)
 def AcceleCore_bin(X_yddot: np.ndarray, B_i: IndexLike, p: PType,
                    vec_w: np.ndarray, m2: int) -> hfmOUTCOME:
+    #                # proj: np.ndarray, m2: int) -> hfmOUTCOME:
     # Project data points onto a one-dimensional space
     proj = X_yddot @ vec_w  # =[projector(ele, vec_w) for ele in X_yddot]
     order = np.argsort(proj)
@@ -132,6 +133,9 @@ def _Approx_bin_sub(X_nA_y: np.ndarray, B_i: IndexLike, p: PType,
         # d_max[k] = tmp[0]
         # d_avg[k] = tmp[1]
 
+        # proj = X_nA_y @ vec_w
+        # mx, sm = AcceleCore_bin(X_nA_y, B_i, p, proj, m2)
+
         mx, sm = AcceleCore_bin(X_nA_y, B_i, p, vec_w, m2)
         d_max[k] = mx
         d_avg[k] = sm
@@ -172,6 +176,16 @@ def _Approx_nonbin_sub(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
             t_avg[j] = sm
         d_max[k] = t_max.min()
         d_avg[k] = t_avg.min()
+
+        # t_max = t_avg = INF64
+        # proj_all = X_nA_y @ W.T  # (n,n_e) 一次gemm代替n_e次gemv
+        # for j in range(n_e):
+        #     mx, sm = AcceleCore_bin(X_nA_y, A_i, p, proj_all[:, j], m2)
+        #     # mx, sm = AcceleCore_bin(X_nA_y, A_i, p, W[j], m2)
+        #     t_max = min(t_max, mx)
+        #     t_avg = min(t_avg, sm)
+        # d_max[k] = t_max
+        # d_avg[k] = t_avg
     return d_max.min(), d_avg.min() / n
 
 
