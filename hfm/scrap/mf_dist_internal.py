@@ -1,4 +1,6 @@
 # coding: utf-8
+# manf/dist_internal.py
+
 
 from scipy.spatial import distance
 import numpy as np
@@ -6,7 +8,7 @@ from numba import njit, prange
 # import numba
 # import pdb
 import math
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 from hfm.utils.verifiers import INF64, DTY_FLT
 # from hfm.manf.parm_hfm import dual_normalize
 
@@ -14,26 +16,26 @@ from hfm.utils.verifiers import INF64, DTY_FLT
 # ------------------------------------------
 # Minkowski distance
 
-@fantasy_timer
+@fantasy_timer_prime
 def avbl_Euclidean(vec):  # ele_i, ele_ic):
     # alt = np.linalg.norm(ele_i - ele_ic)
     alt = np.linalg.norm(vec)
     return float(alt)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def avbl_Manhattan(vec):  # ele_i, ele_ic):
     alt = np.linalg.norm(vec, ord=1)
     return float(alt)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def avbl_Chebyshev(vec):  # ele_i, ele_ic):
     alt = np.linalg.norm(vec, ord=np.inf)
     return float(alt)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def avbl_Minkowski(ele_i, ele_ic, p=3):
     alt = distance.minkowski(ele_i, ele_ic, p=p)
     return float(alt)
@@ -276,7 +278,7 @@ def idx_marginalised(A_i, priv_val=1):
 #     return indices
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Direct_bin(X_nA_y, A_i, priv_val=1, idx_Si=None,
                func='euclidean', p=3):
     func_id = name_intermediate.index(func)
@@ -288,7 +290,7 @@ def Direct_bin(X_nA_y, A_i, priv_val=1, idx_Si=None,
     return max(half_1, half_2), tmp
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Direct_nonbin(X_nA_y, A_i, priv_val=1, idx_Sjs=None,
                   func='euclidean', p=3):
     func_id = name_intermediate.index(func)
@@ -301,7 +303,7 @@ def Direct_nonbin(X_nA_y, A_i, priv_val=1, idx_Sjs=None,
     return max(half_pl_max), sum(half_pl_avg) / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Direct_multivar(X_nA_y, A, priv_val=1, indices=None,
                     func='euclidean', p=3):
     # func_id = name_intermediate.index(func)
@@ -522,7 +524,7 @@ def Approx_bin_sub(X_nA_y, B_i, m1, m2, func_id, p):
     return d_max.min(), d_avg.min() / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Approx_bin(X_nA_y, B_i, m1, m2, func='euclidean', p=3):
     # def Approx_bin(X_nA_y, A_i,priv_val=1,idx_Si=None,
     #                func='euclidean', m1=20, m2=8):

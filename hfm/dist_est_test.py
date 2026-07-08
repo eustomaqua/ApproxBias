@@ -8,7 +8,7 @@
 from hfm.dist_est_bin import (
     AcceleDist_bin, ApproxDist_bin,  # weight_generator,
     ApproxDist_bin_revised)          # projector,
-from hfm.dist_est_nonbin import (
+from hfm.scrap.dist_est_nonbin import (
     orthogonal_weight, AcceleDist_nonbin, ApproxDist_nonbin,
     ApproxDist_nonbin_mpver)  # , ExtendDist_multiver_mp)
 

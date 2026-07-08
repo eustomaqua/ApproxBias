@@ -1,11 +1,13 @@
 # coding: utf-8
 # parm_hfm_test.py
+# manf/parm_test.py
 
 import numpy as np
 import pdb
 from hfm.utils.verifiers import check_equal, poset_nolessthan
 
-from hfm.manf.parm_hfm import (
+from hfm.scrap.mf_parm_hfm import (
+    # from hfm.manf.parm_hfm import (
     direct_single_sa, strat_es_single_sa, strat_ra_single_sa)
 from hfm.manf.renew_core import (  # .renew_drt import (
     lp_norm_vec, dual_norm_vec, dual_normalize, _as_float_p)
@@ -19,13 +21,20 @@ from hfm.manf.renew_cvg import StratRA_nonbin as re_StratRA
 from hfm.manf.renew_app import Approx_bin as re_Approx_bin
 from hfm.manf.renew_app import Approx_nonbin as re_Approx_nonbin
 
-from hfm.manf.dist_internal import (Direct_bin, Direct_nonbin)
-from hfm.manf.dist_external import StratES_nonbin, StratRA_nonbin
-from hfm.manf.dist_internal import Approx_bin, weight_generator
-from hfm.manf.dist_external import Approx_nonbin
+# from hfm.manf.dist_internal import (Direct_bin, Direct_nonbin)
+# from hfm.manf.dist_external import StratES_nonbin, StratRA_nonbin
+# from hfm.manf.dist_internal import Approx_bin, weight_generator
+# from hfm.manf.dist_external import Approx_nonbin
 from hfm.dist_est_bin import ApproxDist_bin as prev_Approx_bin
-from hfm.dist_est_nonbin import ApproxDist_nonbin as prev_Approx_nonbin
+# from hfm.dist_est_nonbin import ApproxDist_nonbin as prev_Approx_nonbin
 from hfm.manf.renew_core import dual_exponent, orthogonal_weight
+
+
+from hfm.scrap.dist_est_nonbin import ApproxDist_nonbin as prev_Approx_nonbin
+from hfm.scrap.mf_dist_internal import (Direct_bin, Direct_nonbin)
+from hfm.scrap.mf_dist_external import StratES_nonbin, StratRA_nonbin
+from hfm.scrap.mf_dist_internal import Approx_bin, weight_generator
+from hfm.scrap.mf_dist_external import Approx_nonbin
 
 
 n, nd = 324, 17
@@ -52,7 +61,9 @@ ele_i, ele_ic = X_nA_y[:2]
 
 
 def dist():
-    from hfm.manf.dist_internal import alter_intermediate
+    from hfm.scrap.mf_dist_internal import alter_intermediate
+
+    # from hfm.manf.dist_internal import alter_intermediate
     d0 = [alter_intermediate(ele_i, ele_ic, p) for p in [4, 5, 0, 1, 3, 2]]
     d1 = [lp_norm_vec(ele_i - ele_ic, _as_float_p(p)
                       ) for p in [4, 7, 2, 1, 3, 'inf']]
@@ -249,16 +260,21 @@ def app_nonbin():
 
 
 def together(curr, ind):
+    from hfm.scrap.dist_cvg_nonbin import (
+        StratVacant, StratEarlyStop, StratRearrange)
+    from hfm.scrap.earlybreak_ver3 import EffHD_bin, EffHD_nonbin
+    #
+
     from hfm.dist_drt import DirectDist_bin as prev_Direct_bin
     from hfm.dist_drt import DirectDist_nonbin as prev_Direct_nonbin
     # from hfm.dist_cvg_nonbin import ApproxDist_nonbin as Approx_nonv2
-    from hfm.dist_cvg_nonbin import StratVacant, StratEarlyStop, StratRearrange
+    # from hfm.dist_cvg_nonbin import StratVacant, StratEarlyStop, StratRearrange
 
     from hfm.earlybreak import EffHD_bin as prev_Eff_bin
     from hfm.earlybreak import EffHD_nonbin as prev_Eff_nonbin
     # from hfm.manf.earlybreak import EffHD_bin, EffHD_nonbin
 
-    from hfm.manf.earlybreak_ver3 import EffHD_bin, EffHD_nonbin
+    # from hfm.manf.earlybreak_ver3 import EffHD_bin, EffHD_nonbin
     from hfm.manf.earlybreak_ver4 import EffHD_bin as re_Eff_bin
     from hfm.manf.earlybreak_ver4 import EffHD_nonbin as re_Eff_nonbin
 
@@ -306,6 +322,10 @@ def together(curr, ind):
     # assert nb_v4_d1[0][-1] > nb_v4_a1[0][-1]
     # assert poset_nolessthan([nb_v4_d2[0][-1]] * 3, [
     #     nb_v4_a2[0][-1], nb_v4_es[0][-1], nb_v4_ra[0][-1], ])
+    # assert nb_v3_dt1[0][-1] > nb_v3_ap1[0][-1]
+    # assert poset_nolessthan([nb_v3_dt2[0][-1]] * 3, [
+    #     nb_v3_ap2[0][-1], nb_v3_es[0][-1], nb_v3_ra[0][-1], ])
+    #
 
     # from hfm.manf.renew_cvg import StratES_nonbin_alt2 as alt2_StratES
     # from hfm.manf.renew_cvg import StratES_nonbin_alt as alt_StratES
@@ -316,11 +336,7 @@ def together(curr, ind):
     # tmp_ra_v6 = [alt_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
     # tmp_ra_v7 = [alt2_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
     # tmp_ra_v8 = [re_StratRA(X_nA_y, curr, p, m1, m2, n_e) for p in curr_p][1:]
-    pdb.set_trace()
-
-    assert nb_v3_dt1[0][-1] > nb_v3_ap1[0][-1]
-    assert poset_nolessthan([nb_v3_dt2[0][-1]] * 3, [
-        nb_v3_ap2[0][-1], nb_v3_es[0][-1], nb_v3_ra[0][-1], ])
+    # pdb.set_trace()
 
     assert na_v1_drt[-1] > nb_v3_dt1[0][-1] > nb_v4_d1[0][-1]
     assert na_v1_app[-1] > nb_v3_ap1[0][-1] > nb_v4_a1[0][-1]

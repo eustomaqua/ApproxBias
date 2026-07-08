@@ -1,4 +1,5 @@
 # coding: utf-8
+# manf/dist_test.py
 
 import numpy as np
 import pdb
@@ -10,7 +11,8 @@ from hfm.utils.verifiers import check_equal, poset_nolessthan
 
 
 def dist_vector(ele_i, ele_ic):
-    from hfm.manf.dist_internal import (
+    from hfm.scrap.mf_dist_internal import (
+        # from hfm.manf.dist_internal import (
         dist_Euclidean, dist_Manhattan, dist_Chebyshev, dist_Minkowski,
         avbl_Euclidean, avbl_Manhattan, avbl_Chebyshev, avbl_Minkowski,
         dist_cos_sim, avbl_cos_sim,   # dist_cos_sim_alt)
@@ -50,7 +52,9 @@ def dist_vector(ele_i, ele_ic):
 
 
 def dist_direct_part1(Si, Si_c):
-    from hfm.manf.dist_internal import Direct_halfway_min
+    from hfm.scrap.mf_dist_internal import Direct_halfway_min
+
+    # from hfm.manf.dist_internal import Direct_halfway_min
     t1 = Direct_halfway_min(Si[0], Si_c, 0)  # 'euclidean')
     t2 = Direct_halfway_min(Si[0], Si_c, 1)  # 'manhattan')
     t3 = Direct_halfway_min(Si[0], Si_c, 2)  # 'chebyshev')
@@ -68,7 +72,8 @@ def dist_direct_part1(Si, Si_c):
 
 def dist_direct_part2(X_nA_y, A, indices):
     # from hfm.manf.dist_internal import Direct_marginalised
-    from hfm.manf.dist_internal import (
+    from hfm.scrap.mf_dist_internal import (
+        # from hfm.manf.dist_internal import (
         Direct_mediator, idx_marginalised, Direct_bin)
 
     ind_alt = [idx_marginalised(A[:, i]) for i in range(A.shape[1])]
@@ -111,7 +116,9 @@ def dist_direct_part2(X_nA_y, A, indices):
 
 
 def dist_direct_part3(X_nA_y, A, indices):
-    from hfm.manf.dist_internal import Direct_nonbin, Direct_multivar
+    from hfm.scrap.mf_dist_internal import Direct_nonbin, Direct_multivar
+
+    # from hfm.manf.dist_internal import Direct_nonbin, Direct_multivar
     from hfm.dist_drt import DirectDist_nonbin as my_nonbin
     from hfm.dist_drt import DirectDist_multiver as my_multivar
     priv = 1
@@ -159,7 +166,8 @@ def dist_direct_part3(X_nA_y, A, indices):
 
 
 def approx_part4_sub(X_nA_y, A_i, idx, m2, vec_w):
-    from hfm.manf.dist_internal import (
+    from hfm.scrap.mf_dist_internal import (
+        # from hfm.manf.dist_internal import (
         sub_accelerator_smaler, sub_accelerator_larger, projector)
     from hfm.dist_est_bin import sub_accelerator_smaler as smaler
     from hfm.dist_est_bin import sub_accelerator_larger as larger
@@ -205,7 +213,9 @@ def approx_part4_sub(X_nA_y, A_i, idx, m2, vec_w):
 
 
 def approx_part4_bin(X_nA_y, A_i, idx, m2, vec_w):
-    from hfm.manf.dist_internal import AcceleCore_bin
+    from hfm.scrap.mf_dist_internal import AcceleCore_bin
+
+    # from hfm.manf.dist_internal import AcceleCore_bin
     from hfm.dist_est_bin import AcceleDist_bin as Accele
 
     n1 = Accele(X_nA_y, A_i, ~idx, idx, m2, vec_w)
@@ -229,7 +239,9 @@ def approx_part4_bin(X_nA_y, A_i, idx, m2, vec_w):
 
 
 def approx_part4_drt(X_nA_y, A_i, idx, m1, m2):
-    from hfm.manf.dist_internal import Direct_bin, Approx_bin
+    from hfm.scrap.mf_dist_internal import Direct_bin, Approx_bin
+
+    # from hfm.manf.dist_internal import Direct_bin, Approx_bin
     from hfm.dist_est_bin import ApproxDist_bin as Approx
     from hfm.dist_drt import DirectDist_bin as Direct
 
@@ -258,7 +270,8 @@ def approx_part4_drt(X_nA_y, A_i, idx, m1, m2):
 
 
 def dist_direct_part4(X_nA_y, A, indices):
-    from hfm.manf.dist_internal import (
+    from hfm.scrap.mf_dist_internal import (
+        # from hfm.manf.dist_internal import (
         weight_generator,  # , weight_gen_many)
         projector, projector_alt)
     from hfm.dist_est_bin import weight_generator as weight
@@ -319,8 +332,11 @@ def test_internal():
 
 
 def dist_approx_part5(X_nA_y, A, indices):
-    from hfm.manf.dist_external import orthogonal_weight
-    from hfm.dist_est_nonbin import orthogonal_weight as weight
+    from hfm.scrap.mf_dist_external import orthogonal_weight
+    from hfm.scrap.dist_est_nonbin import orthogonal_weight as weight
+
+    # from hfm.manf.dist_external import orthogonal_weight
+    # from hfm.dist_est_nonbin import orthogonal_weight as weight
     n_d = X_nA_y.shape[1] - 1
     tt = orthogonal_weight(n_d, n_e=3)
     vec_w = orthogonal_weight(n_d, n_e=3)
@@ -332,9 +348,13 @@ def dist_approx_part5(X_nA_y, A, indices):
 
 
 def approx_part5_drt(X_nA_y, A_i, idx_Sjs, m1, m2, n_e=3):
-    from hfm.manf.dist_internal import Direct_nonbin
-    from hfm.manf.dist_external import Approx_nonbin
-    from hfm.dist_est_nonbin import ApproxDist_nonbin as Approx
+    from hfm.scrap.mf_dist_internal import Direct_nonbin
+    from hfm.scrap.mf_dist_external import Approx_nonbin
+    from hfm.scrap.dist_est_nonbin import ApproxDist_nonbin as Approx
+
+    # from hfm.manf.dist_internal import Direct_nonbin
+    # from hfm.manf.dist_external import Approx_nonbin
+    # from hfm.dist_est_nonbin import ApproxDist_nonbin as Approx
     from hfm.dist_drt import DirectDist_nonbin as Direct
 
     n1 = Approx(X_nA_y, A_i, m1, m2, n_e)
@@ -362,9 +382,13 @@ def approx_part5_drt(X_nA_y, A_i, idx_Sjs, m1, m2, n_e=3):
 
 
 def approx_part5_app(X_nA_y, A, indices, m1, m2, n_e=3):
-    from hfm.manf.dist_internal import Direct_multivar  # er
-    from hfm.manf.dist_external import Extend_multivar  # er
-    from hfm.dist_est_nonbin import ExtendDist_multiver_mp as Extend
+    from hfm.scrap.mf_dist_internal import Direct_multivar
+    from hfm.scrap.mf_dist_external import Extend_multivar
+    from hfm.scrap.dist_est_nonbin import ExtendDist_multiver_mp as Extend
+
+    # from hfm.manf.dist_internal import Direct_multivar  # er
+    # from hfm.manf.dist_external import Extend_multivar  # er
+    # from hfm.dist_est_nonbin import ExtendDist_multiver_mp as Extend
     from hfm.dist_drt import DirectDist_multiver as Direct
 
     n1 = Extend(X_nA_y, A, m1, m2, n_e)
@@ -393,13 +417,18 @@ def approx_part5_app(X_nA_y, A, indices, m1, m2, n_e=3):
 
 
 def approx_part5_sub(X_nA_y, A_i, idx_Sjs, m2, vec_w):
-    from hfm.manf.dist_external import (
+    from hfm.scrap.mf_dist_external import (
         cvg_accelerator_smaler, cvg_accelerator_larger)
-    # from hfm.manf.dist_internal import projector
-    # from hfm.manf.dist_internal import sub_accelerator_smaler as smaler
-    # from hfm.manf.dist_internal import sub_accelerator_larger as larger
-    from hfm.dist_est_nonbin import sub_accelerator_smaler as smaler
-    from hfm.dist_est_nonbin import sub_accelerator_larger as larger
+    from hfm.scrap.dist_est_nonbin import sub_accelerator_smaler as smaler
+    from hfm.scrap.dist_est_nonbin import sub_accelerator_larger as larger
+
+    # from hfm.manf.dist_external import (
+    #     cvg_accelerator_smaler, cvg_accelerator_larger)
+    # # from hfm.manf.dist_internal import projector
+    # # from hfm.manf.dist_internal import sub_accelerator_smaler as smaler
+    # # from hfm.manf.dist_internal import sub_accelerator_larger as larger
+    # from hfm.dist_est_nonbin import sub_accelerator_smaler as smaler
+    # from hfm.dist_est_nonbin import sub_accelerator_larger as larger
 
     proj = X_nA_y @ vec_w
     idx_y_fx = np.argsort(proj)
@@ -436,9 +465,13 @@ def approx_part5_sub(X_nA_y, A_i, idx_Sjs, m2, vec_w):
 
 
 def conver_part6_drt(X_nA_y, A_i, idx_Sjs, n_e=3):
-    from hfm.manf.dist_internal import Direct_nonbin
-    from hfm.manf.dist_external import StratES_nonbin, StratRA_nonbin
-    from hfm.dist_cvg_nonbin import ApproxDist_nonbin as Approx
+    from hfm.scrap.mf_dist_internal import Direct_nonbin
+    from hfm.scrap.mf_dist_external import StratES_nonbin, StratRA_nonbin
+    from hfm.scrap.dist_cvg_nonbin import ApproxDist_nonbin as Approx
+
+    # from hfm.manf.dist_internal import Direct_nonbin
+    # from hfm.manf.dist_external import StratES_nonbin, StratRA_nonbin
+    # from hfm.dist_cvg_nonbin import ApproxDist_nonbin as Approx
     from hfm.dist_drt import DirectDist_nonbin as Direct
 
     n1 = Approx(X_nA_y, A_i, n_e)
@@ -477,14 +510,21 @@ def conver_part6_drt(X_nA_y, A_i, idx_Sjs, n_e=3):
 
 
 def conver_part6_app(X_nA_y, A, indices, m1, m2, n_e):
-    from hfm.manf.dist_external import EffExact_multivar  # er
-    from hfm.manf.dist_internal import Direct_multivar    # er
-    from hfm.dist_drt import DirectDist_multiver as Direct
-    from hfm.dist_cvg_nonbin import EffExact as Extend
+    from hfm.scrap.mf_dist_external import EffExact_multivar
+    from hfm.scrap.mf_dist_internal import Direct_multivar
+    from hfm.scrap.dist_cvg_nonbin import EffExact as Extend
+    from hfm.scrap.dist_cvg_nonbin import StratVacant as SV1
+    from hfm.scrap.dist_cvg_nonbin import StratEarlyStop as SES
+    from hfm.scrap.dist_cvg_nonbin import StratRearrange as SRA
 
-    from hfm.dist_cvg_nonbin import StratVacant as SV1
-    from hfm.dist_cvg_nonbin import StratEarlyStop as SES
-    from hfm.dist_cvg_nonbin import StratRearrange as SRA
+    # from hfm.manf.dist_external import EffExact_multivar  # er
+    # from hfm.manf.dist_internal import Direct_multivar    # er
+    from hfm.dist_drt import DirectDist_multiver as Direct
+    # from hfm.dist_cvg_nonbin import EffExact as Extend
+
+    # from hfm.dist_cvg_nonbin import StratVacant as SV1
+    # from hfm.dist_cvg_nonbin import StratEarlyStop as SES
+    # from hfm.dist_cvg_nonbin import StratRearrange as SRA
     n1 = Extend(X_nA_y, A, SV1, m1, m2, n_e)
     # t7 = EffExact_multiver(X_nA_y, A, 'Vacant', m1, m2, n_e)
 
@@ -507,6 +547,8 @@ def conver_part6_app(X_nA_y, A, indices, m1, m2, n_e):
 
 
 def test_external():
+    from hfm.scrap.mf_dist_internal import weight_generator
+
     n, nd = 324, 17
     nc = na = nai = 2
     nai = 3
@@ -522,7 +564,7 @@ def test_external():
     approx_part5_drt(X_nA_y, A[:, 1], indices[1], m1, m2, n_e)
     approx_part5_app(X_nA_y, A, indices, m1, m2, n_e)
 
-    from hfm.manf.dist_internal import weight_generator
+    # from hfm.manf.dist_internal import weight_generator
     vec_w = weight_generator(n_d=nd)
     # approx_part5_sub(X_nA_y, A[:, 1], indices[1], m2, vec_w)
 

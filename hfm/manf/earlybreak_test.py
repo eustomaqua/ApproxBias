@@ -1,12 +1,19 @@
 # coding: utf-8
 
-# import pdb
+
 import numpy as np
-from hfm.manf.dist_internal import (  # Direct_multiver
-    Direct_bin, Direct_nonbin, Direct_multivar, curr_intermediate)
-from hfm.manf.dist_external import (
-    Approx_nonbin, StratES_nonbin, StratRA_nonbin, EffExact_multivar)
+# from hfm.manf.dist_internal import (  # Direct_multiver
+#     Direct_bin, Direct_nonbin, Direct_multivar, curr_intermediate)
+# from hfm.manf.dist_external import (
+#     Approx_nonbin, StratES_nonbin, StratRA_nonbin, EffExact_multivar)
 from hfm.utils.verifiers import check_equal, poset_nolessthan
+
+
+# import pdb
+from hfm.scrap.mf_dist_internal import (
+    Direct_bin, Direct_nonbin, Direct_multivar, curr_intermediate)
+from hfm.scrap.mf_dist_external import (
+    Approx_nonbin, StratES_nonbin, StratRA_nonbin, EffExact_multivar)
 
 
 n, nd = 324, 17
@@ -31,9 +38,13 @@ m1, m2, n_e = 10, 4, 2
 
 
 def naive_bin(X_nA_y, A_i, idx_Sjs, func='euclidean'):
-    from hfm.manf.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
-    from hfm.manf.earlybreak_ver3 import Naive_bin, EffHD_bin
-    from hfm.manf.dist_internal import Approx_bin
+    from hfm.scrap.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
+    from hfm.scrap.earlybreak_ver3 import Naive_bin, EffHD_bin
+    from hfm.scrap.mf_dist_internal import Approx_bin
+
+    # from hfm.manf.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
+    # from hfm.manf.earlybreak_ver3 import Naive_bin, EffHD_bin
+    # from hfm.manf.dist_internal import Approx_bin
 
     ot1 = Naive_bin(X_nA_y, idx_Sjs[0], func, n_p)
     ot2 = EffHD_bin(X_nA_y, idx_Sjs[0], func, n_p)
@@ -56,7 +67,9 @@ def naive_bin(X_nA_y, A_i, idx_Sjs, func='euclidean'):
 
 
 def naive_nonbin(X_nA_y, A_i, idx_Sjs, func='euclidean'):
-    from hfm.manf.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
+    from hfm.scrap.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
+
+    # from hfm.manf.earlybreak_ver3 import Naive_nonbin, EffHD_nonbin
     # from hfm.manf.earlybreak import Naive_bin, EffHD_bin
 
     ot1 = Naive_nonbin(X_nA_y, idx_Sjs, func, n_p)
@@ -75,8 +88,10 @@ def naive_nonbin(X_nA_y, A_i, idx_Sjs, func='euclidean'):
 
 
 def Naive_multiver(X_nA_y, A, indices, func='euclidean'):
+    from hfm.scrap.earlybreak_ver3 import Naive_multivar, EffHD_multivar
+
     # from hfm.manf.earlybreak import Naive_multiver, EffHD_multiver
-    from hfm.manf.earlybreak_ver3 import Naive_multivar, EffHD_multivar
+    # from hfm.manf.earlybreak_ver3 import Naive_multivar, EffHD_multivar
 
     ot1 = Naive_multivar(X_nA_y, indices, func, n_p)
     ot2 = EffHD_multivar(X_nA_y, indices, func, n_p)
@@ -104,10 +119,15 @@ def excl_test_naive_ver1():
 
 
 def compare_ver():
-    from hfm.manf.earlybreak_ver3 import Naive_bin as Naive_bin_v3
-    from hfm.manf.earlybreak_ver3 import Naive_nonbin as Naive_non_v3
-    from hfm.manf.earlybreak_ver3 import EffHD_bin as Eff_bin_v3
-    from hfm.manf.earlybreak_ver3 import EffHD_nonbin as Eff_non_v3
+    from hfm.scrap.earlybreak_ver3 import Naive_bin as Naive_bin_v3
+    from hfm.scrap.earlybreak_ver3 import Naive_nonbin as Naive_non_v3
+    from hfm.scrap.earlybreak_ver3 import EffHD_bin as Eff_bin_v3
+    from hfm.scrap.earlybreak_ver3 import EffHD_nonbin as Eff_non_v3
+
+    # from hfm.manf.earlybreak_ver3 import Naive_bin as Naive_bin_v3
+    # from hfm.manf.earlybreak_ver3 import Naive_nonbin as Naive_non_v3
+    # from hfm.manf.earlybreak_ver3 import EffHD_bin as Eff_bin_v3
+    # from hfm.manf.earlybreak_ver3 import EffHD_nonbin as Eff_non_v3
 
     from hfm.manf.earlybreak_ver4 import Naive_bin as Naive_bin_v4
     from hfm.manf.earlybreak_ver4 import Naive_nonbin as Naive_non_v4

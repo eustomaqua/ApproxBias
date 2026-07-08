@@ -21,8 +21,8 @@ from hfm.dist_drt import DirectDist_multiver as DistDirect_multivar
 from hfm.hfm_df import bias_degree_bin as fair_degree_v3
 from hfm.hfm_df import bias_degree_nonbin as fair_degree_v4
 # from hfm.dist_est_nonbin import AcceleDist_nonbin as DistAccele
-from hfm.dist_est_nonbin import ApproxDist_nonbin_mpver as DistApprox
-from hfm.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
+from hfm.scrap.dist_est_nonbin import ApproxDist_nonbin_mpver as DistApprox
+from hfm.scrap.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
 from hfm.dist_est_bin import ApproxDist_bin
 
 

@@ -1,4 +1,5 @@
 # coding: utf-8
+# manf/parm_hfm.py
 """
 Metric-parametrized HFM under L_p ground metrics.
 
@@ -33,7 +34,7 @@ from scipy.spatial import cKDTree, distance
 
 from hfm.manf.renew_core import INF64, EPS64
 # from hfm.utils.verifiers import INF64, EPS64
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 import pdb
 ArrayLike = Union[np.ndarray, Iterable[float]]
 PType = Union[int, float, str]
@@ -396,7 +397,7 @@ def aggregate_dmin(d_min: np.ndarray) -> Tuple[float, float]:
     return float(np.max(d_min)), float(np.mean(d_min))
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def direct_single_sa(
     X: np.ndarray,
     A: np.ndarray,
@@ -414,7 +415,7 @@ def direct_single_sa(
     return d_max, d_avg
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def strat_es_single_sa(
     X: np.ndarray,
     A: np.ndarray,
@@ -511,7 +512,7 @@ def strat_ra_dmin_single_sa(
     return best
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def strat_ra_single_sa(
     X: np.ndarray,
     A: np.ndarray,

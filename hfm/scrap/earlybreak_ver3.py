@@ -9,7 +9,8 @@
 
 import numpy as np
 from numba import njit
-from hfm.manf.dist_internal import alter_intermediate, name_intermediate
+from hfm.scrap.mf_dist_internal import alter_intermediate, name_intermediate
+# from hfm.manf.dist_internal import alter_intermediate, name_intermediate
 from hfm.utils.decorators import fantasy_timer
 from hfm.utils.verifiers import INF64
 

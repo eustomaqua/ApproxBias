@@ -8,7 +8,7 @@ from numba import njit, prange
 import pdb
 
 # from hfm.utils.verifiers import INF64, EPS64 #,CONST_ZERO
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 # from hfm.manf.renew_drt import (  # CONST_INF,
 #     ArrayLike, PType, IndexLike, DTY_FLT, DTY_INT,
 #     _as_float_p, dual_norm_vec, _lp_distance_rows,
@@ -101,7 +101,7 @@ from hfm.manf.renew_core import (
 #     return d_min, scanned
 
 
-@njit(cache=True, parallel=True)
+@njit(cache=True, parallel=True, fastmath=True)
 def _StratES_subproc_ver2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
                           vec_w: np.ndarray
                           ) -> Tuple[np.ndarray, np.ndarray]:
@@ -276,7 +276,7 @@ def _StratES_subproc_ver4(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
     return d_min
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def StratES_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0
                    )->hfmOUTCOME:
     p = _as_float_p(p)
@@ -579,7 +579,7 @@ def _StratRA_core(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
     return _aggregate_dmin(fin)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                    # m1: int = 25, m2: Optional[int] = None,
                    # n_e: int = 3) -> hfmOUTCOME:  # *,
@@ -638,7 +638,7 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 #
 # # @njit(parallel=True, cache=True)
 # # def _StratRA_core_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
-# #                        m1: int, m2: int, n_e: int, n_grp: int)->hfmOUTCOME:
+# #                       m1: int, m2: int, n_e: int, n_grp: int)->hfmOUTCOME:
 # #     n, n_d = X_nA_y.shape
 # #     W_all = np.empty((m1, n_e, n_d), dtype=DTY_FLT)
 # #     for v in range(m1):
@@ -665,7 +665,7 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 # #
 # # @fantasy_timer
 # # def StratRA_nonbin_alt2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
-# #                         m1: int=20, m2: int=8, n_e: int = 2)->hfmOUTCOME:
+# #                         m1: int = 20, m2: int = 8, n_e: int = 2)->hfmOUTCOME:
 # #     p = _as_float_p(p)
 # #     # B_i = np.asarray(A_i)  # .reshape(-1)
 # #     _, A_code = np.unique(A_i, return_inverse=True)  # B_i,
@@ -691,8 +691,6 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 #             nxt += 1
 #         next_not[pos] = nxt
 #     return prev_not, next_not
-#
-#
 # @njit
 # def AcceleCoreBack_ver5(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 #                         vec_w: np.ndarray, m2: int,  # n_grp: int,
@@ -726,7 +724,7 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 #         #     count += 1
 #         #     jp = next_not[jp]
 #         best_all[row, k] = best
-# # @njit(parallel=True)
+# # @njit
 # def _StratRA_core_alt(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
 #                       m1: int, m2: int, n_e: int)->hfmOUTCOME:
 #     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
@@ -750,3 +748,53 @@ def StratRA_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 
 
 # ------------------------------------------
+# ------------------------------------------
+
+
+# @njit(parallel=True, cache=True, fastmath=True)
+# def _StratRA_core_V2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                      m1: int, m2: int, n_e: int, n_grp: int) ->hfmOUTCOME:
+#     n, n_d = X_nA_y.shape
+#     W_all = np.empty((m1, n_e, n_d), dtype=DTY_FLT)
+#     for v in range(m1):
+#         W_all[v] = orthogonal_weight(n_d, n_e)
+#     total = m1 * n_e
+#     best_all = np.empty((total, n), dtype=DTY_FLT)
+#     for t in prange(total):
+#         v = t // n_e
+#         k = t % n_e
+#         vec_w = W_all[v, k]  # W[k]
+#         # AcceleCoreBack_ver4(X_nA_y,A_i,p,vec_w,m2, n_grp, best_all,t)
+#         AcceleCoreBack_ver2(X_nA_y, A_i, p, vec_w, m2, best_all[t])
+#     # fin = _reduce_min_axis0(best_all)
+#     fin = np.empty(n, dtype=DTY_FLT)
+#     for i in range(n):
+#         best = best_all[0, i]  # INF64
+#         for t in range(1, total):
+#             val = best_all[t, i]
+#             if val < best:
+#                 best = val
+#         fin[i] = best
+#     return _aggregate_dmin(fin)
+# @fantasy_timer_prime
+# def StratRA_nonbin_V2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
+#                       m1: int = 20, m2: int = 8, n_e: int = 2) -> hfmOUTCOME:
+#     p = _as_float_p(p)
+#     B_i = np.asarray(A_i).reshape(-1)
+#     _, A_code = np.unique(B_i, return_inverse=True)
+#     A_code = A_code.astype(DTY_INT)
+#     n_grp = int(A_code.max()) + 1
+#     return _StratRA_core_V2(X_nA_y, A_code, p, m1, m2, n_e, n_grp)
+
+
+# @fantasy_timer_prime
+# def StratES_nonbin_V2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0
+#                       )->hfmOUTCOME:
+#     p = _as_float_p(p)
+#     n, n_d = X_nA_y.shape
+#     W = orthogonal_weight(n_d, n_e=1)
+#     vec_w = dual_normalize(W[0], p)
+#     d_min, _ = _StratES_subproc_ver2(X_nA_y, A_i, p, vec_w)
+#     # d_min = _StratES_subproc_ver3(X_nA_y, A_i, p, vec_w)
+#     # d_min = _StratES_subproc_ver5(X_nA_y, A_i, p, vec_w)
+#     return _aggregate_dmin(d_min)

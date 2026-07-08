@@ -10,21 +10,21 @@ from hfm.dist_est_bin import (
 # from hfm.dist_est_bin import (weight_generator, AcceleDist_bin,
 #                               ApproxDist_bin,
 #                               ApproxDist_bin_revised)
-from hfm.dist_est_nonbin import sub_accelerator_larger as larger
-from hfm.dist_est_nonbin import sub_accelerator_smaler as smaler
-from hfm.dist_cvg_nonbin import (AcceleDist_nonbin,
-                                 sub_accelerator_smaler,
-                                 sub_accelerator_larger,
-                                 ApproxDist_nonbin,
-                                 ApproxDist_nonbin_mpver)
+from hfm.scrap.dist_est_nonbin import sub_accelerator_larger as larger
+from hfm.scrap.dist_est_nonbin import sub_accelerator_smaler as smaler
+from hfm.scrap.dist_cvg_nonbin import (AcceleDist_nonbin,
+                                       sub_accelerator_smaler,
+                                       sub_accelerator_larger,
+                                       ApproxDist_nonbin,
+                                       ApproxDist_nonbin_mpver)
 
-from hfm.dist_cvg_nonbin import (
+from hfm.scrap.dist_cvg_nonbin import (
     StratVacant, StratRearrange, StratEarlyStop, EffExact)
-from hfm.dist_est_nonbin import ApproxDist_nonbin as StratPrev
+from hfm.scrap.dist_est_nonbin import ApproxDist_nonbin as StratPrev
 from hfm.earlybreak import (
     EffHD_bin, EffHD_nonbin, EffHD_multivar,
     Naive_bin, Naive_nonbin, Naive_multivar)
-from hfm.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
+from hfm.scrap.dist_est_nonbin import ExtendDist_multiver_mp as DistExtend
 
 import numpy as np
 from pathos import multiprocessing as pp

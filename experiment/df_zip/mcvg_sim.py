@@ -29,12 +29,12 @@ from experiment.preprocessing_nonbin import (
 from experiment.df_zip.mcvg_exp import (
     cvgExp1A_anal, cvgExp1B_anal, cvgExp1C_take)
 from hfm.utils.verifiers import DTY_INT, DTY_FLT
-from hfm.manf.dist_internal import (
+from hfm.scrap.mf_dist_internal import (  # .manf.dist_internal
     # Direct_nonbin, Approx_bin,
-    name_intermediate, Direct_multiver, curr_intermediate)
-from hfm.manf.dist_external import (
+    name_intermediate, Direct_multivar, curr_intermediate)
+from hfm.scrap.mf_dist_external import (  # .manf.dist_external
     # Approx_nonbin, StratES_nonbin, StratRA_nonbin,)
-    EffExact_multiver)
+    EffExact_multivar)  # er)
 from hfm.earlybreak import EffHD_multivar  # EffHD_bin
 # curr_intermediate = name_intermediate[-2:] + name_intermediate[:-2]
 
@@ -361,23 +361,23 @@ class ManfCvgEmpir(DataSetup):
         #     curr_res.append(tmp)
         # '' '
 
-        _, tmp = Direct_multiver(
+        _, tmp = Direct_multivar(  # er(
             curr_X_yfx, curr_A, priv_val, func=curr_intermediate[0], p=self._n_p)
         curr_res.append(tmp)
         curr_res.append(EffHD_multivar(curr_X_yfx, indices)[-1])
         for Strat in ['Approx', 'ES', 'RA']:
-            _, tmp = EffExact_multiver(
+            _, tmp = EffExact_multivar(  # er(
                 curr_X_yfx, curr_A, Strat, self._m1, self._m2, self._n_e,
                 func=curr_intermediate[0], p=self._n_p)
             curr_res.append(tmp)
         curr_res.extend(['', ''])
         for Strat in ['Approx', 'ES', 'RA']:
-            _, tmp = EffExact_multiver(
+            _, tmp = EffExact_multivar(  # er(
                 curr_X_yfx, curr_A, Strat, self._m1, self._m2, self._n_e,
                 func=curr_intermediate[0], p=self._n_p)
             curr_res.append(tmp)
         for func in curr_intermediate[1:]:
-            _, tmp = Direct_multiver(curr_X_yfx, curr_A, priv_val,
+            _, tmp = Direct_multivar(curr_X_yfx, curr_A, priv_val,
                                      func=func, p=self._n_p)
             curr_res.append(tmp)
         return curr_res  # [''] * 5 + curr_res  # [''] * 21 + curr_res

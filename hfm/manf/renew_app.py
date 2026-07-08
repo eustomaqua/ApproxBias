@@ -8,7 +8,7 @@ from numba import njit, prange
 import pdb
 
 # from hfm.utils.verifiers import INF64, EPS64
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 # from hfm.manf.renew_drt import (
 #     ArrayLike, PType, IndexLike, DTY_FLT, DTY_INT,
 #     _as_float_p, _lp_distance_rows, _aggregate_dmin,
@@ -142,7 +142,7 @@ def _Approx_bin_sub(X_nA_y: np.ndarray, B_i: IndexLike, p: PType,
     return d_max.min(), d_avg.min() / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Approx_bin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                m1: int = 25, m2: int = 11) -> hfmOUTCOME:
     p = _as_float_p(p)
@@ -178,10 +178,10 @@ def _Approx_nonbin_sub(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
         d_avg[k] = t_avg.min()
 
         # t_max = t_avg = INF64
-        # proj_all = X_nA_y @ W.T  # (n,n_e) 一次gemm代替n_e次gemv
+        # # proj_all = X_nA_y @ W.T  # (n,n_e) 一次gemm代替n_e次gemv
         # for j in range(n_e):
-        #     mx, sm = AcceleCore_bin(X_nA_y, A_i, p, proj_all[:, j], m2)
-        #     # mx, sm = AcceleCore_bin(X_nA_y, A_i, p, W[j], m2)
+        #     # mx,sm = AcceleCore_bin(X_nA_y,A_i,p, proj_all[:,j], m2)
+        #     mx, sm = AcceleCore_bin(X_nA_y, A_i, p, W[j], m2)
         #     t_max = min(t_max, mx)
         #     t_avg = min(t_avg, sm)
         # d_max[k] = t_max
@@ -189,7 +189,7 @@ def _Approx_nonbin_sub(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
     return d_max.min(), d_avg.min() / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Approx_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                   m1: int = 20, m2: int = 8, n_e: int = 2) -> hfmOUTCOME:
     p = _as_float_p(p)
@@ -204,3 +204,30 @@ def Approx_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 
 
 # ------------------------------------------
+# ------------------------------------------
+
+
+# @njit(parallel=True, cache=True)
+# def _Approx_nonbin_sub_V2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType,
+#                           m1: int, m2: int, n_e: int) -> hfmOUTCOME:
+#     n, n_d = X_nA_y.shape
+#     d_max = np.empty(m1, dtype=DTY_FLT)
+#     d_avg = np.empty(m1, dtype=DTY_FLT)
+#     # d_max = d_avg = INF64
+#     for k in prange(m1):
+#         W = orthogonal_weight(n_d, n_e)
+#         t_max = t_avg = INF64
+#         for j in range(n_e):
+#             mx, sm = AcceleCore_bin(X_nA_y, A_i, p, W[j], m2)
+#             t_max = min(t_max, mx)
+#             t_avg = min(t_avg, sm)
+#         d_max[k] = t_max
+#         d_avg[k] = t_avg
+#     # return d_max, d_avg / n
+#     return d_max.min(), d_avg.min() / n
+# @fantasy_timer_prime
+# def Approx_nonbin_V2(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
+#                  m1: int = 20, m2: int = 8, n_e: int = 2) -> hfmOUTCOME:
+#     p = _as_float_p(p)
+#     tmp = _Approx_nonbin_sub(X_nA_y, A_i, p, m1, m2, n_e)
+#     return list(map(float, tmp))

@@ -1,13 +1,17 @@
 # coding: utf-8
+# manf/dist_external.py
+
 
 import numpy as np
 from numba import njit, prange
 import math
 import pdb
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 from hfm.utils.verifiers import CONST_ZERO, INF64, DTY_FLT
 
-from hfm.manf.dist_internal import (
+
+from hfm.scrap.mf_dist_internal import (
+    # from hfm.manf.dist_internal import (
     name_intermediate, alter_intermediate,  # projector,
     # sub_accelerator_smaler, sub_accelerator_larger,
     AcceleCore_bin, _sub_accelerator_dir)
@@ -174,7 +178,7 @@ def Approx_nonbin_sub(X_nA_y, A_j, m1, m2, n_e, func_id, p):
     return d_max.min(), d_avg.min() / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Approx_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
     func_id = name_intermediate.index(func)
     tmp = Approx_nonbin_sub(X_nA_y, A_j, m1, m2, n_e, func_id, p)
@@ -198,7 +202,7 @@ def Approx_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
 #     return d_max.max(), d_avg.mean()
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Extend_multivar(X_nA_y, A, m1, m2, n_e=3, func='euclidean', p=3):
     _, n_a = A.shape  # n= #instances, n_a: number of sen-att
     func_id = name_intermediate.index(func)
@@ -382,7 +386,7 @@ def _StratES_subproc(X_nA_y, A_j, vec_w, func, p):
 #     return list(map(float, tmp))
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def StratES_nonbin(X_nA_y, A_j, n_e=2, func='euclidean', p=3):
     func_id = name_intermediate.index(func)
     n, n_d = X_nA_y.shape  # n_d-1: #non-sen-att
@@ -439,7 +443,7 @@ def _StratRA_core(X_nA_y, A_j, m1, m2, n_e, func, p):
     return fin.max(), fin.sum() / n
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def StratRA_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
     func_id = name_intermediate.index(func)
     tmp = _StratRA_core(X_nA_y, A_j, m1, m2, n_e, func_id, p)
@@ -450,7 +454,7 @@ def StratRA_nonbin(X_nA_y, A_j, m1, m2, n_e=2, func='euclidean', p=3):
 # Approximation
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def EffExact_multivar(X_nA_y, A, Strat, m1=10, m2=4, n_e=3,
                       func='euclidean', p=3):
     _, n_a = A.shape  # n #inst, n_a #sen-att

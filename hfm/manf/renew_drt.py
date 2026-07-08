@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit  # ,prange
 # from scipy.spatial import distance
 # from hfm.utils.verifiers import INF64, EPS64
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 
 # def njit(*args, **kwargs):
 #     if args and callable(args[0]):
@@ -91,7 +91,7 @@ def _idx_marginalised(A_i: IndexLike, priv_val: int = 1) -> list:
 # Public distance-computation APIs
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Direct_bin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                priv_val: int = 1) -> hfmOUTCOME:
     p = _as_float_p(p)
@@ -102,7 +102,7 @@ def Direct_bin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
     return max(half_1, half_2), tmp
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Direct_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
                   priv_val: int = 1) -> hfmOUTCOME:
     """Exact O(n^2) nearest cross-group distance computation"""
@@ -120,7 +120,7 @@ def Direct_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
 #     return
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def direct_sing_sa(X: np.ndarray, A: np.ndarray, *, p: PType = 2.0):
     """Exact O(n^2) nearest cross-group distance computation for one SA."""
     p = _as_float_p(p)

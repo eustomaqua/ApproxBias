@@ -6,10 +6,10 @@ import time
 import numpy as np
 from hfm.utils.verifiers import unique_column, DTY_FLT, DTY_INT
 
-from hfm.manf.dist_internal import (
-    Direct_bin, Direct_nonbin, Direct_multiver, Approx_bin, STRATEGIES)
-from hfm.manf.dist_external import (
-    Approx_nonbin, StratES_nonbin, StratRA_nonbin, EffExact_multiver)
+from hfm.scrap.mf_dist_internal import (  # .manf.dist_internal
+    Direct_bin, Direct_nonbin, Direct_multivar, Approx_bin, STRATEGIES)
+from hfm.scrap.mf_dist_external import (  # .manf.dist_external  #er
+    Approx_nonbin, StratES_nonbin, StratRA_nonbin, EffExact_multivar)
 from hfm.hfm_df import bias_degree_bin as fair_degree_v3
 from hfm.hfm_df import bias_degree_nonbin as fair_degree_v4
 
@@ -39,7 +39,9 @@ from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier
 from pyfair.marble.metric_fair import prev_unpriv_grp_one as sa_grp_dp
 from pyfair.marble.metric_fair import prev_unpriv_grp_two as sa_grp_eo
 from pyfair.marble.metric_fair import prev_unpriv_grp_thr as sa_grp_pp
-from hfm.manf.earlybreak import EffHD_multiver  # EffHD_bin,EffHD_nonbin,
+# from hfm.manf.earlybreak import EffHD_multiver #EffHD_bin,EffHD_nonbin,
+
+from hfm.scrap.earlybreak_ver3 import EffHD_multivar  # er
 
 
 # =====================================
@@ -94,7 +96,7 @@ class cvgExp1C_take(DistPerformance):
                    1: {'max': [], 'avg': [], 'tim': []}}
 
         non_sa = g1m_indices[0][0]
-        (Ds, Ds_avg, half_tmp), t_Ds = Direct_multiver(
+        (Ds, Ds_avg, half_tmp), t_Ds = Direct_multivar(
             X_yfx, A, self._priv_val, g1m_indices, func, n_p)
         # half_tmp = list(zip(*half_tmp))
         # res_wh.extend([Ds, Ds_avg, t_Ds])
@@ -112,7 +114,7 @@ class cvgExp1C_take(DistPerformance):
             res_tmp[1]['avg'].append('')
             res_tmp[1]['tim'].append('')
 
-        (Ds, half_tmp), t_Ds = EffHD_multiver(X_yfx, g1m_indices, func, n_p)
+        (Ds, half_tmp), t_Ds = EffHD_multivar(X_yfx, g1m_indices, func, n_p)
         # (Ds, half_tmp), t_Ds = EffHD_multivar(X_yfx, g1m_indices)
         res_tmp['wh']['max'].append(Ds)
         res_tmp['wh']['tim'].append(t_Ds)
@@ -124,7 +126,7 @@ class cvgExp1C_take(DistPerformance):
             res_tmp[1]['tim'].append('')
 
         for Strat in ['Vacant', 'StratES', 'StratRA']:
-            (Ds, Ds_avg, half_tmp), t_Ds = EffExact_multiver(
+            (Ds, Ds_avg, half_tmp), t_Ds = EffExact_multivar(
                 X_yfx, A, Strat, m1, m2, n_e, func, n_p)
             # half_tmp = list(zip(*half_tmp))
             res_tmp['wh']['max'].append(Ds)
@@ -194,7 +196,7 @@ class cvgExp1A_anal(DistPerformance):
                    0: {'max': [], 'avg': [], 'tim': []},
                    1: {'max': [], 'avg': [], 'tim': []}}
 
-        (Ds, Ds_avg, Ds_midtmp), t_Ds = Direct_multiver(
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = Direct_multivar(
             X_yfx, A, self._priv_val, g1m_indices, func, n_p)
         res_tmp['wh']['max'].append(Ds)
         res_tmp['wh']['avg'].append(Ds_avg)
@@ -211,7 +213,7 @@ class cvgExp1A_anal(DistPerformance):
 
         kw = dict(m1=m1, n_e=n_e, func=func, p=n_p)
         Strat = 'Vacant'  # STRATEGIES[0]
-        ans_approx = [EffExact_multiver(
+        ans_approx = [EffExact_multivar(
             X_yfx, A, Strat, m2=m2, **kw) for m2 in self._m2_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
@@ -230,7 +232,7 @@ class cvgExp1A_anal(DistPerformance):
             res_tmp[1]['tim'].extend([''] * n_l)
 
         Strat = 'ES'      # STRATEGIES[1]
-        (hat_Ds, hat_Ds_avg, hat_Ds_midtmp), t_Ds = EffExact_multiver(
+        (hat_Ds, hat_Ds_avg, hat_Ds_midtmp), t_Ds = EffExact_multivar(
             X_yfx, A, Strat, m2=0, **kw)
         res_tmp['wh']['max'].append(hat_Ds)
         res_tmp['wh']['avg'].append(hat_Ds_avg)
@@ -245,7 +247,7 @@ class cvgExp1A_anal(DistPerformance):
             res_tmp[1]['tim'].append('')
 
         Strat = 'RA'      # STRATEGIES[2]
-        ans_approx = [EffExact_multiver(
+        ans_approx = [EffExact_multivar(
             X_yfx, A, Strat, m2=m2, **kw) for m2 in self._m2_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
@@ -305,7 +307,7 @@ class cvgExp1B_anal(DistPerformance):
                    0: {'max': [], 'avg': [], 'tim': []},
                    1: {'max': [], 'avg': [], 'tim': []}}
 
-        (Ds, Ds_avg, Ds_midtmp), t_Ds = Direct_multiver(
+        (Ds, Ds_avg, Ds_midtmp), t_Ds = Direct_multivar(
             X_yfx, A, self._priv_val, g1m_indices, func, n_p)
         res_tmp['wh']['max'].append(Ds)
         res_tmp['wh']['avg'].append(Ds_avg)
@@ -322,7 +324,7 @@ class cvgExp1B_anal(DistPerformance):
 
         kw = dict(m2=m2, n_e=n_e, func=func, p=n_p)
         Strat = 'Vacant'  # STRATEGIES[0]
-        ans_approx = [EffExact_multiver(
+        ans_approx = [EffExact_multivar(
             X_yfx, A, Strat, m1=m1, **kw) for m1 in self._m1_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
@@ -341,7 +343,7 @@ class cvgExp1B_anal(DistPerformance):
             res_tmp[1]['tim'].extend([''] * n_l)
 
         Strat = 'ES'      # STRATEGIES[1]
-        (hat_Ds, hat_Ds_avg, hat_Ds_midtmp), t_Ds = EffExact_multiver(
+        (hat_Ds, hat_Ds_avg, hat_Ds_midtmp), t_Ds = EffExact_multivar(
             X_yfx, A, Strat, m1=0, **kw)
         res_tmp['wh']['max'].append(hat_Ds)
         res_tmp['wh']['avg'].append(hat_Ds_avg)
@@ -356,7 +358,7 @@ class cvgExp1B_anal(DistPerformance):
             res_tmp[1]['tim'].append('')
 
         Strat = 'RA'      # STRATEGIES[2]
-        ans_approx = [EffExact_multiver(
+        ans_approx = [EffExact_multivar(
             X_yfx, A, Strat, m1=m1, **kw) for m1 in self._m1_set]
         ans_approx, ans_ut = zip(*ans_approx)
         hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)

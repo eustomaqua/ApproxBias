@@ -14,7 +14,7 @@ import numba
 from hfm.utils.decorators import fantasy_timer
 from hfm.dist_drt import DistDirect_Euclidean
 from hfm.dist_est_bin import projector
-from hfm.dist_est_nonbin import (
+from hfm.scrap.dist_est_nonbin import (
     set_belonging, orthogonal_weight, AcceleCore,
     AcceleCoreBack)
 

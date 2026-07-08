@@ -22,17 +22,18 @@ def elegant_timer(text):
     return decorator
 
 
-# def fantasy_timer(func):
-#     # @functools.wraps(func)
-#     def wrapper(*args, **kw):
-#         since = time.time()
-#         ans = func(*args, **kw)
-#         tim_elapsed = time.time() - since
-#         return ans, tim_elapsed
-#     return wrapper
-
-
 def fantasy_timer(func):
+    # @functools.wraps(func)
+    def wrapper(*args, **kw):
+        since = time.time()
+        ans = func(*args, **kw)
+        tim_elapsed = time.time() - since
+        return ans, tim_elapsed
+    return wrapper
+
+
+def fantasy_timer_prime(func):
+    # @functools.wraps(func)
     def wrapper(*args, **kw):
         since = time.perf_counter()
         ans = func(*args, **kw)
