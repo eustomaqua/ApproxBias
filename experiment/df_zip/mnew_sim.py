@@ -30,7 +30,7 @@ from experiment.preprocessing_nonbin import (
 #
 from hfm.utils.verifiers import DTY_INT, DTY_FLT
 from experiment.df_zip.mnew_exp import (
-    cvgExp1C_take,)
+    cvgExp1C_take, cvgExp1A_anal)
 from hfm.manf.renew_core import curr_intermediate
 # from hfm.manf.renew_drt import (
 #     name_intermediate, Direct_multivar, curr_intermediate)
@@ -210,8 +210,8 @@ class ManfCvgEmpir(DataSetup):
         elif self._trial_type[-5:] in ('cvg1a', 'cvg1b'):
             curr_m = self._m1 if self._trial_type.endswith('a') else self._m2
             for func in curr_intermediate:
-                tmp = self._iterator.schedule_content(
-                    X, A, y, g1m_indices, curr_m, self._n_e, self._n_p, func)
+                tmp = self._iterator.schedule_content(  # self._n_p,
+                    X, A, y, g1m_indices, curr_m, self._n_e, func)
                 res_iter.append(tmp)
         return res_iter
 
