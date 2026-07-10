@@ -20,9 +20,9 @@ ApproxBias documentation
 Welcome to the ApproxBias's documentation. This is to help you reproduce our work from
 
 #. Measuring model-induced discrimination via efficient fairness approximation `[arXiv 2405.09251] <https://arxiv.org/abs/2405.09251>`_
-#. Approximating discrimination within models when faced with several non-binary sensitive attributes `[arXiv 2408.06099] <https://arxiv.org/abs/2408.06099>`_
+#. Fast discrimination assessment for multiple non-binary sensitive attributes `[arXiv 2408.06099] <https://arxiv.org/abs/2408.06099>`_
 
-We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation.
+We proposed a fairness measure named *harmonic fairness measure via manifolds (HFM)* with three optional versions, which deals with a fine-grained discrimination evaluation for one or more sensitive attributes (sen-att-s). *HFM* relies on the Euclidean Hausdorff distance, of which the direct computation is rather heavy. To accelerate the distance computation, we further proposed a few approximation algorithms for efficient bias evaluation. Note that, for both *HFM* and approximation algorithms, extension to other distances is possible.
 
 - To get started quickly, see :doc:`an example <posts/quickstart>` here
 - To understand the methodology, see :doc:`methodology <posts/methodology>`

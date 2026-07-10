@@ -26,6 +26,10 @@ DTY_INT = np.int64
 hfmOUTCOME = Tuple[float, float]
 
 
+name_intermediate = [2, 1, float("inf"), 3, 4, 7, ]
+curr_intermediate = name_intermediate[-1:] + name_intermediate[:-1]
+
+
 # ------------------------------------------
 # Dual exponent and dual-norm normalisation
 

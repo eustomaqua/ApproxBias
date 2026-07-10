@@ -11,7 +11,8 @@ import pdb
 from experiment.df_nonbin.mext_sim import (
     ManfExtEmpirical, ManfExtPrime_Empirical)
 from experiment.df_nonbin.rev_mext_sim import Rev_ManfExtPrime_Empir
-from experiment.df_zip.mcvg_sim import ManfCvgPrime  # ManfCvgEmpir,
+# from experiment.df_zip.mcvg_sim import ManfCvgPrime  # ManfCvgEmpir,
+from experiment.df_zip.mnew_sim import ManfCvgPrime
 
 
 def default_parameters():
@@ -24,7 +25,7 @@ def default_parameters():
         choices=["ricci", "german", "adult", "ppr", "ppvr"])
     parser.add_argument(
         '-pre', "--data-preprocessing", type=str, default="min_max",
-        choices=["none", "standard", "min_max", "normalize"])
+        choices=["none", "standard", "min_max", "normalize", 'min_abs'])
     parser.add_argument(
         '--omit', action='store_false', help='--omitted')
     parser.add_argument('-rev', '--revision', action='store_true')
@@ -86,8 +87,9 @@ if args.converge:
     kwargs['m1'] = args.m1_chosen
     kwargs['m2'] = args.m2_chosen
     kwargs['n_e'] = args.n_e_chosen
-    kwargs['n_p'] = args.n_p_chosen
+    # kwargs['n_p'] = args.n_p_chosen
     kwargs['ratio'] = .97
+    # pdb.set_trace()
 
     kwargs['nb_cv'] = args.nb_iter
     if trial_type[-5:] in ('cvg1c', 'cvg1a', 'cvg1b'):
@@ -257,4 +259,7 @@ python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 
 python hfm_nonbin_exec.py -cvg may12 -pre min_max -exp mCV_cvg1c -dat ricci -nk 2 -rep
 python hfm_nonbin_exec.py -cvg may12 .. -exp mCV_cvg1a -nk 2 -rep -m1 20
 python hfm_nonbin_exec.py -cvg may12 .. -exp mCV_cvg1b -nk 2 -rep -m2 8
+
+# -cvg jul8
+python hfm_nonbin_exec.py -cvg jul8 -pre min_max -exp mCV_cvg1c -dat ricci -nk 2 -rep
 """

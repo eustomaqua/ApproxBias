@@ -38,6 +38,9 @@ from hfm.manf.renew_cvg import StratRA_nonbin as re_StratRA
 # from hfm.manf.renew_cvg import StratES_nonbin_V2 as re_strat_V2
 
 
+from hfm.manf.renew_drt import Direct_multivar
+
+
 n, nd = 10324, 17
 nc = na = n_e = 2
 nai = 3
@@ -97,6 +100,9 @@ re_Approx_nonbin(X_nA_y, curr, p, m1, m2, n_e)
 re_StratES(X_nA_y, curr, p)
 re_StratRA(X_nA_y, curr, p, m1, m2, n_e)
 
+
+tmp = Direct_multivar(X_nA_y, np.vstack([B_i, A_i]).T, p, priv)
+pdb.set_trace()
 
 # re_strat_V2(X_nA_y, curr, p)  # , m1, m2, n_e)
 # t2 = time.perf_counter()

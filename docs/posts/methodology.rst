@@ -160,7 +160,7 @@ For multi-valued sen-att-s [#P2]_, we remark that :math:`\mathbf{D}_{\mathbf{a}}
 Up to now, we got a *harmonic fairness measure via manifolds (HFM)*, with three optional versions (that is, previous, maximal, and average HFM).
 
 .. [#P1] Measuring model-induced discrimination via efficient fairness approximation https://arxiv.org/pdf/2405.09251
-.. [#P2] Approximating discrimination within models when faced with several non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
+.. [#P2] Fast discrimination assessment for multiple non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
 .. [#P3] Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning (M3L)*, Vancouver, Dec 2024. (Non-archival `poster <https://eustomadew.github.io/posters/2024_m3l_fairmanf.pdf>`_, `OpenReview <https://openreview.net/pdf?id=ywqVkVQZDj>`_)
 
 
@@ -189,8 +189,9 @@ As the direct computation of the distances above is rather heavy, we'd like to e
 .. After sorting all the projected data points on :math:`\mathbb{R}`, it is likely that for one :math:`(\mathbf{x,a},y)` in :math:`S_j`, the desired instance :math:`\arg\min_{(\mathbf{x}',\mathbf{a}',y') \in\bar{S}_j} \mathbf{d}\big( (\mathbf{x},\ddot{y}),(\mathbf{x}',\ddot{y}') \big)` would be somewhere near it after the projection, and vice versa. Thus, searching for it could be *accelerated* by checking several adjacent instances rather than traversing the whole dataset.
 
 
-For multi-valued sen-att-s [#P2]_,
+For multi-valued sen-att-s,
 
+.. [#P2]_,
 .. - *Algorithm 3. ExtendDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S)`)
 .. - *Algorithm 2. ApproxDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
 .. - *Algorithm 1. AcceleDist*  (to estimate :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)` and :math:`\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)`)
@@ -239,6 +240,43 @@ For one bi-valued sen-att [#P1]_,
 
 - *Algorithm 4. Simplified* [#P3]_ *ApproxDist* calling algo1,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
 - *Algorithm 1. AcceleDist*,  to estimate :math:`\mathbf{D}_{\cdot}(S_1,\bar{S}_1)` or :math:`\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)`
+
+
+.. attention::
+   While we mainly instantiate the specific distance metric :math:`\mathbf{d}(\cdot,\cdot)` with the Euclidean distance, it is also possible to choose other options (such as Manhattan, Chebyshev, Minkowski, cosine distance, or correlation distance) [#P2]_ in use, depending on contexts or needs.
+
++-----------+------------------+--------------------+
+| *sen-att* |direct computation| approximation algo |
++===========+==================+====================+
+| binary    | Direct_bin       |  Approx_bin        |
++-----------+------------------+--------------------+
+| non-binary| Direct_nonbin    |  Approx_nonbin     |
++           +                  +--------------------+
+|           |                  |  StratES_nonbin    |
++           +                  +--------------------+
+|           |                  |  StratRA_nonbin    |
++-----------+------------------+--------------------+
+| multiple  | EffDist                               |
++-----------+------------------+--------------------+
+
+.. .. important: : note
+.. +===========+====================+=========================+
+.. For a multi-valued sen-att [#P2]_,
+.. =========== ==================== =========================
+..  sen-att     direct computation   approximation algorithm
+.. =========== ==================== =========================
+.. binary       Direct_bin           Approx_bin
+.. non-binary   Direct_nonbin        Approx_nonbin
+..                                   StratES_nonbin
+..                                   StratRA_nonbin
+.. =========== ==================== =========================
+
+.. ===== ======== ======= =======
+..       previous maximal average
+.. ===== ======== ======= =======
+.. ===== ======== ======= =======
+.. Distance between sets :math:`\mathbf{D}_{\cdot}(\bar{S}_1,\bar{S}_1;)` :math:`g` :math:`g`
+
 
 .. In this way, we reduce the high computational complexity :math:`\mathcal{O}(n^2)` of direct computation to :math:`\mathcal{O}(n\log n)`.
 

@@ -10,7 +10,7 @@
 
 import numpy as np
 from numba import njit
-from hfm.utils.decorators import fantasy_timer
+from hfm.utils.decorators import fantasy_timer_prime
 
 # from hfm.manf.earlybreak_ver1 import HDD_randomize
 from hfm.manf.renew_core import ( 
@@ -147,7 +147,7 @@ def HDD_earlybreak(X: np.ndarray, iA: IndexLike, iB: IndexLike,
 #     return cmax
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def EffHD_bin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
               priv_val: int = 1) -> float:
     p = _as_float_p(p)
@@ -158,7 +158,7 @@ def EffHD_bin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
     return max(half_1, half_2)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def EffHD_nonbin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
                  priv_val: int = 1) -> float:
     p = _as_float_p(p)
@@ -196,7 +196,7 @@ def EffHD_nonbin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
 #     return cmax
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Naive_bin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
               priv_val: int = 1) -> float:
     p = _as_float_p(p)
@@ -208,7 +208,7 @@ def Naive_bin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
     return max(half_1, half_2)
 
 
-@fantasy_timer
+@fantasy_timer_prime
 def Naive_nonbin(X_nA_y: ArrayLike, Ai: IndexLike, p: PType = 2.0,
                  priv_val: int = 1) -> float:
     p = _as_float_p(p)

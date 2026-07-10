@@ -21,6 +21,7 @@ from hfm.manf.renew_core import ArrayLike, PType, IndexLike
 from hfm.manf.renew_core import (
     _lp_distance_rows, _as_float_p, _aggregate_dmin,
     _validate_inputs, hfmOUTCOME)  # ,_idx_marginalised)
+import pdb
 
 
 # ------------------------------------------
@@ -114,9 +115,29 @@ def Direct_nonbin(X_nA_y: np.ndarray, A_i: IndexLike, p: PType = 2.0,
     return max(half_pl_max), sum(half_pl_avg) / n
 
 
-# @fantasy_timer
-# def Direct_multivar(X_nA_y: np.ndarray, A: np.ndarray, p: PType = 2.0,
-#                     priv_val: int = 1):
+@fantasy_timer_prime
+def Direct_multivar(X_nA_y: np.ndarray, A: np.ndarray, p: PType = 2.0,
+                    priv_val: int = 1, nb_margd: int = 0):
+    n_a = A.shape[1]
+    # vA = np.unique(A).shape[0]
+    if not nb_margd:  # if not nb_marginalised:  # if vA <= 2:
+        half_mid = [Direct_bin(
+            X_nA_y, A[:, i], p, priv_val) for i in range(n_a)]
+    else:
+        half_mid = [Direct_nonbin(
+            X_nA_y, A[:, i], p, priv_val) for i in range(n_a)]
+
+    # half_mid = [Direct_nonbin(
+    #     X_nA_y, A[:, i], p, priv_val) for i in range(n_a)]
+    half_mid, half_tim = zip(*half_mid)
+    half_pl_max, half_pl_avg = zip(*half_mid)
+    return max(half_pl_max), sum(half_pl_avg) / n_a, (
+        half_pl_max, half_pl_avg, half_tim)
+
+
+# @fantasy_timer_prime
+# def EffDist(X: np.ndarray, A: np.ndarray, *, p: PType = 2.0,
+#             priv_val: int = 1):
 #     return
 
 

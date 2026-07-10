@@ -18,8 +18,7 @@ from pyfair.facil.data_split import (
     manual_repetitive, scale_normalize_helper)
 
 from experiment.utils_empirical import DataSetup
-from experiment.datasets import (
-    transform_X_and_y, transform_unpriv_tag)
+from experiment.datasets import transform_X_and_y, transform_unpriv_tag
 from experiment.preprocessing_bin import normalise_disturb_prime
 from experiment.preprocessing_nonbin import (
     renewed_prep_and_adversarial, renewed_transform_X_A_and_y,
@@ -27,19 +26,21 @@ from experiment.preprocessing_nonbin import (
     renewed_normalise_disturb, renewed_normalise_separate)
 
 
-# -cvg may12
+# -cvg jul8
 #
-from experiment.df_zip.mcvg_exp import (
-    cvgExp1A_anal, cvgExp1B_anal, cvgExp1C_take)
 from hfm.utils.verifiers import DTY_INT, DTY_FLT
-from hfm.scrap.mf_dist_internal import (  # .manf.dist_internal
-    # Direct_nonbin, Approx_bin,
-    name_intermediate, Direct_multivar, curr_intermediate)
-from hfm.scrap.mf_dist_external import (  # .manf.dist_external
-    # Approx_nonbin, StratES_nonbin, StratRA_nonbin,)
-    EffExact_multivar)  # er)
-from hfm.earlybreak import EffHD_multivar  # EffHD_bin
-# curr_intermediate = name_intermediate[-2:] + name_intermediate[:-2]
+from experiment.df_zip.mnew_exp import (
+    cvgExp1C_take,)
+from hfm.manf.renew_core import curr_intermediate
+# from hfm.manf.renew_drt import (
+#     name_intermediate, Direct_multivar, curr_intermediate)
+# from hfm.scrap.mf_dist_external import EffExact_multivar
+from hfm.manf.earlybreak_ver4 import EffHD_nonbin, EffHD_bin
+
+from hfm.manf.earlybreak_ver4 import Naive_bin, Naive_nonbin
+from hfm.manf.renew_drt import Direct_bin, Direct_nonbin
+from hfm.manf.renew_app import Approx_bin, Approx_nonbin
+from hfm.manf.renew_cvg import StratES_nonbin, StratRA_nonbin
 
 
 # =====================================
@@ -53,13 +54,13 @@ from hfm.earlybreak import EffHD_multivar  # EffHD_bin
 
 class ManfCvgEmpir(DataSetup):
     def __init__(self, trial_type, data_type, prep=False, nb_cv=5,
-                 m1=20, m2=8, n_e=2, n_p=3, m2_fixed=False, ratio=.97,
+                 m1=20, m2=8, n_e=2, m2_fixed=False, ratio=.97,
                  rep=False, gen=False, screen=True, logged=False):
         super().__init__(data_type)
         self._ratio = ratio  # discriminative risk
         self._m2_fixed = m2_fixed  # hfm
         self._m1, self._m2, self._n_e = m1, m2, n_e
-        self._n_p = n_p       # Minkowski distance
+        # self._n_p = n_p      # Minkowski distance
 
         self._trial_type = trial_type
         self._nb_cv = nb_cv
@@ -72,7 +73,8 @@ class ManfCvgEmpir(DataSetup):
         return
 
     def preparing_iterator(self, trial_type, rep, gen):
-        self.saIndex = [-1] if self._data_type == 'ricci' else [-2, 1]
+        self.saIndex = [-1] if self._data_type == 'ricci' else [-2, -1]  # ?
+        pdb.set_trace()
         self._subcore_iterator(trial_type, rep, gen)
         return
 
@@ -92,7 +94,8 @@ class ManfCvgEmpir(DataSetup):
             trial_type, self._prep.replace('_', ''), nk, self._log_document,
             'r{}'.format(int(self._ratio * 100)), 'pms', ])
         if trial_type[-5:] in ('cvg1c', 'cvg1d',):
-            formatted += f'_ne{self._n_e}p{self._n_p}'
+            # formatted += f'_ne{self._n_e}p{self._n_p}'
+            formatted += f'_ne{self._n_e}'
         formatted += f'_ma{self._m1}' * trial_type.endswith(
             '1a') + f'_mb{self._m2}' * trial_type.endswith('1b')
         self._log_document = formatted + ('_rep' * rep + '_gen' * gen)
@@ -122,18 +125,12 @@ class ManfCvgEmpir(DataSetup):
             "\t binary? = {}".format(not self._trial_type.startswith('mu')),
             "\t   trail = {}".format(self._trial_type),
             "\t dataset = {}".format(self._data_type),
-            # "\t nb_iter = {}, gen {}, rep/cv(s) {}".format(
-            #     self._nb_iter,
-            #     str(self._gen_iter)[0], str(self._rep_iter)[0]),
-            # "\t w/o omit= {}".format(self._omit),
             "\tdata prep= {}".format(self._prep),
             "\t nb_iter = {}".format(self._nb_cv),
             "PARAMETERS",
             "\t  m1, m2 = {}, {}".format(self._m1, self._m2),
             "\t  n_e    = {}    ".format(self._n_e),
-            "\t  n_p    = {}    ".format(self._n_p),
-            # "\t  nb_cls = {}".format(self._nb_cls),
-            # "\t  constr = {}".format(self._constraint_type),
+            # "\t  n_p    = {}    ".format(self._n_p),
             "HYPER-PARAMS", ""], logger)
 
         # START
@@ -160,11 +157,11 @@ class ManfCvgEmpir(DataSetup):
 
     def coding_per_procedure(self, csv_w, logger):
         csv_row_2a = ['dat_name', 'binary', '#sen-att',  # 'pre', '#cv',
-                      '#cv', 'm1', 'm2', 'n_e', 'n_p', 'func', 'k?']
+                      '#cv', 'm1', 'm2', 'n_e', 'func', 'k?']  # 'n_p',
         csv_row_1, cr2c, cr3c, cr4c = self._iterator.prepare_trial()
         csv_w.writerows([csv_row_1, csv_row_2a + cr2c,
-                         ['', '', self._prep] + [''] * 7 + cr3c,
-                         [''] * 10 + cr4c, ])
+                         ['', '', self._prep] + [''] * 6 + cr3c,
+                         [''] * 9 + cr4c, ])
         del cr2c, cr3c, cr4c, csv_row_2a, csv_row_1
 
         # START
@@ -175,6 +172,7 @@ class ManfCvgEmpir(DataSetup):
         json_w.close()
         del json_saver, json_w
         # END
+        # pdb.set_trace()
 
         csv_w.writerow(res_aux[0] + res_aux[-1])
         sens_att, priv_val, marginalised_grp = res_aux[1:4]
@@ -182,16 +180,16 @@ class ManfCvgEmpir(DataSetup):
         if self._trial_type[-5:] in ('cvg1c', 'cvg1d'):
             for fi, func in enumerate(curr_intermediate):
                 k = 0
-                csv_w.writerow([''] * 8 + [func, k] + res_data[k][fi])
+                csv_w.writerow([''] * 7 + [func, k] + res_data[k][fi])
                 for k in range(1, nk):
-                    csv_w.writerow([''] * 8 + ['', k] + res_data[k][fi])
+                    csv_w.writerow([''] * 7 + ['', k] + res_data[k][fi])
         elif self._trial_type[-5:] in ('cvg1a', 'cvg1b'):
             # curr_ms = res_aux[-2]
             for fi, func in enumerate(curr_intermediate):
                 k = 0
-                csv_w.writerow([''] * 8 + [func, k] + res_data[k][fi])
+                csv_w.writerow([''] * 7 + [func, k] + res_data[k][fi])
                 for k in range(1, nk):
-                    csv_w.writerow([''] * 8 + ['', k] + res_data[k][fi])
+                    csv_w.writerow([''] * 7 + ['', k] + res_data[k][fi])
         # pdb.set_trace()
         return
 
@@ -201,13 +199,14 @@ class ManfCvgEmpir(DataSetup):
             self, logger,  # k,
             X, A, y, X_wA, g1m_indices, idx_jt=None, Aq=None, X_wAq=None):
         res_iter = []  # None
-        kw = dict(m1=self._m1, m2=self._m2, n_e=self._n_e, n_p=self._n_p)
+        kw = dict(m1=self._m1, m2=self._m2, n_e=self._n_e)  # ,n_p=self._n_p)
         if self._trial_type[-5:] in ('cvg1c', 'cvg1d'):
             for func in curr_intermediate:
+                # ver = True if (func == 7 and k == 0) else False
+                # verbose=ver,
                 tmp = self._iterator.schedule_content(
-                    X, A, y, g1m_indices, func=func,
-                    **kw)  # self._m1, self._m2, self._n_e, self._n_p, func)
-                res_iter.append(tmp)  # [func] + tmp)
+                    X, A, y, g1m_indices, func=func, **kw)
+                res_iter.append(tmp)
         elif self._trial_type[-5:] in ('cvg1a', 'cvg1b'):
             curr_m = self._m1 if self._trial_type.endswith('a') else self._m2
             for func in curr_intermediate:
@@ -220,6 +219,7 @@ class ManfCvgEmpir(DataSetup):
             self, logger, k,
             X_trn, A_trn, y_trn, Aq_trn, g1m_trn, jt_trn,
             X_tst, A_tst, y_tst, Aq_tst, g1m_tst, jt_tst):
+        pdb.set_trace()
         return
 
     def coding_per_dataset(self, logger):
@@ -258,17 +258,10 @@ class ManfCvgEmpir(DataSetup):
                 (scaler, X_trn, _, X_tst, _, _, _, _, _, _
                  ) = renewed_normalise_disturb(
                     scaler, X_trn, [], X_tst, saIndex=[])  # self.saIndex)
-            # else:
-            #     pass
-
             # i-th K-Fold  # TODO
             elegant_print("Iteration {}-th".format(k + 1), logger)
-            pdb.set_trace()
             res_iter = self.coding_per_iteration_cv_split()
         return
-
-    # def _subcore_perset(self):
-    #     return
 
     def preparing_curr_dat(self, logger):
         (origin_dat, processed_dat, process_mult, disturbed_dat,
@@ -322,7 +315,7 @@ class ManfCvgEmpir(DataSetup):
 
         res_aux = [[self._dataset.dataset_name, len(set(y.values)),
                     len(sens_att), self._nb_cv,  # self._nb_iter,self._prep,
-                    self._m1, self._m2, self._n_e, self._n_p, '', ''],
+                    self._m1, self._m2, self._n_e, '', ''],  # self._n_p,
                    sens_att, priv_val, marginalised_grp, ]
         if self._trial_type.endswith('cvg1a'):
             res_aux.extend([self._iterator._m2_set, ['m2=?']])
@@ -389,13 +382,6 @@ class ManfCvgEmpir(DataSetup):
 class ManfCvgPrime(ManfCvgEmpir):
     def preparing_iterator(self, trial_type, rep, gen):
         self._subcore_iterator(trial_type, rep, gen)  # pass
-        # nk = f'nk{self._nb_cv}' if self._nb_cv > 0 else 'sing'
-        # formatted = '_'.join([
-        #     trial_type, nk, self._prep.replace('_', ''), self._log_document,
-        #     'r{}'.format(int(self._ratio * 100)), 'pms', ])
-        # if trial_type[-5:] in ('cvg1c', 'cvg1d'):
-        #     formatted += f'_ne{self._n_e}np{self._n_p}'
-        # self._log_document = formatted  # + ('_gen' * gen + '_rep' * rep)
         return
 
     def coding_per_iteration_cv_split(
@@ -408,6 +394,23 @@ class ManfCvgPrime(ManfCvgEmpir):
     def coding_per_dataset(self, logger):
         X_and_A, y, X_and_Aq, adjunctive, res_aux = self.preparing_curr_dat(logger)
         marginalised_grp, g1m_indices, new_attr, idx_g1, idx_jt = adjunctive
+
+        # tmpX, tp, tpv = X_and_A[:5].astype(DTY_FLT), 7, 1
+        # tmpA = np.random.randint(2, size=5)  # tmpA, y[:5],
+        # # tmpX = np.concatenate([y.reshape(-1, 1).astype(DTY_FLT), X], axis=1)[:5]
+        # # tmpA, tp, tpv = A[:5, 0], 7, 1
+        # Naive_bin(tmpX, tmpA, tp, tpv)
+        # EffHD_bin(tmpX, tmpA, tp, tpv)
+        # Direct_bin(tmpX, tmpA, tp, tpv)
+        # # pdb.set_trace()
+        # Approx_bin(tmpX, tmpA, tp, self._m1, self._m2)
+        # Naive_nonbin(tmpX, tmpA, tp, tpv)
+        # EffHD_nonbin(tmpX, tmpA, tp, tpv)
+        # Direct_nonbin(tmpX, tmpA, tp, tpv)
+        # Approx_nonbin(tmpX, tmpA, tp, self._m1, self._m2, self._n_e)
+        # StratES_nonbin(tmpX, tmpA, tp)
+        # StratRA_nonbin(tmpX, tmpA, tp, self._m1, self._m2, self._n_e)
+        # del tmpX, tmpA, tp, tpv
 
         if self._nb_cv <= 1:
             elegant_print("Running /executing as a whole", logger)

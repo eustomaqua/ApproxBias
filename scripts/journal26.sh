@@ -15,6 +15,7 @@
 
 module load singularity
 cd /home/qgl539/GitH/AB_15May
+cd /home/qgl539/GitH/AB_8Jul
 
 EXP=mCV_cvg1c
 PRE=min_max
@@ -25,7 +26,9 @@ do
 	 conda activate py311
 	 python hfm_nonbin_exec.py -cvg may12 -pre $PRE -exp $EXP -dat $DAT -nk 5 -rep
     "
+    # python hfm_nonbin_exec.py -cvg jul8 -pre $PRE -exp $EXP -dat $DAT -nk 5 -rep
 done
+# renamed from `journal_may.sh`
 
 
 # ssh hendrix
