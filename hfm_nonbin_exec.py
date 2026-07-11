@@ -262,4 +262,6 @@ python hfm_nonbin_exec.py -cvg may12 .. -exp mCV_cvg1b -nk 2 -rep -m2 8
 
 # -cvg jul8
 python hfm_nonbin_exec.py -cvg jul8 -pre min_max -exp mCV_cvg1c -dat ricci -nk 2 -rep
+python hfm_nonbin_exec.py -cvg .. -pre min_abs -exp mCV_cvg1a -dat german -nk 2 -rep -m1 20
+python hfm_nonbin_exec.py -cvg .. -pre min_abs -exp mCV_cvg1b -dat german -nk 2 -rep -m2 8
 """

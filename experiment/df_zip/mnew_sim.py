@@ -30,7 +30,7 @@ from experiment.preprocessing_nonbin import (
 #
 from hfm.utils.verifiers import DTY_INT, DTY_FLT
 from experiment.df_zip.mnew_exp import (
-    cvgExp1C_take, cvgExp1A_anal)
+    cvgExp1C_take, cvgExp1A_anal, cvgExp1B_anal)
 from hfm.manf.renew_core import curr_intermediate
 # from hfm.manf.renew_drt import (
 #     name_intermediate, Direct_multivar, curr_intermediate)

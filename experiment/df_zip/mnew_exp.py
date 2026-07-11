@@ -221,107 +221,65 @@ class cvgExp1A_anal(DistPerformance):
 class cvgExp1B_anal(DistPerformance):
     _m1_set = list(range(3, 34, 2))  # not 50, len=16
 
-    def schedule_content(self, X, A, y_fx, g1m_indices, m2, n_e, n_p, func):
-        X_yfx = np.concatenate([
+    def single_sen_att(self, X_nA_y, A_i, m2, n_e, func):
+        ans_max, ans_avg, ans_tim = [], [], []
+        tmp = Direct_nonbin(X_nA_y, A_i, func, self._priv_val)
+        ans_max.append(tmp[0][0])
+        ans_avg.append(tmp[0][1])
+        ans_tim.append(tmp[1])
+
+        kw = dict(m2=m2, n_e=n_e)
+        res_approx = [Approx_nonbin(
+            X_nA_y, A_i, func, m1=m1, **kw) for m1 in self._m1_set]
+        res_approx, tmp_ut = zip(*res_approx)
+        tmp_max, tmp_avg = zip(*res_approx)
+        ans_max.extend(tmp_max)
+        ans_avg.extend(tmp_avg)
+        ans_tim.extend(tmp_ut)
+
+        tmp = StratES_nonbin(X_nA_y, A_i, func)
+        ans_max.append(tmp[0][0])
+        ans_avg.append(tmp[0][1])
+        ans_tim.append(tmp[1])
+        res_approx = [StratRA_nonbin(
+            X_nA_y, A_i, func, m1=m1, **kw) for m1 in self._m1_set]
+        res_approx, tmp_ut = zip(*res_approx)
+        tmp_max, tmp_avg = zip(*res_approx)
+        ans_max.extend(tmp_max)
+        ans_avg.extend(tmp_avg)
+        ans_tim.extend(tmp_ut)
+
+        # n_l=16, (1+n_l)*2 *3 =34*3 =102
+        return ans_tim + ans_max + ans_avg
+
+    def schedule_content(self, X, A, y_fx, g1m_indices, m2, n_e, func):
+        X_nA_y = np.concatenate([
             y_fx.reshape(-1, 1).astype(DTY_FLT), X], axis=1)
         n_l, n_a = len(self._m1_set), len(g1m_indices)
-        res_tmp = {'wh': {'max': [], 'avg': [], 'tim': []},
-                   0: {'max': [], 'avg': [], 'tim': []},
-                   1: {'max': [], 'avg': [], 'tim': []}}
-
-        (Ds, Ds_avg, Ds_midtmp), t_Ds = Direct_multivar(
-            X_yfx, A, self._priv_val, g1m_indices, func, n_p)
-        res_tmp['wh']['max'].append(Ds)
-        res_tmp['wh']['avg'].append(Ds_avg)
-        res_tmp['wh']['tim'].append(t_Ds)
-        for i in range(n_a):
-            res_tmp[i]['max'].append(Ds_midtmp[0][i])
-            res_tmp[i]['avg'].append(Ds_midtmp[1][i])
-            res_tmp[i]['tim'].append(Ds_midtmp[2][i])
+        res_tmp = []
+        res_tmp += self.single_sen_att(X_nA_y, A[:, 0], m2, n_e, func)
         if n_a == 1:
-            res_tmp[1]['max'].append('')
-            res_tmp[1]['avg'].append('')
-            res_tmp[1]['tim'].append('')
-        del Ds, Ds_avg, Ds_midtmp, t_Ds
-
-        kw = dict(m2=m2, n_e=n_e, func=func, p=n_p)
-        Strat = 'Vacant'  # STRATEGIES[0]
-        ans_approx = [EffExact_multivar(
-            X_yfx, A, Strat, m1=m1, **kw) for m1 in self._m1_set]
-        ans_approx, ans_ut = zip(*ans_approx)
-        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
-        del ans_approx
-        res_tmp['wh']['max'].extend(hat_Ds)
-        res_tmp['wh']['avg'].extend(hat_Ds_avg)
-        res_tmp['wh']['tim'].extend(ans_ut)
-        hat_Ds_midtmp = np.array(hat_Ds_midtmp)
-        for i in range(n_a):
-            res_tmp[i]['max'].extend(hat_Ds_midtmp[:, 0, i].tolist())
-            res_tmp[i]['avg'].extend(hat_Ds_midtmp[:, 1, i].tolist())
-            res_tmp[i]['tim'].extend(hat_Ds_midtmp[:, 2, i].tolist())
-        if n_a == 1:
-            res_tmp[1]['max'].extend([''] * n_l)
-            res_tmp[1]['avg'].extend([''] * n_l)
-            res_tmp[1]['tim'].extend([''] * n_l)
-
-        Strat = 'ES'      # STRATEGIES[1]
-        (hat_Ds, hat_Ds_avg, hat_Ds_midtmp), t_Ds = EffExact_multivar(
-            X_yfx, A, Strat, m1=0, **kw)
-        res_tmp['wh']['max'].append(hat_Ds)
-        res_tmp['wh']['avg'].append(hat_Ds_avg)
-        res_tmp['wh']['tim'].append(t_Ds)
-        for i in range(n_a):
-            res_tmp[i]['max'].append(hat_Ds_midtmp[0][i])
-            res_tmp[i]['avg'].append(hat_Ds_midtmp[1][i])
-            res_tmp[i]['tim'].append(hat_Ds_midtmp[2][i])
-        if n_a == 1:
-            res_tmp[1]['max'].append('')
-            res_tmp[1]['avg'].append('')
-            res_tmp[1]['tim'].append('')
-
-        Strat = 'RA'      # STRATEGIES[2]
-        ans_approx = [EffExact_multivar(
-            X_yfx, A, Strat, m1=m1, **kw) for m1 in self._m1_set]
-        ans_approx, ans_ut = zip(*ans_approx)
-        hat_Ds, hat_Ds_avg, hat_Ds_midtmp = zip(*ans_approx)
-        del ans_approx
-        res_tmp['wh']['max'].extend(hat_Ds)
-        res_tmp['wh']['avg'].extend(hat_Ds_avg)
-        res_tmp['wh']['tim'].extend(ans_ut)
-        hat_Ds_midtmp = np.array(hat_Ds_midtmp)  # .transpose(2, 1, 0)
-        for i in range(n_a):
-            res_tmp[i]['max'].extend(hat_Ds_midtmp[:, 0, i].tolist())
-            res_tmp[i]['avg'].extend(hat_Ds_midtmp[:, 1, i].tolist())
-            res_tmp[i]['tim'].extend(hat_Ds_midtmp[:, 2, i].tolist())
-        if n_a == 1:
-            res_tmp[1]['max'].extend([''] * n_l)
-            res_tmp[1]['avg'].extend([''] * n_l)
-            res_tmp[1]['tim'].extend([''] * n_l)
-
-        res_curr = {
-            'tim': res_tmp['wh']['tim'] + res_tmp[0]['tim'] + res_tmp[1]['tim'],
-            'max': res_tmp['wh']['max'] + res_tmp[0]['max'] + res_tmp[1]['max'],
-            'avg': res_tmp['wh']['avg'] + res_tmp[0]['avg'] + res_tmp[1]['avg']}
-        return res_curr['max'] + res_curr['avg'] + res_curr['tim']
+            return res_tmp + [''] * 102
+        res_tmp += self.single_sen_att(X_nA_y, A[:, 1], m2, n_e, func)
+        return res_tmp
 
     def prepare_trial(self):
-        csv_row_1 = unique_column(10 + 102 * 3)
+        csv_row_1 = unique_column(9 + 102 * 2)
         csv_r4c = [f'm1={i}' for i in self._m1_set]  # n_l=16
         csv_r4c = [''] + csv_r4c + [''] + csv_r4c    # (1+n_l)*2   =34
         csv_r4c = csv_r4c * 3                        # (1+n_l)*2*3 =102
+
         n_l = len(self._m1_set) - 1
         csv_r3c = (['Direct_nonbin', 'Approx_nonbin'] + [''] * n_l + [
-            'StratES', 'StratRA'] + [''] * n_l) * 2
-        csv_r3c = ['Direct_multiver', 'ExtendDist'] + [''] * n_l + [
-            'ExactDist(StratES)', 'ExactDist(StratRA)'] + [''] * n_l + csv_r3c
+            'StratES', 'StratRA'] + [''] * n_l) * 3  # *2
+        # csv_r3c = ['Direct_multiver', 'ExtendDist'] + [''] * n_l + [
+        #     'ExactDist(StratES)', 'ExactDist(StratRA)']+['']*n_l+csv_r3c
         n_l = (1 + len(self._m1_set)) * 2 - 1
-        csv_r2c = ['d^max (*_multiver)'] + [''] * n_l + ['d^max sa#1'] + [
-            ''] * n_l + ['d^max sa#2'] + [''] * n_l + ['d^avg (*_multiver)'] + [
-            ''] * n_l + ['d^avg sa#1'] + [''] * n_l + ['d^avg sa#2'] + [
-            ''] * n_l + ['T(*_multiver)'] + [''] * n_l + ['T() sa#1'] + [
-            ''] * n_l + ['T() sa#2'] + [''] * n_l
+        csv_r2c = ['T() sa#1'] + [''] * n_l + ['d^max sa#1'] + [''] * n_l + [
+            'd^avg sa#1'] + [''] * n_l + ['T() sa#2'] + [''] * n_l + [
+            'd^max sa#2'] + [''] * n_l + ['d^avg sa#2'] + [''] * n_l
         csv_r2c[-1] = '[END]'
-        return csv_row_1, csv_r2c, csv_r3c * 3, csv_r4c * 3
+        return csv_row_1, csv_r2c, csv_r3c * 2, csv_r4c * 2
 
 
 # -------------------------------------
