@@ -160,7 +160,8 @@ For multi-valued sen-att-s [#P2]_, we remark that :math:`\mathbf{D}_{\mathbf{a}}
 Up to now, we got a *harmonic fairness measure via manifolds (HFM)*, with three optional versions (that is, previous, maximal, and average HFM).
 
 .. [#P1] Measuring model-induced discrimination via efficient fairness approximation https://arxiv.org/pdf/2405.09251
-.. [#P2] Fast discrimination assessment for multiple non-binary sensitive attributes https://arxiv.org/pdf/2408.06099
+.. [#P2] Fast discrimination assessment for multiple non-binary sensitive attributes
+.. https://arxiv.org/pdf/2408.06099
 .. [#P3] Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning (M3L)*, Vancouver, Dec 2024. (Non-archival `poster <https://eustomadew.github.io/posters/2024_m3l_fairmanf.pdf>`_, `OpenReview <https://openreview.net/pdf?id=ywqVkVQZDj>`_)
 
 

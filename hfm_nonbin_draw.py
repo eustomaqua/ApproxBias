@@ -35,8 +35,10 @@ from experiment.df_nonbin.rev_mext_plt_cor import (
     ConvFig_5H_exact, ConvFig_5I_exact, ConvFig_5Isimpl)
 from experiment.df_nonbin.rev_mext_plt_cor import HPEA_m1fix, HPEB_m2fix
 
-from experiment.df_zip.mcvg_plt import (  # DistPerf_draw
-    cvgPlt1C_take, cvgPlt1_anal_gather)  # cvgPlt1A_anal,cvgPlt1B_anal,
+# from experiment.df_zip.mcvg_plt import (  # DistPerf_draw
+#     cvgPlt1C_take, cvgPlt1_anal_gather)# cvgPlt1A_anal,cvgPlt1B_anal,
+from experiment.df_zip.mnew_plt import (
+    cvgPlt1C_take, cvgPlt1_anal_gather)
 
 
 # ===============================
@@ -420,13 +422,38 @@ class Rev_ManfExtDrawing(object):
 
         pre = self._prep.replace('_', '')
         fgn = self._trial_type.split('_')[-1]
-        self.subproc_cvg1(self._trial_type, pre, fgn)
+        # self.subproc_cvg1(self._trial_type, pre, fgn)
+        self.subproc_cvg1new(self._trial_type, pre, fgn)
 
         # END
         tim_elapsed = time.time() - since
         elegant_print([
             "Duration /TimeCost: {}".format(fantasy_durat(tim_elapsed)),
             "[ENDED {}]".format(elegant_dated(time.time()))], logger)
+        return
+
+    def subproc_cvg1new(self, trial_type, pre, fgn):
+        xlsx_name = '{}_nk{}_r{}_pms'.format(
+            trial_type[:-1], self._nb_iter, int(self._ratio * 100))
+        xlsx_name += f'_ne{self._n_e}'      # 'p{self._n_p}'
+        xlsx_name += ('_rep' * self._rep_iter + '_gen' * self._gen_iter)
+        sheet_name = 'exp{}_{}'.format(trial_type[-2:], pre)
+        xlsx_name = f'(py311) {xlsx_name}'
+
+        kws = dict(m1=self._m1, m2=self._m2, n_e=self._n_e,
+                   n_p=self._n_p, figname=fgn)
+        if trial_type.endswith('cvg1g'):
+            self._iterator = cvgPlt1_anal_gather(self._nb_iter, **kws)
+            df_a = self._iterator.load_raw_dataset(xlsx_name, f'exp1a_{pre}')
+            df_b = self._iterator.load_raw_dataset(xlsx_name, f'exp1b_{pre}')
+            self._iterator.schedule_mspaint(df_a, df_b, pre)
+            return
+
+        if trial_type.endswith('cvg1c'):
+            self._iterator = cvgPlt1C_take(self._nb_iter, **kws)
+        # pdb.set_trace()
+        df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
+        self._iterator.schedule_mspaint(df, pre)
         return
 
     def subproc_cvg1(self, trial_type, pre, fgn):
@@ -458,6 +485,7 @@ class Rev_ManfExtDrawing(object):
         # elif trial_type.endswith('cvg1b'):
         #     self._iterator = cvgPlt1B_anal(self._nb_iter, **kws)
 
+        pdb.set_trace()
         df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(df, pre)
         return
@@ -652,4 +680,7 @@ python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1c -pre min_max
 python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1a -m1 20 -pre min_max
 python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1b -m2 8  -pre min_max
 python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1g -pre min_max
+
+python hfm_nonbin_draw.py -cvg jul10 -exp mCV_cvg1c -pre min_max
+python hfm_nonbin_draw.py -cvg jul10 -exp mCV_cvg1g -pre min_max
 """

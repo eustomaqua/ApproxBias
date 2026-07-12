@@ -45,3 +45,4 @@ html_theme = 'renku'
 # extensions = ['recommonmark', 'sphinx_markdown_tables']
 # html_theme = 'alabaster'
 html_static_path = ['_static']
+html_show_sourcelink = False

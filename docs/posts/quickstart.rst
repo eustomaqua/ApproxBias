@@ -9,7 +9,8 @@ Getting started
 We provide the evaluation of extra discrimination introduced in the learning procedure for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from [P1]_, and two others come from [P2]_.
 
 .. [P1] Measuring model-induced discrimination via efficient fairness approximation (https://arxiv.org/pdf/2405.09251 preprint, accepted by TNNLS)
-.. [P2] Fast discrimination assessment for multiple non-binary sensitive attributes (https://arxiv.org/pdf/2408.06099 preprint)
+.. [P2] Fast discrimination assessment for multiple non-binary sensitive attributes
+.. (https://arxiv.org/pdf/2408.06099 preprint)
 
 
 .. This is a short tutorial covering all the aforementioned cases and methods; Note to check your configuration please before running the example. 

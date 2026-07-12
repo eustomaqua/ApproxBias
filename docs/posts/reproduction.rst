@@ -8,7 +8,14 @@ Reproduction
    :maxdepth: 1
 
 
-The `experimental data <https://github.com/eustomaqua/ApproxBias/tree/master/findings>`_ are released with ApproxBias.
+The `experimental data <https://github.com/eustomaqua/ApproxBias/tree/master/findings>`_ are released with ApproxBias, as well as on `Zenodo <https://zenodo.org/communities/fairml/>`_.
+
+.. code-block:: console
+  :linenos:
+
+  $ git clone git@github.com:eustomaqua/ApproxBias.git
+  $ cd ApproxBias
+  $ git reset --hard 0d2e92dd37062aa5731a8a7d3033f418407cb221
 
 
 To reproduce our empirical results for **binary cases** [#P1]_, you may collect `data <https://doi.org/10.5281/zenodo.21263075>`_ and do the following.
@@ -61,7 +68,8 @@ To reproduce our empirical results for **non-binary cases** [#P2]_, you may do a
 
 
 
-.. [#P2] Fast discrimination assessment for multiple non-binary sensitive attributes (arXiv preprint `2408.06099 <https://arxiv.org/pdf/2408.06099>`_)
+.. (arXiv preprint `2408.06099 <https://arxiv.org/pdf/2408.06099>`_)
+.. [#P2] Fast discrimination assessment for multiple non-binary sensitive attributes
 .. [#P1] Measuring model-induced discrimination via efficient fairness approximation (arXiv preprint `2405.09251 <https://arxiv.org/pdf/2405.09251>`_, doi `10.1109/TNNLS.2026.3706648 <https://doi.org/10.1109/TNNLS.2026.3706648>`_, data `10.5281/zenodo.21263075 <https://doi.org/10.5281/zenodo.21263075>`_)
 
 

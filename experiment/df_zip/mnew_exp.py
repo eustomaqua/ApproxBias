@@ -118,7 +118,7 @@ class cvgExp1C_take(DistPerformance):
         return res_curr + tmp  # shape=(52+26,)
 
     def prepare_trial(self):
-        csv_row_1 = unique_column(9 + 52)
+        csv_row_1 = unique_column(9 + 52 + 26)
         tmp_bin = ['Naive_bin', 'EffHD_bin', 'Direct_bin', 'Approx_bin']
         tmp_nonbin = ['Naive_nonbin', 'EffHD_nonbin', 'Direct_nonbin',
                       'Approx_nonbin', 'StratES_nonbin', 'StratRA_nonbin']

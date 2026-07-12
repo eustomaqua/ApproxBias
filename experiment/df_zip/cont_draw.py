@@ -116,7 +116,8 @@ def _lr_subproc_myclr(snspec, Ys):
         myclr = _pl_myclr[1:3] + _pl_myclr[5:]
         if len(Ys) == 1:
             myclr = _pl_myclr[:1] + myclr
-    elif snspec == 'sty4' and len(Ys) == 2:
+    elif snspec in ['sty4', 'sty6'] and len(Ys) == 2:
+        # elif snspec == 'sty4' and len(Ys) == 2:
         myclr = _pl_myclr[:1] + myclr
 
     if snspec in ['sty3a', 'sty3b', 'sty3c', 'sty3d', 'sty3e']:
@@ -125,7 +126,7 @@ def _lr_subproc_myclr(snspec, Ys):
                       'fontsize': 6, 'framealpha': .5}
     elif snspec == 'sty3bf':
         _curr_fram = {'frameon': 'lower right', 'fontsize': 6, 'framealpha': .5}
-    elif snspec in ['sty6', 'sty6c', 'sty6d', 'sty6e', ]:
+    elif snspec in ['sty6', 'sty6c', 'sty6d', 'sty6e', 'sty6b', ]:
         _curr_fram = {'frameon': True, 'framealpha': .5, 'loc': 'best'}  # 'upper right'
     elif snspec in ['sty4', 'sty8a', 'sty8b', 'sty4d', 'sty4c', 'sty4e', ]:
         _curr_fram = {'loc': 'upper left' if snspec == 'sty4e' else 'best',

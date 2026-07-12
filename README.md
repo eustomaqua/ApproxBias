@@ -26,13 +26,17 @@ Here we release the code of proposed methods from our following papers
 We release the code of proposed methods from our following papers here, to help researchers or people who are interested to reproduce our results
 
 We release the code of proposed methods from our following papers here, to help people who are interested in reproducing our results.
+
+
+// Fast discrimination assessment for multiple multi-valued sensitive attributes
+[[arXiv]](https://arxiv.org/abs/2408.06099)
+- Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival poster, [OpenReview](https://openreview.net/pdf?id=ywqVkVQZDj)).
 -->
 
 Here, we release the code of the proposed methods from our following papers, to help people who are interested in our work reproduce those results.
 
 - \[**P1**\] Measuring model-induced discrimination via efficient fairness approximation. [[arXiv]](https://arxiv.org/abs/2405.09251)
-- \[**P2**\] Fast discrimination assessment for multiple multi-valued sensitive attributes. [[arXiv]](https://arxiv.org/abs/2408.06099)
-- Does machine bring in extra bias in learning? Approximating discrimination within models quickly. In *NeurIPS 2024 Workshop on Mathematics of Modern Machine Learning* (Non-archival poster, [OpenReview](https://openreview.net/pdf?id=ywqVkVQZDj)).
+- \[**P2**\] Fast discrimination assessment for multiple non-binary sensitive attributes. 
 
 
 To reproduce our empirical results, please refer to the [instructions](https://approxbias.readthedocs.io/en/latest/posts/reproduction.html) and use the released experimental data.
@@ -44,6 +48,15 @@ We proposed a fairness measure named *harmonic fairness measure via manifolds (H
 
 In other words, we provide the evaluation of extra discrimination for three cases: 1) only one bi-valued sensitive attribute (sen-att); 2) one multi-valued sen-att; and 3) more than one sen-att. Among them, case 1 comes from \[**P1**\], and two others come from \[**P2**\]. Here is a [short tutorial](https://approxbias.readthedocs.io/en/latest/posts/quickstart.html) covering all the aforementioned cases and methods.
 
+Note that, for both HFM and approximation algorithms, extension to other distances is possible.
+
+```shell
+$ git clone git@github.com:eustomaqua/ApproxBias.git
+$ cd ApproxBias
+$ git reset --hard 0d2e92dd37062aa5731a8a7d3033f418407cb221
+$ # see `Reproduction` in the documentation
+```
+
 You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues) please.
 
 
@@ -54,16 +67,13 @@ If you find this repository useful, you may consider to cite our work.
 ```bibtex
 @article{bian2024does,
   author  = {Bian, Yijun and Luo, Yujie},
-  title   = {Does machine bring in extra bias in learning? Approximating fairness in models promptly},
-  journal = {arXiv preprint arXiv:2405.09251},
-  year    = {2024},
-}
-
-@article{bian2024approximating,
-  author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
-  title   = {Approximating discrimination within models when faced with several non-binary sensitive attributes},
-  journal = {arXiv preprint arXiv:2408.06099},
-  year    = {2024},
+  title   = {Measuring model-induced discrimination via efficient fairness approximation},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  year    = {2026},
+  volume  = {},
+  number  = {},
+  pages   = {},
+  doi     = {10.1109/TNNLS.2026.3706648},
 }
 ```
 
@@ -75,6 +85,23 @@ If you find this repository useful, you may consider to cite our work.
 
 
 
+
+
+
+<!--
+@article{bian2024does,
+  author  = {Bian, Yijun and Luo, Yujie},
+  title   = {Does machine bring in extra bias in learning? Approximating fairness in models promptly},
+  journal = {arXiv preprint arXiv:2405.09251},
+  year    = {2024},
+}
+@article{bian2024approximating,
+  author  = {Bian, Yijun and Luo, Yujie and Xu, Ping},
+  title   = {Approximating discrimination within models when faced with several non-binary sensitive attributes},
+  journal = {arXiv preprint arXiv:2408.06099},
+  year    = {2024},
+}
+-->
 
 
 
