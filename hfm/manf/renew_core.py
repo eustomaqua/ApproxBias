@@ -28,6 +28,8 @@ hfmOUTCOME = Tuple[float, float]
 
 name_intermediate = [2, 1, float("inf"), 3, 4, 7, ]
 curr_intermediate = name_intermediate[-1:] + name_intermediate[:-1]
+# norm-induced distances: L7, L2 (Euclidean),
+#   L1 (Manhattan), L_\infty (Chebyshev), Minkowski (L_p: L_3,L_4)
 
 
 # ------------------------------------------

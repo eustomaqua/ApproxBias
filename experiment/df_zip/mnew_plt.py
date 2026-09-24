@@ -291,7 +291,8 @@ class cvgPlt1C_take(DistPerf_draw):
              [r'$T_{ApproxDist}$', r'$T_{StratES}$', r'$T_{StartRA}$'], ],
             [annots_sub1, annots_sub2, annots_sub3, annots_sub3],
             fgn + '_strat',  # fgn.replace('_strat', '_strat_alt'),
-            snspec=['sty3b', 'sty3c', 'sty6', 'sty6c'], strt=0)
+            snspec=['sty3b', 'sty3c', 'sty6', 'sty6c'],  # strt=0)
+            strt=0 + 4 * ('bin' in fgn))
         return
 
     # def sub_plt_tim(self, df_tmp, tag, fgn, sgn='t_D.'):  # ,eb=True):
@@ -318,11 +319,64 @@ class cvgPlt1C_take(DistPerf_draw):
     #               '${}$'.format(ant_cvg), '${}$'.format(ant_arr)]
     #     if 'multivar' in fgn:
     #         multi_lin_reg_without_distr(
-    #             scat_X, scat_Y, annotY, annot, fgn, snspec='sty4')
+    #             scat_X, scat_Y, annotY, annot, fgn, snspec='styaarox
     #         return
-    #     multi_lin_reg_without_distr(
+    #     multi_lin_reg_without_distr(m_l
+
     #         scat_X, scat_Y[:4], annotY[:4], annot, fgn, snspec='sty4')
     #     return
+
+
+class cvgPlt1D_take(cvgPlt1C_take):
+    # def schedule_mspaint(self, raw_dframe, pre='minmax'):
+    #     nb_set, id_set, _, _, _ = self.recap_sub_data(
+    #         raw_dframe, nb_row=4, nc_norm=6, nc_sens=0)
+    #     tag_wh, tag_sa1, tag_sa2 = self.prepare_graph()
+    #     fgn = f'{self._figname}_{pre}'
+    #     df_raw = self.sub_dat_4tentative(
+    #         raw_dframe, id_set, 1, tag_sa1, tag_sa2, True)
+    #     pdb.set_trace()
+    #     return
+
+    def sub_plt_curr_dist(self, df_raw, tag_sa1, fgn):
+        tag_tim, tag_d_max, tag_d_avg = tag_sa1[:10], tag_sa1[10:20], tag_sa1[20:]
+        annots_sub1 = [r'$\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}} = \mathbf{D}_{\cdot,\mathbf{a}}$']
+        annots_sub2 = [r'$\mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^\text{avg}(S,a_i)$',
+                       r'$\hat{\mathbf{D}}_{\cdot,\mathbf{a}}^\text{avg} = \mathbf{D}_{\cdot,\mathbf{a}}^\text{avg}$']
+        annots_sub3 = [r'$T_{ \mathbf{D}_{\cdot,\mathbf{a}}(S,a_i) }$ (sec)',
+                       r'$T_{ \hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S,a_i) }$ (sec)',
+                       r'$T_{ \hat{\mathbf{D}}_{\cdot,\mathbf{a}} }= T_{ \mathbf{D}_{\cdot,\mathbf{a}} }$']
+        # pdb.set_trace()  # EffHD_bin # =tag_d_max[5:6] EffHD_nonbin
+        tag_compare = tag_d_max[1:2] + tag_d_max[3:4] + tag_d_max[7:]
+        tag_earlybreak = tag_tim[1:2] + tag_tim[3:4] + tag_tim[7:]
+
+        tim_part_x = df_raw[tag_tim[6]].values.astype(DTY_FLT)
+        tim_part_ya = df_raw[tag_earlybreak[:3]].values.astype(DTY_FLT).T
+        # tim_part_yb = df_raw[tag_earlybreak[1:]].values.astype(DTY_FLT).T
+        tim_part_yb = df_raw[tag_earlybreak[2:]].values.astype(DTY_FLT).T
+        tim_part_ya = np.log10(tim_part_ya / tim_part_x)
+        tim_part_yb = np.log10(tim_part_yb / tim_part_x)
+        annots_sub3[1] = r'$\lg( \frac{ T_{\hat{\mathbf{D}}_{\cdot,\mathbf{a}}(S,a_i)} }{ T_{\mathbf{D}_{\cdot,\mathbf{a}}(S,a_i)} } )$'
+        multi_lin_reg_wo_distr_gather(
+            [df_raw[tag_d_max[6]].values.astype(DTY_FLT),
+             df_raw[tag_d_avg[2]].values.astype(DTY_FLT),
+             tim_part_x, tim_part_x, ],
+            [df_raw[tag_compare].values.astype(DTY_FLT).T,
+             df_raw[tag_d_avg[1:2] + tag_d_avg[3:]].values.astype(DTY_FLT).T,
+             tim_part_ya, tim_part_yb, ],
+            [['EarlyBreak', 'ApproxSimp', 'ApproxDist', 'StratES', 'StratRA'],
+             ['ApproxSimp', 'ApproxDist', 'StratES', 'StratRA'],
+             [r'$T_{EarlyBreak}$', r'$T_{ApproxSimp}$', r'$T_{ApproxDist}$'],
+             [  # r'$T_{ApproxSimp}$', 
+             r'$T_{ApproxDist}$', r'$T_{StratES}$', r'$T_{StartRA}$'], ],
+            [annots_sub1, annots_sub2, annots_sub3, annots_sub3],
+            fgn.replace('1d', '1c') + '_strat',
+            snspec=['sty3b', 'sty3c', 'sty6', 'sty6d'],
+            strt=0 + 4 * ('bin' in fgn) + 4 * (int(fgn[-1]) - 2))
+        return
 
 
 class cvgPlt1_anal_gather(DistPerf_draw):
@@ -337,6 +391,7 @@ class cvgPlt1_anal_gather(DistPerf_draw):
         mb_picked_set = [r'$m_1$={}'.format(self._m1_set[i]) for i in mb_pick]
         id_set = self.recap_sub_data(raw_df_mA, nb_row=4, nc_norm=6, nc_sens=0)[1]
         id_set = self.recap_sub_data(raw_df_mB, nb_row=4, nc_norm=6, nc_sens=0)[1]
+        pdb.set_trace()
         n_l = {'ma': ma_n_l, 'mb': mb_n_l}
         picked_m = {'ma': ma_pick, 'mb': mb_pick}
         tag_d_max = {'ma': ma_max, 'mb': mb_max}

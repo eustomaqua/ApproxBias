@@ -38,7 +38,7 @@ from experiment.df_nonbin.rev_mext_plt_cor import HPEA_m1fix, HPEB_m2fix
 # from experiment.df_zip.mcvg_plt import (  # DistPerf_draw
 #     cvgPlt1C_take, cvgPlt1_anal_gather)# cvgPlt1A_anal,cvgPlt1B_anal,
 from experiment.df_zip.mnew_plt import (
-    cvgPlt1C_take, cvgPlt1_anal_gather)
+    cvgPlt1C_take, cvgPlt1_anal_gather, cvgPlt1D_take)
 
 
 # ===============================
@@ -439,6 +439,7 @@ class Rev_ManfExtDrawing(object):
         xlsx_name += ('_rep' * self._rep_iter + '_gen' * self._gen_iter)
         sheet_name = 'exp{}_{}'.format(trial_type[-2:], pre)
         xlsx_name = f'(py311) {xlsx_name}'
+        sheet_name = sheet_name.replace('1d', '1c')  # pdb.set_trace()
 
         kws = dict(m1=self._m1, m2=self._m2, n_e=self._n_e,
                    n_p=self._n_p, figname=fgn)
@@ -451,6 +452,9 @@ class Rev_ManfExtDrawing(object):
 
         if trial_type.endswith('cvg1c'):
             self._iterator = cvgPlt1C_take(self._nb_iter, **kws)
+        elif trial_type.endswith('cvg1d'):
+            # kws['figname'] = f'{fgn}_{pre}'
+            self._iterator = cvgPlt1D_take(self._nb_iter, **kws)
         # pdb.set_trace()
         df = self._iterator.load_raw_dataset(xlsx_name, sheet_name)
         self._iterator.schedule_mspaint(df, pre)
@@ -683,4 +687,5 @@ python hfm_nonbin_draw.py -cvg may12 -exp mCV_cvg1g -pre min_max
 
 python hfm_nonbin_draw.py -cvg jul10 -exp mCV_cvg1c -pre min_max
 python hfm_nonbin_draw.py -cvg jul10 -exp mCV_cvg1g -pre min_max
+python hfm_nonbin_draw.py -cvg jul10 -exp mCV_cvg1d -pre min_max
 """

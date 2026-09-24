@@ -20,6 +20,13 @@ _pl_myclr = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
              '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 _navy = 'navy'
 
+# https://zhuanlan.zhihu.com/p/704390338
+# https://blog.csdn.net/WakingStone/article/details/133040803
+# https://peiseka.com/zhinengpeise.html
+_pl_myclr = ['#1f77b4',
+             '#60966D', '#5B3660', '#FFC839', '#E90F44', '#63ADEE', 
+             '#403990', '#80A6E2', '#FBDD85', '#F46F43', '#CF3D3E', ]
+
 
 def _hp_subproc_linreg(ax, X, Ys, picked_keys, annotZ, snspec, myclr,
                        corr=False, curr_legend_nb_split=4, identity=True,
@@ -136,9 +143,9 @@ def _lr_subproc_myclr(snspec, Ys):
 
 def multi_lin_reg_wo_distr_gather(X, Ys, Zs, annots=(('X', 'Y', 'Y=X'),),
                                   figname='smd', sharey=True, strt=0, snspec='sty'):
-    num_c = len(X)  # =len(Ys)
-    fig = plt.figure(figsize=(9.1, 2.4), dpi=300, constrained_layout=True)
-    outer = fig.add_gridspec(1, num_c, wspace=0.07, hspace=.35)
+    num_c = len(X)  # =len(Ys)  | figsize=(9.1, 2.4)
+    fig = plt.figure(figsize=(9.8, 2.6), dpi=300, constrained_layout=True)
+    outer = fig.add_gridspec(1, num_c, wspace=0.01, hspace=.02)  # w=0.07,h=.35
     # annotZ = annots[2] if len(annots) > 2 else r'$f(x)=x$'
     _curr_ft = plt.rcParams['font.family']  # 'Times New Roman'
     legend_font = {'family': _curr_ft, 'size': 8}
