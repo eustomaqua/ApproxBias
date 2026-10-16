@@ -35,8 +35,8 @@ We release the code of proposed methods from our following papers here, to help 
 
 Here, we release the code of the proposed methods from our following papers, to help people who are interested in our work reproduce those results.
 
-- \[**P1**\] Measuring model-induced discrimination via efficient fairness approximation. [[arXiv]](https://arxiv.org/abs/2405.09251)
-- \[**P2**\] Fast discrimination assessment for multiple non-binary sensitive attributes. 
+- \[**P1**\] Measuring model-induced discrimination via efficient fairness approximation [[arXiv](https://arxiv.org/abs/2405.09251), [paper](https://doi.org/10.1109/TNNLS.2026.3706648), [data](https://doi.org/10.5281/zenodo.21263075)]
+- \[**P2**\] Fast discrimination assessment for multiple non-binary sensitive attributes 
 
 
 To reproduce our empirical results, please refer to the [instructions](https://approxbias.readthedocs.io/en/latest/posts/reproduction.html) and use the released experimental data.
@@ -63,6 +63,8 @@ pytest --ignore=pyfair
 ps aux | grep qgl539 | grep python
 du -h -d 1
 rsync -r --exclude='.git' ApproxBias qgl539@hendrixgate03fl:/home/qgl539/GitH
+
+https://researchprofiles.ku.dk/en/publications/measuring-model-induced-discrimination-via-efficient-fairness-app/
 -->
 
 You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues) please.
