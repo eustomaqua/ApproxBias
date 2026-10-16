@@ -57,6 +57,14 @@ $ git reset --hard 0d2e92dd37062aa5731a8a7d3033f418407cb221
 $ # see `Reproduction` in the documentation
 ```
 
+<!--
+source activate py311  # py38
+pytest --ignore=pyfair
+ps aux | grep qgl539 | grep python
+du -h -d 1
+rsync -r --exclude='.git' ApproxBias qgl539@hendrixgate03fl:/home/qgl539/GitH
+-->
+
 You're welcome to adjust the parameters (except `priv_val`, which depends on the data you use) as needed or to explore potential improvements. Please note that this version may contain typos or errors; If you find any, feel free to contact us or [raise an issue](https://github.com/eustomaqua/ApproxBias/issues) please.
 
 

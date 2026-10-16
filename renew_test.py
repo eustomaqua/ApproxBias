@@ -102,7 +102,7 @@ re_StratRA(X_nA_y, curr, p, m1, m2, n_e)
 
 
 tmp = Direct_multivar(X_nA_y, np.vstack([B_i, A_i]).T, p, priv)
-pdb.set_trace()
+# pdb.set_trace()
 
 # re_strat_V2(X_nA_y, curr, p)  # , m1, m2, n_e)
 # t2 = time.perf_counter()
@@ -252,4 +252,4 @@ print("   strat ra :", (t1 - t0) / N)
 
 
 print('')
-pdb.set_trace()
+# pdb.set_trace()
